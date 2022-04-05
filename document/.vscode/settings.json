@@ -1,0 +1,29 @@
+{
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true
+  },
+  "workbench.colorCustomizations": {
+    // 上部バーの背景色
+    "titleBar.activeBackground": "#cea2517a",
+    // サイドバーの背景色
+    "activityBar.background": "#b4812362"
+  },
+  // 保存時に不要な空白文字を自動で削除
+  "files.trimTrailingWhitespace": true,
+  // 保存時のprettier自動フォーマッターを有効化
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // Javascriptは個別で指定しないと.prettierrcの設定が適用されない
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  // markdownはprettierを適用しない
+  "[markdown]": {
+    "editor.formatOnSave": false
+  },
+  // 保存時のeslintを有効化
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
+}
