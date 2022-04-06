@@ -3,12 +3,6 @@
     "**/node_modules": true,
     "**/dist": true
   },
-  "workbench.colorCustomizations": {
-    // 上部バーの背景色
-    "titleBar.activeBackground": "#cea2517a",
-    // サイドバーの背景色
-    "activityBar.background": "#b4812362"
-  },
   // 保存時に不要な空白文字を自動で削除
   "files.trimTrailingWhitespace": true,
   // 保存時のprettier自動フォーマッターを有効化

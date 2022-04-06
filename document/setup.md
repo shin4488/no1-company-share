@@ -97,3 +97,7 @@ No issues found.                                                                
 
 No issues found.  
 ```
+
+新しくgit cloneした後のディレクトリで
+`yarn install`
+`yarn dev`
