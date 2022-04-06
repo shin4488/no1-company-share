@@ -7,7 +7,7 @@
       </v-card>
       <v-card>
         <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
+          ようこそWelcome to the Vuetify + Nuxt.js template
         </v-card-title>
         <v-card-text>
           <p>
