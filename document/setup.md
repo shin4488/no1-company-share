@@ -83,10 +83,10 @@ i Discovered Components: .nuxt/components/readme.md                             
 √ Server
   Compiled successfully in 11.83s
 
-i Waiting for file changes                                                                                             17:35:04  
-i Memory usage: 328 MB (RSS: 506 MB)                                                                                   17:35:04  
-i Listening on: http://localhost:3000/                                                                                 17:35:04  
-No issues found.                                                                                                       17:35:04  
+i Waiting for file changes                                                                                             17:35:04
+i Memory usage: 328 MB (RSS: 506 MB)                                                                                   17:35:04
+i Listening on: http://localhost:3000/                                                                                 17:35:04
+No issues found.                                                                                                       17:35:04
 » Updated pages\index.vue                                                                                              17:43:06
 
 √ Client
@@ -95,9 +95,111 @@ No issues found.                                                                
 √ Server
   Compiled successfully in 616.62ms
 
-No issues found.  
+No issues found.
 ```
 
 新しくgit cloneした後のディレクトリで
 `yarn install`
 `yarn dev`
+
+## frontディレクトリの作成
+https://nuxtjs.org/ja/docs/configuration-glossary/configuration-srcdir/#srcdir-%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3
+
+```javascript
+export default {
+  srcDir: 'front',
+  // その他の記述
+}
+```
+
+```
+.babelrc
+.editorconfig
+.eslintrc.js
+.gitignore
+.nuxt
+.prettierignore
+.prettierrc
+.vscode
+document
+front
+ ┣assets
+ ┣components
+ ┣layouts
+ ┣pages
+ ┣static
+ ┣store
+ ┗test
+jest.config.js
+jsconfig.json
+LICENSE
+node_modules
+nuxt.config.js
+package.json
+README.md
+tsconfig.json
+workflows
+yarn.lock
+```
+
+## serverMiddlewareの設定
+
+https://nuxtjs.org/ja/docs/configuration-glossary/configuration-servermiddleware/
+https://liginc.co.jp/438249
+
+```
+.babelrc
+.editorconfig
+.eslintrc.js
+.gitignore
+.nuxt
+.prettierignore
+.prettierrc
+.vscode
+document
+front
+ ┣assets
+ ┣components
+ ┣layouts
+ ┣pages
+ ┣static
+ ┣store
+ ┗test
+server
+ ┗index.ts
+jest.config.js
+jsconfig.json
+LICENSE
+node_modules
+nuxt.config.js
+package.json
+README.md
+tsconfig.json
+workflows
+yarn.lock
+```
+
+```javascript
+export default {
+  srcDir: './front',
+  serverMiddleware: [
+    '~~/server/',
+  ],
+}
+```
+
+```typescript
+import express from 'express'
+
+const app = express()
+// リクエストボディがundefinedにならないようにする
+app.use(express.json())
+app.get('/api/v1/development', (req, res) => {
+  res.send({ aaa: 123, bbb: 'abcdd' })
+})
+
+export default app
+```
+
+http://localhost:3000/api/v1/development
+{"aaa":123,"bbb":"abcdd"}
