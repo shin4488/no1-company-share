@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  # nginxサーバ用
+  web:
+    # webフォルダ内のDockerfileでビルドを行う
+    build: ./web
+    # host:10000 <-> docker:80を結び付ける
+    ports:
+      - 20000:80
+    tty: true
+    volumes:
+      # - ./web/nginx.conf:/etc/nginx/nginx.conf
+      # nginxの動作確認用でindex.html
+      - ./web/index.html:/usr/share/nginx/html/index.html
+  database:
+    build: ./database
