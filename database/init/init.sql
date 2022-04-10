@@ -1,9 +1,5 @@
---ユーザーの作成
--- CREATE USER devUser;
---DBの作成
+--DB作成
 CREATE DATABASE test;
---ユーザーにDBの権限をまとめて付与
--- GRANT ALL PRIVILEGES ON DATABASE test TO postgres;
 --データベースを切り替え
 \c test
 --テーブルを作成
