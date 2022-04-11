@@ -22,6 +22,7 @@ services:
     volumes:
       - ./application:/home/companyshare/app
       - ./application/node_modules:/home/companyshare/app/node_modules
+      - ./application/.nuxt:/home/companyshare/app/.nuxt
     depends_on:
       - database
   database:
