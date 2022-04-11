@@ -343,5 +343,85 @@ https://github.com/nodesource/distributions
 RUN apt install -y npm
 ```
 
-yarn install遅い問題
+## yarn install遅い問題
 https://tkkm.tokyo/post-495/
+
+## 403
+alias /var/www/html;
+alias /var/www/html/;
+https://qiita.com/oogaki_newmedia/items/749c855ad985c8258e66
+aliasはディレクトリ指定の場合、末尾に「/」が必要
+
+## nuxt起動（502になってしまう）
+```js
+export default {
+  server: {
+    host: '0.0.0.0',
+  },
+}
+```
+をnuxt.config.jsに追加かつ↓
+nginx.conf
+https://qiita.com/eijenson/items/7ed5cf6ea8716567d02a
+
+```
+http {
+    upstream nodeapp {
+        server application:3000;
+    }
+
+    server {
+        listen 80;
+        location /app {
+            proxy_pass http://nodeapp/;
+        }
+    }
+}
+```
+
+## hot reloadできない
+https://sunday-morning.app/posts/2020-11-30-docker-nuxt-js-hot-reload
+以下をnuxt.config.jsに追加
+
+```js
+export default {
+  watchers: {
+    webpack: {
+      poll: true,
+    },
+  },
+}
+```
+
+## Nginx（静的コンテンツへのルーティング）
+default_serverをnuxt.jsが起動しているサーバへルーティングするserverディレクティブに設定
+`server_name 任意の名前.localhost;` でserver_nameを指定する
+ブラウザからは `任意の名前.localhost` にアクセス
+https://webkaru.net/linux/nginx-default-server/#:~:text=%E4%BE%8B%E7%A4%BA%E3%81%97%E3%81%BE%E3%81%99%E3%80%82-,%E3%83%87%E3%83%95%E3%82%A9%E3%83%AB%E3%83%88%E3%81%AE%E3%83%90%E3%83%BC%E3%83%81%E3%83%A3%E3%83%AB%E3%83%9B%E3%82%B9%E3%83%88%E3%81%AE%E8%A8%AD%E5%AE%9A,%E3%83%9B%E3%82%B9%E3%83%88%E3%82%92%E8%A8%AD%E5%AE%9A%E3%81%A7%E3%81%8D%E3%81%BE%E3%81%99%E3%80%82
+
+```
+http {
+    server {
+        listen 80;
+        server_name f1c.localhost;
+
+        location / {
+            proxy_pass http://nodeapp;
+        }
+    }
+}
+```
+
+## nginxを介してのhot reloadが遅い
+https://houdoukyokucho.com/2021/08/18/post-3407/
+nuxt.config.jsに以下を追加
+
+```js
+export default {
+  watchers: {
+    webpack: {
+      ignored: /node_modules/, // ここを追加
+      poll: true,
+    },
+  },
+```
