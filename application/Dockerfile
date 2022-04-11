@@ -8,11 +8,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 RUN apt install -y nodejs
 RUN npm install -g yarn
 
-# VOLUME . /home/companyshare/app
-# VOLUME ./node_modules /home/companyshare/app/node_modules
-# COPY . /home/companyshare/app
 WORKDIR /home/companyshare/app
-# RUN yarn install
-# RUN chmod -R 755 /home/companyshare/app
 
+# ホスト側でyarn installしたものをマウントするため、yarn installはコンテナ側では行わない
 CMD ["yarn", "dev"]
