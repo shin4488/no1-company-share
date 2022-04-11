@@ -7,7 +7,8 @@
       </v-card>
       <v-card>
         <v-card-title class="headline">
-          ようこそWelcome to the Vuetify + Nuxt.js template
+          おおおおtest11okokokああいいtestｓｓぶぶ１２３123kokokoaabbようこそWelcome
+          to the Vuetify + Nuxt.js template
         </v-card-title>
         <v-card-text>
           <p>
@@ -83,5 +84,5 @@
 <script>
 export default {
   name: 'IndexPage',
-}
+};
 </script>

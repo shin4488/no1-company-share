@@ -1,6 +1,15 @@
-import colors from 'vuetify/es5/util/colors'
+import colors from 'vuetify/es5/util/colors';
 
 export default {
+  watchers: {
+    webpack: {
+      ignored: /node_modules/,
+      poll: true,
+    },
+  },
+  server: {
+    host: '0.0.0.0',
+  },
   srcDir: './front',
   serverMiddleware: [
     '~~/server/',
@@ -72,4 +81,4 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
-}
+};
