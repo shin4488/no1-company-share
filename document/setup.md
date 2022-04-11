@@ -1,3 +1,7 @@
+`>git --version && node -v && docker -v`
+git version 2.35.1.windows.2
+v16.14.2
+Docker version 20.10.13, build a224086
 
 https://nuxtjs.org/docs/get-started/installation/
 `yarn create nuxt-app no1-company-share`
@@ -203,3 +207,13 @@ export default app
 
 http://localhost:3000/api/v1/development
 {"aaa":123,"bbb":"abcdd"}
+
+## docker
+
+https://docs.docker.jp/docker-for-windows/install.html
+
+```
+C:\>systeminfo
+OS 名: Microsoft Windows 10 Pro
+```
+
