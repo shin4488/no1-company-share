@@ -1,4 +1,6 @@
 import colors from 'vuetify/es5/util/colors';
+// eslint-disable-next-line nuxt/no-cjs-in-config
+const path = require('path');
 
 export default {
   watchers: {
@@ -11,10 +13,7 @@ export default {
     host: '0.0.0.0',
   },
   srcDir: './front',
-  serverMiddleware: [
-    '~~/server/',
-    // handler: './server/index.ts',
-  ],
+  serverMiddleware: ['~~/server/'],
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     titleTemplate: '%s - no1-company-share',
@@ -64,7 +63,7 @@ export default {
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
     theme: {
-      dark: true,
+      dark: false,
       themes: {
         dark: {
           primary: colors.blue.darken2,
@@ -75,10 +74,30 @@ export default {
           error: colors.deepOrange.accent4,
           success: colors.green.accent3,
         },
+        light: {
+          primary: colors.lightBlue.lighten4,
+          secondary: colors.grey.lighten4,
+          accent: '#ECF2FD',
+          error: '#E06666',
+          success: '#B6D7A8',
+          warning: '#FFD966',
+          primaryText: '#a4a6a4',
+          secondaryText: '#555555',
+          accentText: '#555555',
+          errorText: '#000000',
+          successText: '#000000',
+          warningText: '#000000',
+          bookmark: '#d64d31',
+        },
       },
     },
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    extend(config) {
+      config.resolve.alias['@f'] = path.resolve(__dirname, 'front');
+      config.resolve.alias['@c'] = path.resolve(__dirname, 'commons');
+    },
+  },
 };

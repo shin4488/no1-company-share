@@ -12,10 +12,9 @@
     "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
-      "~f/*": ["./front/*"],
       "@f/*": ["./front/*"],
-      "~s/*": ["./server/*"],
-      "@s/*": ["./server/*"]
+      "@s/*": ["./server/*"],
+      "@c/*": ["./commons/*"]
     },
     "noImplicitAny": true,
     "types": ["@nuxt/types", "@nuxtjs/axios", "@types/node"]
