@@ -91,3 +91,5 @@ sw.*
 
 ~$*.xlsx
 database/data
+*.bat
+!setup.bat
