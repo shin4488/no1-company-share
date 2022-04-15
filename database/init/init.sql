@@ -1,5 +1,7 @@
-CREATE DATABASE companyshare;
-\c companyshare;
+CREATE DATABASE company_share;
+\c company_share;
+
+GRANT ALL PRIVILEGES ON DATABASE company_share TO company_share_admin;
 
 -- ユーザ：ユーザID
 CREATE TABLE public.user_master (

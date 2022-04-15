@@ -18,6 +18,8 @@ services:
     build: ./application
     ports:
       - 20000:3000
+    env_file:
+      - ./application/.env
     tty: true
     volumes:
       - ./application:/home/companyshare/app
@@ -27,6 +29,11 @@ services:
       - database
   database:
     build: ./database
+    ports:
+      # postgreSQLはデフォルトで5432ポートを使用
+      - 5432:5432
+    env_file:
+      - ./database/.env
     tty: true
     volumes:
       - ./database/init:/docker-entrypoint-initdb.d
