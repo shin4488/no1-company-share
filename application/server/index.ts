@@ -4,11 +4,7 @@
 import 'module-alias/register';
 import express, { json, urlencoded } from 'express';
 import { Sequelize } from 'sequelize';
-// import chokidar from 'chokidar';
-// import esm from 'esm';
 import { FirebaseAuth } from '@s/commons/middleware/firebaseAuth';
-
-// const isDevelopment = process.env.NODE_ENV === 'development';
 
 const app = express();
 // リクエストボディがundefinedにならないようにする
@@ -48,16 +44,5 @@ app.get(
     res.send({ aaa: 123, bbb: 'abcdd' });
   },
 );
-
-// if (isDevelopment) {
-//   const watcher = chokidar.watch('.');
-//   watcher.on('all', () => {
-//     Object.keys(esm.cache).forEach(function (id) {
-//       if (/[\/\\]app[\/\\]/.test(id)) {
-//         delete esm.cache[id];
-//       }
-//     });
-//   });
-// }
 
 export default app;
