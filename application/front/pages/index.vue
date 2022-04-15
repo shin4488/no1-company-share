@@ -10,6 +10,7 @@
           おおおおtest11okokokああいいtestｓｓぶぶ１２３123kokokoaabbようこそWelcome
           to the Vuetify + Nuxt.js template
         </v-card-title>
+        <input v-model="message" placeholder="edit me" />
         <v-card-text>
           <p>
             Vuetify is a progressive Material Design component framework for
@@ -81,8 +82,25 @@
   </v-row>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue';
+import { StringUtil } from '@c/utils/stringUtil';
+import { CalloutHepler } from '@f/commons/ajax/calloutHelper';
+
+export default Vue.extend({
   name: 'IndexPage',
-};
+  data: () => {
+    return {
+      message: 'aaaaaa',
+    };
+  },
+  mounted() {
+    console.log('StringUtil.isEmpty');
+    console.log(StringUtil.isEmpty(this.message));
+    const instance = new CalloutHepler();
+    const result = instance.sayHello(this.message);
+    console.log('result');
+    console.log(result);
+  },
+});
 </script>
