@@ -3,61 +3,47 @@
 // https://github.com/nuxt/nuxt.js/issues/7017
 import 'module-alias/register';
 import express, { json, urlencoded } from 'express';
-import { Sequelize } from 'sequelize';
-// import chokidar from 'chokidar';
-// import esm from 'esm';
-import { FirebaseAuth } from '@s/commons/middleware/firebaseAuth';
-
-// const isDevelopment = process.env.NODE_ENV === 'development';
+import { Op, QueryTypes } from 'sequelize';
+import SequelizeHandler from '@s/commons/sequelize/sequelizeHandler';
+import CompanyMaster from '@s/commons/sequelize/models/companyMaster';
+import {
+  dbHandlerEndpoint,
+  handleDatabase,
+} from '@s/features/endopoints/development/dbHandler';
+import UserMaster from '@s/commons/sequelize/models/userMaster';
 
 const app = express();
 // リクエストボディがundefinedにならないようにする
 app.use(json());
 app.use(urlencoded({ extended: true }));
 
-app.get(
-  '/api/v1/development1',
-  async (_req: express.Request, res: express.Response) => {
-    const instance = new FirebaseAuth('ccdd');
-    const result = instance.validateToken();
-    console.log(result);
-    try {
-      console.log(process.env.DB_CONNECTION_URI);
-      const sequelize = new Sequelize(process.env.DB_CONNECTION_URI || '');
-      await sequelize.authenticate();
-      console.log('sequelize.authenticated');
-    } catch (e) {
-      console.log(e);
-    }
-    res.send({ aaa: 123, bbb: [11, false, 'wer'] });
-  },
-);
+const sequelize = SequelizeHandler.initialize();
+
+app.get(dbHandlerEndpoint, handleDatabase);
 
 app.get(
   '/api/v1/development2',
-  (_req: express.Request, res: express.Response) => {
-    res.send({ url: '/api/v1/development2' });
+  async (_req: express.Request, res: express.Response) => {
+    console.log('ユーザ取得');
+    const [users, metadata1] = await sequelize.query<UserMaster>(
+      'SELECT * FROM public.user_master',
+      { type: QueryTypes.SELECT },
+    );
+    console.log(users);
+    console.log(metadata1);
+    const userWhere = await UserMaster.findAll({
+      where: { id: { [Op.like]: 'eUFhpDok0k' } },
+    });
+    console.log(userWhere);
+
+    console.log('会社取得（query）');
+    const companies = await sequelize.query<CompanyMaster>(
+      'SELECT * FROM public.company_master',
+      { type: QueryTypes.SELECT },
+    );
+    console.log(companies);
+    res.send({ users, companies });
   },
 );
-
-app.get(
-  '/api/v1/development',
-  (req: express.Request, res: express.Response) => {
-    console.log(req);
-    console.log(res);
-    res.send({ aaa: 123, bbb: 'abcdd' });
-  },
-);
-
-// if (isDevelopment) {
-//   const watcher = chokidar.watch('.');
-//   watcher.on('all', () => {
-//     Object.keys(esm.cache).forEach(function (id) {
-//       if (/[\/\\]app[\/\\]/.test(id)) {
-//         delete esm.cache[id];
-//       }
-//     });
-//   });
-// }
 
 export default app;
