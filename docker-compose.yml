@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+  # nginxサーバ用
+  web:
+    # webフォルダ内のDockerfileでビルドを行う
+    build: ./web
+    # host:10000 <-> docker:80を結び付ける
+    ports:
+      - 10000:80
+    tty: true
+    volumes:
+      - ./web/nginx.conf:/etc/nginx/nginx.conf
+      # nginxの動作確認用でindex.html
+      - ./web/index.html:/var/www/html/index.html
+    depends_on:
+      - application
+  application:
+    build: ./application
+    ports:
+      - 20000:3000
+    env_file:
+      - ./application/.env
+    tty: true
+    volumes:
+      - ./application:/home/companyshare/app
+      - ./application/node_modules:/home/companyshare/app/node_modules
+      - ./application/.nuxt:/home/companyshare/app/.nuxt
+    depends_on:
+      - database
+  database:
+    build: ./database
+    ports:
+      # postgreSQLはデフォルトで5432ポートを使用
+      - 5432:5432
+    env_file:
+      - ./database/.env
+    tty: true
+    volumes:
+      - ./database/init:/docker-entrypoint-initdb.d
+      - ./database/data:/var/lib/postgresql/data

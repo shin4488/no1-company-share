@@ -1,0 +1,46 @@
+{
+  "appenders": {
+    "systemLog": {
+      "type": "dateFile",
+      "filename": "./logs/system.log",
+      "pattern": "yyyy-MM-dd",
+      "compress": true,
+      "maxLogSize": 3000000,
+      "backups": 5
+    },
+    "errorLog": {
+      "type": "dateFile",
+      "filename": "./logs/error.log",
+      "pattern": "yyyy-MM-dd",
+      "compress": true,
+      "maxLogSize": 3000000,
+      "backups": 5
+    },
+    "accessLog": {
+      "type": "dateFile",
+      "filename": "./logs/access.log",
+      "pattern": ".yyyy-MM-dd",
+      "compress": true,
+      "maxLogSize": 3000000,
+      "backups": 5
+    }
+  },
+  "categories": {
+    "default": {
+      "appenders": ["systemLog", "errorLog"],
+      "level": "all"
+    },
+    "system": {
+      "appenders": ["systemLog"],
+      "level": "info"
+    },
+    "error": {
+      "appenders": ["errorLog"],
+      "level": "error"
+    },
+    "access": {
+      "appenders": ["accessLog"],
+      "level": "info"
+    }
+  }
+}
