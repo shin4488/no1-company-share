@@ -9,7 +9,7 @@ import CompanyMaster from '@s/commons/sequelize/models/companyMaster';
 import {
   dbHandlerEndpoint,
   handleDatabase,
-} from '@s/features/endopoints/development/dbHandler';
+} from '@s/features/development/dbHandler';
 import UserMaster from '@s/commons/sequelize/models/userMaster';
 
 const app = express();
