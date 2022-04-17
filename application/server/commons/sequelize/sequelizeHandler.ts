@@ -19,8 +19,6 @@ export default class SequelizeHandler {
     this.sequelize = new Sequelize(process.env.DB_CONNECTION_URI || '');
 
     CompanyMaster.initialize(this.sequelize);
-    const dir = __dirname;
-    import(`./say.js/${dir}`).then((x) => x).catch((e) => console.log(e));
 
     return this.sequelize;
   }
