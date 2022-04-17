@@ -1,14 +1,7 @@
 import { Model, Sequelize, DataTypes } from 'sequelize';
+import { CommonModelAttribute } from './commonModelAttribute';
 
 interface CompanyMasterModelAttribute {
-  companyNumber: string;
-  companyName: string;
-  homepageUrl: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-interface CompanyMasterCreationAttribute {
   companyNumber: string;
   companyName: string;
   homepageUrl: string;
@@ -18,8 +11,8 @@ interface CompanyMasterCreationAttribute {
  * 会社マスタ
  */
 export default class CompanyMaster extends Model<
-  CompanyMasterModelAttribute,
-  CompanyMasterCreationAttribute
+  CompanyMasterModelAttribute & CommonModelAttribute,
+  CompanyMasterModelAttribute
 > {
   declare companyNumber: string;
   declare companyName: string;

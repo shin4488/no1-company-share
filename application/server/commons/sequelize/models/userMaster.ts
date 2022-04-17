@@ -1,12 +1,7 @@
 import { Model, Sequelize, DataTypes } from 'sequelize';
+import { CommonModelAttribute } from './commonModelAttribute';
 
 interface UserMasterModelAttribute {
-  id: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-interface UserMasterCreationAttribute {
   id: string;
 }
 
@@ -14,8 +9,8 @@ interface UserMasterCreationAttribute {
  * ユーザマスタ
  */
 export default class UserMaster extends Model<
-  UserMasterModelAttribute,
-  UserMasterCreationAttribute
+  UserMasterModelAttribute & CommonModelAttribute,
+  UserMasterModelAttribute
 > {
   declare id: string;
   declare createdAt: Date;

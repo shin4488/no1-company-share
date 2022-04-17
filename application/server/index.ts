@@ -3,7 +3,7 @@
 // https://github.com/nuxt/nuxt.js/issues/7017
 import 'module-alias/register';
 import express, { json, urlencoded } from 'express';
-import { QueryTypes } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import SequelizeHandler from '@s/commons/sequelize/sequelizeHandler';
 import CompanyMaster from '@s/commons/sequelize/models/companyMaster';
 import {
@@ -31,6 +31,10 @@ app.get(
     );
     console.log(users);
     console.log(metadata1);
+    const userWhere = await UserMaster.findAll({
+      where: { id: { [Op.like]: 'eUFhpDok0k' } },
+    });
+    console.log(userWhere);
 
     console.log('会社取得（query）');
     const companies = await sequelize.query<CompanyMaster>(

@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize';
 import CompanyMaster from './models/companyMaster';
+import UserMaster from './models/userMaster';
 
 /**
  * Sequelize操作用クラス
@@ -19,6 +20,7 @@ export default class SequelizeHandler {
     this.sequelize = new Sequelize(process.env.DB_CONNECTION_URI || '');
 
     CompanyMaster.initialize(this.sequelize);
+    UserMaster.initialize(this.sequelize);
 
     return this.sequelize;
   }
