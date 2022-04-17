@@ -93,3 +93,4 @@ sw.*
 database/data
 *.bat
 !setup.bat
+logs/

@@ -1,13 +1,15 @@
 import express from 'express';
+import { systemLogger, errorLogger } from '@s/commons/logger/logHandler';
 import { FirebaseAuth } from '@s/commons/middleware/firebaseAuth';
 import CompanyMaster from '@s/commons/sequelize/models/companyMaster';
 
-export const [dbHandlerEndpoint, handleDatabase] = [
-  '/api/v1/development1',
+export const [companyEndpoint, companyController] = [
+  '/development/companies',
   async (_req: express.Request, res: express.Response) => {
     const instance = new FirebaseAuth('ccdd');
     const result = instance.validateToken();
     console.log(result);
+    systemLogger.info('test log', 123, { message: 455 });
 
     try {
       console.log('会社取得（findAll）');
@@ -38,6 +40,7 @@ export const [dbHandlerEndpoint, handleDatabase] = [
       res.send({ companies: records2 });
     } catch (e) {
       console.log(e);
+      errorLogger.error(e);
     }
   },
 ];
