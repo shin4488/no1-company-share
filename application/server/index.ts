@@ -5,6 +5,7 @@ import 'module-alias/register';
 import '@s/commons/sequelize/sequelizeHandler';
 import express, { json, urlencoded } from 'express';
 import { accessLoggerMiddleware } from '@s/commons/logger/logHandler';
+import { logRequestResponse } from '@s/commons/middleware/logger';
 import { developmentRouter } from '@s/features/development/router';
 
 const app = express();
@@ -13,6 +14,7 @@ app.use(json());
 app.use(urlencoded({ extended: true }));
 // アクセスログをログファイルに出力
 app.use(accessLoggerMiddleware);
+app.use(logRequestResponse);
 
 const rootEndpoint = '/api/v1';
 app.use(rootEndpoint, developmentRouter);
