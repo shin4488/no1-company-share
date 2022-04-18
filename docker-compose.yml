@@ -31,7 +31,7 @@ services:
     build: ./database
     ports:
       # postgreSQLはデフォルトで5432ポートを使用
-      - 5432:5432
+      - 30000:5432
     env_file:
       - ./database/.env
     tty: true
