@@ -2,12 +2,12 @@
 // https://github.com/nuxt/nuxt.js/issues/4580
 // https://github.com/nuxt/nuxt.js/issues/7017
 import 'module-alias/register';
-import '@s/commons/sequelize/sequelizeHandler';
+import '@s/common/sequelize/sequelizeHandler';
 import express, { json, urlencoded } from 'express';
-import { accessLoggerMiddleware } from '@s/commons/logger/logHandler';
-import { logRequestResponse } from '@s/commons/middleware/logger';
-import { catchError } from '@s/commons/middleware/appErrorHandler';
-import { developmentRouter } from '@s/features/development/router';
+import { accessLoggerMiddleware } from '@s/common/logger/logHandler';
+import { logRequestResponse } from '@s/common/middleware/logger';
+import { catchError } from '@s/common/middleware/appErrorHandler';
+import { developmentRouter } from '@s/feature/development/router';
 
 const app = express();
 // リクエストボディがundefinedにならないようにする

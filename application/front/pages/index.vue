@@ -84,7 +84,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { StringUtil } from '@c/utils/stringUtil';
+import { StringUtil } from '@c/util/stringUtil';
 import { CalloutHepler } from '@f/commons/ajax/calloutHelper';
 
 export default Vue.extend({

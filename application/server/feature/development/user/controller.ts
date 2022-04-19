@@ -1,9 +1,9 @@
 import express from 'express';
 import { Op, QueryTypes } from 'sequelize';
-import { sequelize } from '@s/commons/sequelize/sequelizeHandler';
-import { systemLogger } from '@s/commons/logger/logHandler';
-import CompanyMaster from '@s/commons/sequelize/models/companyMaster';
-import UserMaster from '@s/commons/sequelize/models/userMaster';
+import { sequelize } from '@s/common/sequelize/sequelizeHandler';
+import { systemLogger } from '@s/common/logger/logHandler';
+import CompanyMaster from '@s/common/sequelize/models/companyMaster';
+import UserMaster from '@s/common/sequelize/models/userMaster';
 
 export const [userEndpoint, userController] = [
   '/development/users',

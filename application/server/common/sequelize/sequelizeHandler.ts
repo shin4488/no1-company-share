@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
 import CompanyMaster from './models/companyMaster';
 import UserMaster from './models/userMaster';
-import { systemLogger } from '@s/commons/logger/logHandler';
+import { systemLogger } from '@s/common/logger/logHandler';
 
 /**
  * Sequelize操作用クラス

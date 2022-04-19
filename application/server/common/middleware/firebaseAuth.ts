@@ -1,4 +1,4 @@
-import { StringUtil } from '@c/utils/stringUtil';
+import { StringUtil } from '@c/util/stringUtil';
 
 /**
  * Firebase用の認証処理

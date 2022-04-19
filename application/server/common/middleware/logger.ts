@@ -1,5 +1,5 @@
 import express from 'express';
-import { systemLogger } from '@s/commons/logger/logHandler';
+import { systemLogger } from '@s/common/logger/logHandler';
 
 export const logRequestResponse = (
   request: express.Request,

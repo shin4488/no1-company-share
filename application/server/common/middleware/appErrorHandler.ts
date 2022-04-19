@@ -1,6 +1,6 @@
 import express from 'express';
-import { AppError } from '@s/commons/errors/appError';
-import { errorLogger } from '@s/commons/logger/logHandler';
+import { AppError } from '@s/common/error/appError';
+import { errorLogger } from '@s/common/logger/logHandler';
 
 export const catchError = (
   error: Error,

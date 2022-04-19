@@ -52,6 +52,6 @@
   },
   "_moduleAliases": {
     "@s": "./server",
-    "@c": "./commons"
+    "@c": "./common"
   }
 }
