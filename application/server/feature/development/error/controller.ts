@@ -1,6 +1,6 @@
 import express from 'express';
-import { RecordNotFoundError } from '@s/commons/errors/recordNotFoundError';
-import { AppError } from '@s/commons/errors/appError';
+import { RecordNotFoundError } from '@s/common/error/recordNotFoundError';
+import { AppError } from '@s/common/error/appError';
 
 export const [errorEndpoint1, errorController1] = [
   '/development/errors/1',

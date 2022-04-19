@@ -1,7 +1,7 @@
 import express from 'express';
-import { systemLogger, errorLogger } from '@s/commons/logger/logHandler';
-import { FirebaseAuth } from '@s/commons/middleware/firebaseAuth';
-import CompanyMaster from '@s/commons/sequelize/models/companyMaster';
+import { systemLogger, errorLogger } from '@s/common/logger/logHandler';
+import { FirebaseAuth } from '@s/common/middleware/firebaseAuth';
+import CompanyMaster from '@s/common/sequelize/models/companyMaster';
 
 export const [companyEndpoint, companyController] = [
   '/development/companies',

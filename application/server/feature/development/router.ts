@@ -8,15 +8,15 @@ import {
   errorController3,
   errorEndpoint4,
   errorController4,
-} from '@s/features/development/error/controller';
+} from '@s/feature/development/error/controller';
 import {
   companyEndpoint,
   companyController,
-} from '@s/features/development/company/controller';
+} from '@s/feature/development/company/controller';
 import {
   userEndpoint,
   userController,
-} from '@s/features/development/user/controller';
+} from '@s/feature/development/user/controller';
 
 const developmentRouter = Router();
 developmentRouter.get(companyEndpoint, companyController);

@@ -97,7 +97,7 @@ export default {
   build: {
     extend(config) {
       config.resolve.alias['@f'] = path.resolve(__dirname, 'front');
-      config.resolve.alias['@c'] = path.resolve(__dirname, 'commons');
+      config.resolve.alias['@c'] = path.resolve(__dirname, 'common');
     },
   },
 };
