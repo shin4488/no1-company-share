@@ -1,6 +1,7 @@
 FROM ubuntu:20.04
 
 # コンテナ間通信時は、コンテナ内部で使用されるポートを指定
+# postgreSQLはデフォルトで5432ポートを使用
 ENV DB_CONNECTION_URI postgres://company_share_admin:admin@database:5432/company_share
 # nuxtのサーバサイドプログラムもホットリロードを可能とする
 ENV CHOKIDAR_USEPOLLING true
