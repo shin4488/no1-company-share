@@ -1,15 +1,19 @@
 import express from 'express';
-import { systemLogger, errorLogger } from '@s/common/logger/logHandler';
+import { appContainer } from '@s/common/dependencyInjection/inversify.config';
+import { types } from '@s/common/dependencyInjection/types';
+import { LogHandler } from '@s/common/logger/interface/LogHandler';
 import { FirebaseAuth } from '@s/common/middleware/firebaseAuth';
 import CompanyMaster from '@s/common/sequelize/models/companyMaster';
 
 export const [companyEndpoint, companyController] = [
   '/development/companies',
   async (_req: express.Request, res: express.Response) => {
+    const logger = appContainer.get<LogHandler>(types.LogHandler);
+
     const instance = new FirebaseAuth('ccdd');
     const result = instance.validateToken();
     console.log(result);
-    systemLogger.info('test log', 123, { message: 455 });
+    logger.log('info', 'test log', 123, { message: 455 });
 
     try {
       console.log('会社取得（findAll）');
@@ -40,7 +44,7 @@ export const [companyEndpoint, companyController] = [
       res.send({ companies: records2 });
     } catch (e) {
       console.log(e);
-      errorLogger.error(e);
+      logger.error(e);
     }
   },
 ];

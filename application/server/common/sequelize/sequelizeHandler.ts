@@ -1,23 +1,33 @@
 import { Sequelize } from 'sequelize';
+import { injectable, inject } from 'inversify';
 import CompanyMaster from './models/companyMaster';
 import UserMaster from './models/userMaster';
-import { systemLogger } from '@s/common/logger/logHandler';
+import { SequelizeHandler } from './interface/SequelizeHandler';
+import { LogHandler } from '@s/common/logger/interface/LogHandler';
+import { types } from '@s/common/dependencyInjection/types';
 
 /**
  * Sequelize操作用クラス
  */
-class SequelizeHandler {
+@injectable()
+export class SequelizeHandlerImpl implements SequelizeHandler {
   private static _sequelize: Sequelize;
+  private logger: LogHandler;
 
   get sequelize(): Sequelize {
-    return SequelizeHandler._sequelize;
+    return SequelizeHandlerImpl._sequelize;
   }
 
-  constructor() {
-    if (SequelizeHandler._sequelize !== undefined) {
-      return;
-    }
+  constructor(@inject(types.LogHandler) logger: LogHandler) {
+    this.logger = logger;
 
+    // SQL出力先をLog4jsに変更
+    SequelizeHandlerImpl._sequelize = new Sequelize(
+      process.env.DB_CONNECTION_URI || '',
+      {
+        logging: (log) => this.logger.log('info', log),
+      },
+    );
     this.initialize();
   }
 
@@ -26,18 +36,7 @@ class SequelizeHandler {
    * @returns Sequelizeインスタンス
    */
   private initialize(): void {
-    // SQL出力先をLog4jsに変更
-    SequelizeHandler._sequelize = new Sequelize(
-      process.env.DB_CONNECTION_URI || '',
-      {
-        logging: (log) => systemLogger.info(log),
-      },
-    );
-
-    CompanyMaster.initialize(SequelizeHandler._sequelize);
-    UserMaster.initialize(SequelizeHandler._sequelize);
+    CompanyMaster.initialize(SequelizeHandlerImpl._sequelize);
+    UserMaster.initialize(SequelizeHandlerImpl._sequelize);
   }
 }
-
-const sequelizeInitializer = new SequelizeHandler();
-export const sequelize = sequelizeInitializer.sequelize;

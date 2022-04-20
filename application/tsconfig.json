@@ -10,6 +10,7 @@
     "strict": true,
     "noEmit": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "baseUrl": ".",
     "paths": {
       "@f/*": ["./front/*"],
@@ -17,7 +18,7 @@
       "@c/*": ["./common/*"]
     },
     "noImplicitAny": true,
-    "types": ["@nuxt/types", "@nuxtjs/axios", "@types/node"]
+    "types": ["@nuxt/types", "@nuxtjs/axios", "@types/node", "reflect-metadata"]
   },
   "exclude": ["node_modules", ".nuxt", "dist"]
 }
