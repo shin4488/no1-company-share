@@ -1,6 +1,8 @@
 import express from 'express';
 import { AppError } from '@s/common/error/appError';
-import { errorLogger } from '@s/common/logger/logHandler';
+import { appContainer } from '@s/common/dependencyInjection/inversify.config';
+import { types } from '@s/common/dependencyInjection/types';
+import { LogHandler } from '@s/common/logger/interface/LogHandler';
 
 export const catchError = (
   error: Error,
@@ -8,7 +10,8 @@ export const catchError = (
   response: express.Response,
   _next: express.NextFunction,
 ) => {
-  errorLogger.error(error);
+  const logger = appContainer.get<LogHandler>(types.LogHandler);
+  logger.error(error);
 
   // 例外発生時にステータスコードがセットされている場合は、セットされたステータスコードを使用
   const statusCode =

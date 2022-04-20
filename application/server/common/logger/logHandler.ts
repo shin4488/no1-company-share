@@ -1,53 +1,40 @@
 import * as path from 'path';
 import express from 'express';
-import log4js, { getLogger, connectLogger, configure } from 'log4js';
+import { injectable } from 'inversify';
+import log4js, { Level, getLogger, connectLogger, configure } from 'log4js';
+import { LogHandler } from './interface/LogHandler';
 
-class LogHandler {
-  private static _systemLogger: log4js.Logger;
-  private static _errorLogger: log4js.Logger;
-  private static _accessLogger: log4js.Logger;
-
-  get systemLogger(): log4js.Logger {
-    return LogHandler._systemLogger;
-  }
-
-  get errorLogger(): log4js.Logger {
-    return LogHandler._errorLogger;
-  }
+@injectable()
+export class LogHandlerImpl implements LogHandler {
+  private systemLogger: log4js.Logger;
+  private errorLogger: log4js.Logger;
+  private accessLogger: log4js.Logger;
 
   constructor() {
-    if (!this.shouldInitialize()) {
-      return;
-    }
-
     // https://github.com/log4js-node/log4js-node/tree/master/docs
     const configPath = path.resolve(__dirname, 'config.json');
     configure(configPath);
-    LogHandler._systemLogger = getLogger('system');
-    LogHandler._errorLogger = getLogger('error');
-    LogHandler._accessLogger = getLogger('access');
+    this.systemLogger = getLogger('system');
+    this.errorLogger = getLogger('error');
+    this.accessLogger = getLogger('access');
+  }
+
+  log(
+    level: Level | 'trace' | 'debug' | 'info' | 'warn',
+    ...argments: any[]
+  ): void {
+    this.systemLogger.log(level, argments);
+  }
+
+  error(message: any, ...argments: any[]): void {
+    this.errorLogger.error(message, argments);
   }
 
   getAccessLoggerMiddleware(): express.Handler {
     const accessLoggerMiddleware: express.Handler = connectLogger(
-      LogHandler._accessLogger,
+      this.accessLogger,
       {},
     );
     return accessLoggerMiddleware;
   }
-
-  private shouldInitialize(): boolean {
-    return (
-      LogHandler._systemLogger === undefined ||
-      LogHandler._errorLogger === undefined ||
-      LogHandler._accessLogger === undefined
-    );
-  }
 }
-
-const logInstance: LogHandler = new LogHandler();
-const systemLogger = logInstance.systemLogger;
-const errorLogger = logInstance.errorLogger;
-const accessLoggerMiddleware = logInstance.getAccessLoggerMiddleware();
-
-export { systemLogger, errorLogger, accessLoggerMiddleware };
