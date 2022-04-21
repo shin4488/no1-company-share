@@ -66,7 +66,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-// import { firebaseUserStore } from '@f/store';
 
 export default Vue.extend({
   name: 'DefaultLayout',
@@ -109,7 +108,9 @@ export default Vue.extend({
   },
   computed: {
     navigationItems(): Record<string, string>[] {
-      return this.logginedItems;
+      const hasUserId =
+        this.$accessor.firebaseAuthorization.userIdComputed !== null;
+      return hasUserId ? this.logginedItems : this.logoutItems;
     },
     shouldUseBottomBarComputed(): boolean {
       return this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm;
@@ -119,23 +120,26 @@ export default Vue.extend({
     onClickedNavigationBar(): void {
       this.isDrawerMini = !this.isDrawerMini;
     },
-    onClickedListItem(path: string): void {
-      console.log(this.$accessor.firebaseUser.userId);
-      this.$accessor.firebaseUser.login('aaaaaa');
-      console.log(this.$accessor.firebaseUser.userId);
-      this.$accessor.firebaseUser.logout();
-      console.log(this.$accessor.firebaseUser.userIdComputed);
-
-      if (!(path === '#login' || path === '#logout')) {
+    async onClickedListItem(path: string): Promise<void> {
+      const isLoginPath = path === '#login';
+      const isLogoutPath = path === '#logout';
+      if (!(isLoginPath || isLogoutPath)) {
+        const loginUserId = this.$accessor.firebaseAuthorization.userIdComputed;
+        const res = await this.$axios.get('/api/v1/development/users', {
+          headers: {
+            Authorization: loginUserId,
+          },
+        });
+        console.log(res);
         return;
       }
 
-      if (path === '#login') {
-        console.log('ログイン処理');
-        return;
+      console.log(this.$accessor.firebaseAuthorization.userIdComputed);
+      if (isLoginPath) {
+        await this.$accessor.firebaseAuthorization.loginByGoogle();
+      } else {
+        await this.$accessor.firebaseAuthorization.logout();
       }
-
-      console.log('ログアウト処理');
     },
   },
 });

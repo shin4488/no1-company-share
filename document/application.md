@@ -103,6 +103,56 @@ this.$accessor.firebaseUser.setLoginUserId('aaaaaa');
 console.log(this.$accessor.firebaseUser.userId);
 ```
 
+## nuxt.jsでfirebaseを使用する
+https://zenn.dev/kojinishimura/articles/87aae239571fb4#5.%E9%80%A3%E6%90%BA%E3%81%AE%E7%A2%BA%E8%AA%8D%E3%81%A8compositionapi%E3%81%A7%E3%81%AEfirebase%E3%81%AE%E5%91%BC%E3%81%B3%E5%87%BA%E3%81%97%E6%96%B9
+
+nuxt.config.js
+
+```js
+export default {
+  modules: [
+    // https://go.nuxtjs.dev/axios
+    '@nuxtjs/axios',
+    '@nuxtjs/firebase',
+  ],
+  firebase: {
+    config: {
+      apiKey: '<apiKey>',
+      authDomain: '<authDomain>',
+      projectId: '<projectId>',
+      storageBucket: '<storageBucket>',
+      messagingSenderId: '<messagingSenderId>',
+      appId: '<appId>',
+      measurementId: '<measurementId>',
+    },
+    services: {
+      auth: true,
+      analytics: true,
+    },
+    injectModule: true,
+  },
+}
+```
+
+tsconfig.json
+
+```json
+{
+  "compilerOptions": {
+    "types": [
+      "@nuxtjs/firebase",
+    ]
+  }
+}
+```
+
+```ts
+const provider = new this.$fireModule.auth.GoogleAuthProvider();
+const credential = await this.$fire.auth.signInWithPopup(provider);
+const userId = credential.user?.uid;
+this.$fire.auth.signOut();
+```
+
 # Typescript
 ## 絶対パスでimport
 

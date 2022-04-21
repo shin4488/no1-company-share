@@ -7,7 +7,7 @@ export class StringUtil {
    * @param text
    * @returns
    */
-  static isEmpty(text: string): Boolean {
+  static isEmpty(text: string | undefined | null): Boolean {
     return text === null || text === undefined || text === '';
   }
 }

@@ -23,6 +23,7 @@
       "@nuxtjs/axios",
       "@types/node",
       "@nuxtjs/vuetify",
+      "@nuxtjs/firebase",
       "reflect-metadata"
     ]
   },

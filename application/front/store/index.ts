@@ -4,7 +4,7 @@ import {
   mutationTree,
   actionTree,
 } from 'typed-vuex';
-import * as firebaseUser from './firebaseUser';
+import * as firebaseAuthorization from './firebaseAuthorization';
 
 export const state = () => ({});
 export const getters = getterTree(state, {});
@@ -16,6 +16,6 @@ export const accessorType = getAccessorType({
   mutations,
   actions,
   modules: {
-    firebaseUser,
+    firebaseAuthorization,
   },
 });
