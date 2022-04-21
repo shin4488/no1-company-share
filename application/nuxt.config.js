@@ -45,6 +45,8 @@ export default {
     '@nuxt/typescript-build',
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
+    // storeをtypescriptで$accessインテリセンス可能とするため
+    'nuxt-typed-vuex',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -99,5 +101,7 @@ export default {
       config.resolve.alias['@f'] = path.resolve(__dirname, 'front');
       config.resolve.alias['@c'] = path.resolve(__dirname, 'common');
     },
+    // storeをtypescriptで$accessインテリセンス可能とするため
+    transpile: [/typed-vuex/],
   },
 };

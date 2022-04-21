@@ -5,7 +5,103 @@ yarn -v
 ```
 
 # Vue.js
+## nuxt.jsとtypescriptでvuexのデータを扱う
+https://zenn.dev/syuri/articles/ff82f5b13ffa73
+nuxt.config.js（storeをtypescriptで$accessインテリセンス可能とするため）
 
+```js
+export default {
+  buildModules: [
+    'nuxt-typed-vuex'
+  ],
+  build: {
+    transpile: [/typed-vuex/]
+  }
+}
+```
+
+~/store/index.ts
+
+```ts
+import {
+  getAccessorType,
+  getterTree,
+  mutationTree,
+  actionTree,
+} from 'typed-vuex';
+import * as firebaseUser from './firebaseUser';
+
+export const state = () => ({});
+export const getters = getterTree(state, {});
+export const mutations = mutationTree(state, {});
+export const actions = actionTree({ state, getters, mutations }, {});
+export const accessorType = getAccessorType({
+  state,
+  getters,
+  mutations,
+  actions,
+  modules: {
+    firebaseUser,
+  },
+});
+```
+
+~/store/firebaseUser.ts
+
+```ts
+import { getterTree, mutationTree, actionTree } from 'typed-vuex';
+
+export const state = () => ({
+  userId: null as string | null,
+});
+export type RootState = ReturnType<typeof state>;
+
+export const getters = getterTree(state, {
+  userId(state): string | null {
+    return state.userId;
+  },
+});
+
+export const mutations = mutationTree(state, {
+  setUserId(state, userId: string | null) {
+    state.userId = userId;
+  },
+});
+
+export const actions = actionTree(
+  { state, mutations },
+  {
+    setLoginUserId({ commit }, userId: string) {
+      commit('setUserId', userId);
+    },
+  },
+);
+```
+
+~/types/index.d.ts
+
+```ts
+import { accessorType } from '@f/store';
+
+declare module 'vue/types/vue' {
+  interface Vue {
+    $accessor: typeof accessorType;
+  }
+}
+
+declare module '@nuxt/types' {
+  interface NuxtAppOptions {
+    $accessor: typeof accessorType;
+  }
+}
+```
+
+ストアへのアクセス
+
+```ts
+this.$accessor.firebaseUser.setLoginUserId('aaaaaa');
+console.log(this.$accessor.firebaseUser.userId);
+```
 
 # Typescript
 ## 絶対パスでimport

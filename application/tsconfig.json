@@ -18,7 +18,13 @@
       "@c/*": ["./common/*"]
     },
     "noImplicitAny": true,
-    "types": ["@nuxt/types", "@nuxtjs/axios", "@types/node", "reflect-metadata"]
+    "types": [
+      "@nuxt/types",
+      "@nuxtjs/axios",
+      "@types/node",
+      "@nuxtjs/vuetify",
+      "reflect-metadata"
+    ]
   },
   "exclude": ["node_modules", ".nuxt", "dist"]
 }
