@@ -124,7 +124,6 @@ export default Vue.extend({
       this.$accessor.firebaseUser.login('aaaaaa');
       console.log(this.$accessor.firebaseUser.userId);
       this.$accessor.firebaseUser.logout();
-      console.log(this.$accessor.firebaseUser.userId);
       console.log(this.$accessor.firebaseUser.userIdComputed);
 
       if (!(path === '#login' || path === '#logout')) {

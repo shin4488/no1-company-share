@@ -4,7 +4,7 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex';
 
 export const state = () => ({
-  userId: null as Readonly<string | null>,
+  userId: null as string | null,
 });
 export type RootState = ReturnType<typeof state>;
 
