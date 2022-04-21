@@ -84,8 +84,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { StringUtil } from '@c/util/stringUtil';
-import { CalloutHepler } from '@f/commons/ajax/calloutHelper';
 
 export default Vue.extend({
   name: 'IndexPage',
@@ -93,14 +91,6 @@ export default Vue.extend({
     return {
       message: 'aaaaaa',
     };
-  },
-  mounted() {
-    console.log('StringUtil.isEmpty');
-    console.log(StringUtil.isEmpty(this.message));
-    const instance = new CalloutHepler();
-    const result = instance.sayHello(this.message);
-    console.log('result');
-    console.log(result);
   },
 });
 </script>
