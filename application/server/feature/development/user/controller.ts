@@ -1,4 +1,4 @@
-import express, { response } from 'express';
+import express from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
@@ -9,14 +9,14 @@ import UserMaster from '@s/common/sequelize/models/userMaster';
 
 export const [userEndpoint, userController] = [
   '/development/users',
-  async (_req: express.Request, res: express.Response) => {
+  async (_request: express.Request, response: express.Response) => {
     const logger = appContainer.get<LogHandler>(types.LogHandler);
     const sequelizeHandler = appContainer.get<SequelizeHandler>(
       types.SequelizeHandler,
     );
     const sequelize = sequelizeHandler.sequelize;
 
-    logger.log('info', 'firebase user id', response.locals.firebaseUserId);
+    logger.log('debug', 'firebase user id', response.locals.firebaseUserId);
 
     console.log('ユーザ取得');
     const [users, metadata1] = await sequelize.query<UserMaster>(
@@ -37,6 +37,6 @@ export const [userEndpoint, userController] = [
     );
     console.log(companies);
     logger.log('debug', 'debug log');
-    res.send({ users, companies });
+    response.send({ users, companies });
   },
 ];

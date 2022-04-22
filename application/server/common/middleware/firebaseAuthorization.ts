@@ -11,13 +11,8 @@ export const authorizationFirebaseUser = async (
   response: express.Response,
   next: express.NextFunction,
 ) => {
-  // データ更新系のみ認証チェックを行う
   const requestMethod = request.method;
   const isGet = requestMethod === 'GET';
-  if (isGet) {
-    next();
-    return;
-  }
 
   const firebaseIdToken = request.headers.authorization;
   const token =
@@ -30,9 +25,17 @@ export const authorizationFirebaseUser = async (
   try {
     const firebaseDecodedToken = await admin.auth().verifyIdToken(token);
     const firebaseUserId = firebaseDecodedToken?.uid;
+    // GETリクエストであってもログイン中であればユーザIDを取得する
+    // 自分の投稿かどうか、お気に入り済みかどうかを判定するため
     response.locals.firebaseUserId = firebaseUserId;
     next();
   } catch {
+    // データ更新系のみ認証チェックを行う
+    if (isGet) {
+      next();
+      return;
+    }
+
     const error = new NotAuthorizedError();
     next(error);
   }
