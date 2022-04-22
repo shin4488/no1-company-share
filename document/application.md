@@ -223,6 +223,80 @@ export const apiController = (request: express.Request, response: express.Respon
 };
 ```
 
+## pluginを使用したaxiosの共通処理
+用途例：リクエストヘッダにAuthorizeヘッダ（認証データ）をつけるなどを共通処理化する
+https://b1san-blog.com/post/nuxtjs/nuxt-axios/
+
+
+front/store/index.ts
+
+```ts
+import {
+  getAccessorType,
+  getterTree,
+  mutationTree,
+  actionTree,
+} from 'typed-vuex';
+import * as firebaseAuthorization from './firebaseAuthorization';
+
+export const state = () => ({});
+export const getters = getterTree(state, {});
+export const mutations = mutationTree(state, {});
+export const actions = actionTree({ state, getters, mutations }, {});
+export const accessorType = getAccessorType({
+  state,
+  getters,
+  mutations,
+  actions,
+  modules: {
+    firebaseAuthorization,
+  },
+});
+```
+
+front/types/index.d.tsにいかを追加
+
+```ts
+import { accessorType } from '~/front/store';
+
+declare module '@nuxt/types' {
+  interface Context {
+    $accessor: typeof accessorType;
+  }
+}
+```
+
+front/plugins/axios.ts
+pluginからstoreにアクセスするには$accessorを引数のオブジェクトに追加
+
+```ts
+import { Context, Plugin } from '@nuxt/types';
+
+const plugin: Plugin = ({ $axios, $accessor }: Context) => {
+  // リクエスト送信の共通処理
+  $axios.onRequest((config) => {
+    // storeにはidTokenComputedというgetterが存在する
+    config.headers.Authorization =
+      $accessor.firebaseAuthorization.idTokenComputed;
+    return config;
+  });
+  // レスポンスエラー時の共通処理
+  $axios.onResponseError((error) => {
+    console.log(error);
+  });
+};
+
+export default plugin;
+```
+
+nuxt.confi.js
+
+```js
+export default {
+  plugins: ['~/front/plugins/axios.ts'],
+}
+```
+
 # Typescript
 ## 絶対パスでimport
 
