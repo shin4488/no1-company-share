@@ -153,6 +153,37 @@ const userId = credential.user?.uid;
 this.$fire.auth.signOut();
 ```
 
+## 以下のエラー
+
+```
+vue.runtime.esm.js?2b0e:619 [Vue warn]: The client-side rendered virtual DOM tree is not matching server-rendered content. This is likely caused by incorrect HTML markup, for example nesting block-level elements inside <p>, or missing <tbody>. Bailing hydration and performing full client-side render.
+```
+
+https://github.com/nuxt-community/firebase-module/issues/502
+
+computed内の処理でstoreを参照すると発生？
+↓ひとまずの代替策
+
+```vue
+computed: {
+  firebaseUserId(): string | null {
+    return this.$accessor.firebaseAuthorization.userId;
+  },
+},
+watch: {
+  // ログイン状態が変わればサイドバー表示内容も変更
+  firebaseUserId(updatedUserId) {
+    this.sideBarItems = this.setSidebarItems(updatedUserId);
+  },
+},
+mounted() {
+  // TODO:本当はsideBarItemsはdataではなくcomputedを使用したいが、computedでstoreにアクセスすると以下エラーとなるためmountedを使用
+  // The client-side rendered virtual DOM tree is not matching server-rendered content.
+  const firebaseUserId = this.$accessor.firebaseAuthorization.userIdComputed;
+  this.sideBarItems = this.setSidebarItems(firebaseUserId);
+},
+```
+
 # Typescript
 ## 絶対パスでimport
 
