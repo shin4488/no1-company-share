@@ -122,7 +122,7 @@ export default Vue.extend({
         },
         {
           icon: 'mdi-account',
-          title: 'マイポスト',
+          title: 'マイ投稿',
           to: '/inspire',
         },
         {
@@ -143,17 +143,17 @@ export default Vue.extend({
   watch: {
     // ログイン状態が変わればサイドバー表示内容も変更
     firebaseUserId(updatedUserId) {
-      this.sideBarItems = this.setSidebarItems(updatedUserId);
+      this.sideBarItems = this.decideSidebarItems(updatedUserId);
     },
   },
   mounted() {
     // TODO:本当はsideBarItemsはdataではなくcomputedを使用したいが、computedでstoreにアクセスすると以下エラーとなるためmountedを使用
     // The client-side rendered virtual DOM tree is not matching server-rendered content.
     const firebaseUserId = this.$accessor.firebaseAuthorization.userIdComputed;
-    this.sideBarItems = this.setSidebarItems(firebaseUserId);
+    this.sideBarItems = this.decideSidebarItems(firebaseUserId);
   },
   methods: {
-    setSidebarItems(firebaseUserId: string | null): SidebarItem[] {
+    decideSidebarItems(firebaseUserId: string | null): SidebarItem[] {
       return StringUtil.isEmpty(firebaseUserId)
         ? this.logoutSideBarItems
         : this.logginedSidebarItems;
