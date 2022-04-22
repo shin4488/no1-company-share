@@ -94,3 +94,5 @@ database/data
 *.bat
 !setup.bat
 logs/
+# firebase認証用の秘密鍵はリポジトリにあげない
+application/server/common/middleware/secret/no1-company-share-firebase-adminsdk-secret.json
