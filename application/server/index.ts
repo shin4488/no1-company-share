@@ -3,12 +3,13 @@
 // https://github.com/nuxt/nuxt.js/issues/7017
 import 'module-alias/register';
 import express, { json, urlencoded } from 'express';
+import Admin from 'firebase-admin';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
 import { SequelizeHandler } from '@s/common/sequelize/interface/SequelizeHandler';
 import { logRequestResponse } from '@s/common/middleware/logger';
-import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthrization';
+import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthorization';
 import { catchError } from '@s/common/middleware/appErrorHandler';
 import { developmentRouter } from '@s/feature/development/router';
 
@@ -16,6 +17,12 @@ import { developmentRouter } from '@s/feature/development/router';
 const logger = appContainer.get<LogHandler>(types.LogHandler);
 // Sequelize初期化のため
 appContainer.get<SequelizeHandler>(types.SequelizeHandler);
+
+// デフォルトで「FIREBASE_CONFIG」環境変数のパスにある秘密鍵を見に行くため、引数不要
+const firebaseApps = Admin.apps;
+if (firebaseApps === null || firebaseApps.length === 0) {
+  Admin.initializeApp();
+}
 
 const app = express();
 // リクエストボディがundefinedにならないようにする

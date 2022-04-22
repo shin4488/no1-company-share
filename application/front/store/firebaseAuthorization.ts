@@ -31,8 +31,6 @@ export const actions = actionTree(
   { state, mutations },
   {
     async onAuthStateChangedAction({ commit }, { authUser }) {
-      console.log('onAuthStateChangedAction');
-      console.log(authUser);
       if (authUser === null) {
         commit('setUserId', null);
         commit('setIdToken', null);
@@ -45,7 +43,8 @@ export const actions = actionTree(
     },
     async loginByGoogle() {
       const provider = new this.$fireModule.auth.GoogleAuthProvider();
-      await this.$fire.auth.signInWithPopup(provider);
+      // ポップアップを閉じたときのエラー回避のためcatchを記載
+      await this.$fire.auth.signInWithPopup(provider).catch((error) => error);
     },
     async logout() {
       await this.$fire.auth.signOut();

@@ -20,7 +20,7 @@ import {
 
 const developmentRouter = Router();
 developmentRouter.get(companyEndpoint, companyController);
-developmentRouter.get(userEndpoint, userController);
+developmentRouter.post(userEndpoint, userController);
 developmentRouter.get(errorEndpoint1, errorController1);
 developmentRouter.get(errorEndpoint2, errorController2);
 developmentRouter.get(errorEndpoint3, errorController3);
