@@ -164,7 +164,7 @@ https://github.com/nuxt-community/firebase-module/issues/502
 computed内の処理でstoreを参照すると発生？
 ↓ひとまずの代替策
 
-```vue
+```ts
 computed: {
   firebaseUserId(): string | null {
     return this.$accessor.firebaseAuthorization.userId;
