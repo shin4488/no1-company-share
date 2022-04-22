@@ -12,7 +12,7 @@
       <v-navigation-drawer
         v-model="isDrawerOpened"
         :mini-variant="isDrawerMini"
-        width="200"
+        width="190"
         clipped
         permanent
         fixed
@@ -128,7 +128,8 @@ export default Vue.extend({
         {
           icon: 'mdi-logout',
           title: 'ログアウト',
-          to: '#logout',
+          // ログアウトしつつホームに戻る
+          to: '/#logout',
         },
       ];
     },
@@ -162,7 +163,7 @@ export default Vue.extend({
     },
     async onClickedListItem(path: string): Promise<void> {
       const isLoginPath = path === '#login';
-      const isLogoutPath = path === '#logout';
+      const isLogoutPath = path === '/#logout';
       if (!(isLoginPath || isLogoutPath)) {
         return;
       }
