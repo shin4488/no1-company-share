@@ -19,7 +19,7 @@ import {
 } from '@s/feature/development/user/controller';
 
 const developmentRouter = Router();
-developmentRouter.get(companyEndpoint, companyController);
+developmentRouter.post(companyEndpoint, companyController);
 developmentRouter.post(userEndpoint, userController);
 developmentRouter.get(errorEndpoint1, errorController1);
 developmentRouter.get(errorEndpoint2, errorController2);

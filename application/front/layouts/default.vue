@@ -20,12 +20,13 @@
       >
         <v-list>
           <v-list-item
-            v-for="(item, i) in navigationItems"
+            v-for="(item, i) in sideBarItems"
             :key="i"
             :to="item.to"
             :title="item.title"
             router
             exact
+            nuxt
             @click="onClickedListItem(item.to)"
           >
             <v-list-item-action>
@@ -50,9 +51,10 @@
       <v-bottom-navigation app fixed :value="0" color="primary">
         <v-slide-group>
           <v-btn
-            v-for="(item, index) in navigationItems"
+            v-for="(item, index) in sideBarItems"
             :key="index"
             :to="item.to"
+            nuxt
             @click="onClickedListItem(item.to)"
           >
             <span>{{ item.title }}</span>
@@ -66,23 +68,48 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import {
+  DefaultData,
+  SidebarItem,
+} from '@f/definition/layouts/default/defaultData';
+import { StringUtil } from '@c/util/stringUtil';
 
 export default Vue.extend({
   name: 'DefaultLayout',
-  data() {
+  data(): DefaultData {
     return {
       isDrawerOpened: true,
       isDrawerMini: true,
       title: 'F1C',
       // https://materialdesignicons.com/
-      logoutItems: [
+      sideBarItems: [
+        {
+          icon: '',
+          title: '',
+          to: '',
+        },
+      ],
+    };
+  },
+  computed: {
+    /**
+     * ログアウト状態でのサイドバーメニュー
+     */
+    logoutSideBarItems(): SidebarItem[] {
+      return [
         {
           icon: 'mdi-login',
           title: 'ログイン',
+          // ログイン画面はfirebaseのポップアップとなるが、ログインボタン押下判定のために「#」を付与
           to: '#login',
         },
-      ],
-      logginedItems: [
+      ];
+    },
+    /**
+     * ログイン状態でのサイドバーメニュー
+     */
+    logginedSidebarItems(): SidebarItem[] {
+      return [
         {
           icon: 'mdi-home-variant-outline',
           title: 'ホーム',
@@ -91,7 +118,7 @@ export default Vue.extend({
         {
           icon: 'mdi-star',
           title: 'お気に入り',
-          to: '/',
+          to: '/development/card-temp',
         },
         {
           icon: 'mdi-account',
@@ -103,20 +130,33 @@ export default Vue.extend({
           title: 'ログアウト',
           to: '#logout',
         },
-      ],
-    };
-  },
-  computed: {
-    navigationItems(): Record<string, string>[] {
-      const hasUserId =
-        this.$accessor.firebaseAuthorization.userIdComputed !== null;
-      return hasUserId ? this.logginedItems : this.logoutItems;
+      ];
+    },
+    firebaseUserId(): string | null {
+      return this.$accessor.firebaseAuthorization.userIdComputed;
     },
     shouldUseBottomBarComputed(): boolean {
       return this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm;
     },
   },
+  watch: {
+    // ログイン状態が変わればサイドバー表示内容も変更
+    firebaseUserId(updatedUserId) {
+      this.sideBarItems = this.setSidebarItems(updatedUserId);
+    },
+  },
+  mounted() {
+    // TODO:本当はsideBarItemsはdataではなくcomputedを使用したいが、computedでstoreにアクセスすると以下エラーとなるためmountedを使用
+    // The client-side rendered virtual DOM tree is not matching server-rendered content.
+    const firebaseUserId = this.$accessor.firebaseAuthorization.userIdComputed;
+    this.sideBarItems = this.setSidebarItems(firebaseUserId);
+  },
   methods: {
+    setSidebarItems(firebaseUserId: string | null): SidebarItem[] {
+      return StringUtil.isEmpty(firebaseUserId)
+        ? this.logoutSideBarItems
+        : this.logginedSidebarItems;
+    },
     onClickedNavigationBar(): void {
       this.isDrawerMini = !this.isDrawerMini;
     },
@@ -124,17 +164,9 @@ export default Vue.extend({
       const isLoginPath = path === '#login';
       const isLogoutPath = path === '#logout';
       if (!(isLoginPath || isLogoutPath)) {
-        const loginUserId = this.$accessor.firebaseAuthorization.userIdComputed;
-        const res = await this.$axios.get('/api/v1/development/users', {
-          headers: {
-            Authorization: loginUserId,
-          },
-        });
-        console.log(res);
         return;
       }
 
-      console.log(this.$accessor.firebaseAuthorization.userIdComputed);
       if (isLoginPath) {
         await this.$accessor.firebaseAuthorization.loginByGoogle();
       } else {
