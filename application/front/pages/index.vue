@@ -33,23 +33,17 @@ export default Vue.extend({
   },
   methods: {
     async onClickUserButton() {
-      const a = await this.$axios.post(
-        '/development/users',
-        {},
-        {
-          headers: {
-            Authorization: this.$accessor.firebaseAuthorization.idTokenComputed,
-          },
-        },
-      );
+      const a = await this.$axios.post('/development/users');
       console.log(a);
     },
     async onClickCompanyButton() {
-      const a = await this.$axios.post('/development/companies', {});
+      const a = await this.$axios.post('/development/companies');
       console.log(a);
     },
     async onClickErrorButton() {
-      const a = await this.$axios.get('/development/errors/1');
+      const a = await this.$axios
+        .get('/development/errors/1')
+        .catch((error) => error);
       console.log(a);
     },
   },
