@@ -8,7 +8,7 @@ export const [companyEndpoint, companyController] = [
   '/development/companies',
   async (_req: express.Request, res: express.Response) => {
     const logger = appContainer.get<LogHandler>(types.LogHandler);
-    logger.log('info', 'test log', 123, { message: 455 });
+    logger.log('info', 'firebase user id', res.locals.firebaseUserId);
 
     try {
       console.log('会社取得（findAll）');

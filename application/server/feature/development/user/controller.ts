@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
@@ -15,6 +15,8 @@ export const [userEndpoint, userController] = [
       types.SequelizeHandler,
     );
     const sequelize = sequelizeHandler.sequelize;
+
+    logger.log('info', 'firebase user id', response.locals.firebaseUserId);
 
     console.log('ユーザ取得');
     const [users, metadata1] = await sequelize.query<UserMaster>(

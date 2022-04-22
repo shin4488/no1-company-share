@@ -8,7 +8,7 @@ import { NotAuthorizedError } from '@s/common/error/notAuthorizedError';
  */
 export const authorizationFirebaseUser = async (
   request: express.Request,
-  _response: express.Response,
+  response: express.Response,
   next: express.NextFunction,
 ) => {
   // データ更新系のみ認証チェックを行う
@@ -30,6 +30,7 @@ export const authorizationFirebaseUser = async (
   try {
     const firebaseDecodedToken = await admin.auth().verifyIdToken(token);
     const firebaseUserId = firebaseDecodedToken?.uid;
+    response.locals.firebaseUserId = firebaseUserId;
     next();
   } catch {
     const error = new NotAuthorizedError();
