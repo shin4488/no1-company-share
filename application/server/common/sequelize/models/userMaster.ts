@@ -3,6 +3,7 @@ import { CommonModelAttribute } from './commonModelAttribute';
 
 interface UserMasterModelAttribute {
   id: string;
+  iconImageUrl: string;
 }
 
 /**
@@ -13,6 +14,7 @@ export default class UserMaster extends Model<
   UserMasterModelAttribute
 > {
   declare id: string;
+  declare iconImageUrl: string;
   declare createdAt: Date;
   declare updatedAt: Date;
 
@@ -22,6 +24,10 @@ export default class UserMaster extends Model<
         id: {
           type: DataTypes.STRING(28),
           primaryKey: true,
+        },
+        iconImageUrl: {
+          type: DataTypes.STRING(2100),
+          allowNull: true,
         },
       },
       {

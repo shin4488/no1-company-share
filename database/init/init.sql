@@ -8,6 +8,7 @@ GRANT ALL PRIVILEGES ON DATABASE company_share TO company_share_admin;
 CREATE TABLE public.user_master (
   -- firebaseのauthユーザid
   id VARCHAR(28) PRIMARY KEY,
+  icon_image_url VARCHAR(2100),
   created_at TIMESTAMP WITH TIME ZONE,
   updated_at TIMESTAMP WITH TIME ZONE
 );
