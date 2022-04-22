@@ -184,6 +184,45 @@ mounted() {
 },
 ```
 
+## expressでミドルウェアなどからAPI側にデータを受け継ぐ方法（リクエストスコープでデータを複数処理に受け継ぐ方法）
+用途：ミドルウェアで認証したユーザ情報をAPI側で使用するなど
+https://stackoverflow.com/questions/55362741/overwrite-any-in-typescript-when-merging-interfaces
+`response.locals` を使用する
+server/types/index.d.tsにいかを記述
+
+```ts
+import 'express';
+
+declare module 'express' {
+  export interface Response {
+    locals: {
+      // 追加したいデータをここで記述する
+      userId?: string;
+    };
+  }
+}
+```
+
+ミドルウェアの処理（データをセットする側）
+
+```ts
+export const authorizationUser = (
+  request: express.Request,
+  response: express.Response,
+  next: express.NextFunction,
+) => {
+  response.locals.userId = 'hogehoge';
+};
+```
+
+APIの処理（セットされているデータを読み取る側）
+
+```ts
+export const apiController = (request: express.Request, response: express.Response) => {
+  console.log(response.locals.userId); // hogehoge
+};
+```
+
 # Typescript
 ## 絶対パスでimport
 
