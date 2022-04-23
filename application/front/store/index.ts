@@ -5,6 +5,7 @@ import {
   actionTree,
 } from 'typed-vuex';
 import * as firebaseAuthorization from './firebaseAuthorization';
+import * as snackBarError from './snackBarError';
 
 export const state = () => ({});
 export const getters = getterTree(state, {});
@@ -17,5 +18,6 @@ export const accessorType = getAccessorType({
   actions,
   modules: {
     firebaseAuthorization,
+    snackBarError,
   },
 });

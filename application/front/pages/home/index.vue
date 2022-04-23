@@ -10,7 +10,9 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="primary" @click="onClickErrorButton">Errors</v-btn>
+          <v-btn color="primary" @click="onClickSnackBarErrorButton"
+            >SnackBarError</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-col>
@@ -36,6 +38,12 @@ export default Vue.extend({
         .get('/development/errors/1')
         .catch((error) => error);
       console.log(a);
+    },
+    onClickSnackBarErrorButton() {
+      const message =
+        'エラーです！！！ああああああああああ' +
+        'いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい';
+      this.$accessor.snackBarError.open(message);
     },
   },
 });
