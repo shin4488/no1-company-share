@@ -23,6 +23,8 @@ const responseBody = {
                 "companyName": "テスト1株式会社",
                 "companyHomepageUrl": "http://1.example.com",
                 "postingUserId": "cDYrCmleUFhpDok0klZxvCpZVJt1",
+                "postingUserIcomImageUrl": "http://i1.example.com",
+                "numberOfBookmarks": 10,
                 "isReported": false,
                 "remarks": "テスト備考1",
                 "postDetails": [
