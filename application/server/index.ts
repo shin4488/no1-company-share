@@ -35,7 +35,10 @@ app.use(logRequestResponse);
 app.use(authorizationFirebaseUser);
 
 const rootEndpoint = '/api/v1';
-app.use(rootEndpoint, developmentRouter);
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(rootEndpoint, developmentRouter);
+}
 
 // 例外発生キャッチ用のミドルウェアはルーティング後に追加する必要がある
 // 参照：「エラー処理を記述する」：https://expressjs.com/ja/guide/error-handling.html
