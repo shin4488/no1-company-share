@@ -19,4 +19,13 @@ export class StringUtil {
   public static isNotEmpty(text: string | undefined | null): boolean {
     return !this.isEmpty(text);
   }
+
+  /**
+   * 数値を文字に変換
+   * @param value
+   * @returns
+   */
+  public static toString(value: number | undefined | null): string {
+    return value === null || value === undefined ? '' : value.toString();
+  }
 }
