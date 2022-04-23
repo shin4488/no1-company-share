@@ -377,6 +377,25 @@ export default Vue.extend({
 </script>
 ```
 
+~/front/layouts/default.vue
+
+```html
+<template>
+  <v-app>
+    <SnackBarError></SnackBarError>
+  </v-app>
+</template>
+
+<script lang="ts">
+import SnackBarError from '@f/components/SnackBarError.vue';
+export default Vue.extend({
+  components: {
+    SnackBarError,
+  },
+});
+</script>
+```
+
 呼び出し方（vueインスタンス内やpluginなどnuxtのContextを取得できるところから）
 
 ```ts
