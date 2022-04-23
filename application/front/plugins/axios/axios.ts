@@ -1,6 +1,9 @@
 import { Context, Plugin } from '@nuxt/types';
 import { AxiosResponse, AxiosError } from 'axios';
-import { AppResponse } from '@f/definition/plugins/ajaxResponse';
+import {
+  AppResponse,
+  AppMessageResponse,
+} from '@f/definition/plugins/ajaxResponse';
 import { ArrayUtil } from '@c/util/arrayUtil';
 
 /**
@@ -15,7 +18,7 @@ const extractErrorMessageIfExists = (
     return null;
   }
 
-  const messages = messageObjects.map((x) => x.message);
+  const messages = messageObjects.map((x: AppMessageResponse) => x.message);
   const joinedMessage = messages.join('\n');
   return joinedMessage;
 };

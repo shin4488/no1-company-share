@@ -1,7 +1,7 @@
 /**
  * レスポンスのエラーメッセージ
  */
-export interface AppResponseMessage {
+export interface AppMessageResponse {
   message: string;
 }
 
@@ -9,6 +9,6 @@ export interface AppResponseMessage {
  * レスポンスのデータ
  */
 export interface AppResponse<T = {}> {
-  messages: AppResponseMessage[] | [];
+  messages: AppMessageResponse[] | [];
   data: T | null;
 }
