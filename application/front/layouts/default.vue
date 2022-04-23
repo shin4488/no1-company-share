@@ -4,7 +4,11 @@
     <template v-if="!shouldUseBottomBarComputed">
       <v-app-bar clipped-left fixed dense app>
         <v-app-bar-nav-icon @click.stop="onClickedNavigationBar" />
-        <v-toolbar-title v-text="title" />
+        <v-toolbar-title
+          class="app-toobar-title"
+          @click="$router.push('/')"
+          v-text="title"
+        />
       </v-app-bar>
 
       <!-- mini-variant:アイコンのみナビゲーション表示 -->
@@ -18,10 +22,10 @@
         fixed
         app
       >
-        <v-list>
+        <v-list shaped>
           <v-list-item
-            v-for="(item, i) in sideBarItems"
-            :key="i"
+            v-for="(item, index) in sideBarItems"
+            :key="index"
             :to="item.to"
             :title="item.title"
             router
@@ -79,7 +83,7 @@ export default Vue.extend({
   data(): DefaultData {
     return {
       isDrawerOpened: true,
-      isDrawerMini: true,
+      isDrawerMini: false,
       title: 'F1C',
       // https://materialdesignicons.com/
       sideBarItems: [
@@ -118,12 +122,12 @@ export default Vue.extend({
         {
           icon: 'mdi-star',
           title: 'お気に入り',
-          to: '/development/card-temp',
+          to: '/bookmark',
         },
         {
           icon: 'mdi-account',
           title: 'マイ投稿',
-          to: '/inspire',
+          to: '/my-post',
         },
         {
           icon: 'mdi-logout',
@@ -177,3 +181,8 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="sass" scoped>
+.app-toobar-title
+  cursor: pointer
+</style>
