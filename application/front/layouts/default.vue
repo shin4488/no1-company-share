@@ -6,7 +6,7 @@
         <v-app-bar-nav-icon @click.stop="onClickedNavigationBar" />
         <v-toolbar-title
           class="app-toobar-title"
-          @click="$router.push('/')"
+          @click="routeToHome"
           v-text="title"
         />
       </v-app-bar>
@@ -96,6 +96,15 @@ export default Vue.extend({
     };
   },
   computed: {
+    homePath(): string {
+      return '/home';
+    },
+    loginPath(): string {
+      return '#login';
+    },
+    logoutPath(): string {
+      return '#logout';
+    },
     /**
      * ログアウト状態でのサイドバーメニュー
      */
@@ -105,7 +114,7 @@ export default Vue.extend({
           icon: 'mdi-login',
           title: 'ログイン',
           // ログイン画面はfirebaseのポップアップとなるが、ログインボタン押下判定のために「#」を付与
-          to: '#login',
+          to: this.loginPath,
         },
       ];
     },
@@ -117,7 +126,7 @@ export default Vue.extend({
         {
           icon: 'mdi-home-variant-outline',
           title: 'ホーム',
-          to: '/',
+          to: this.homePath,
         },
         {
           icon: 'mdi-star',
@@ -133,7 +142,7 @@ export default Vue.extend({
           icon: 'mdi-logout',
           title: 'ログアウト',
           // ログアウトしつつホームに戻る
-          to: '/#logout',
+          to: this.logoutPath,
         },
       ];
     },
@@ -148,6 +157,10 @@ export default Vue.extend({
     // ログイン状態が変わればサイドバー表示内容も変更
     firebaseUserId(updatedUserId) {
       this.sideBarItems = this.decideSidebarItems(updatedUserId);
+
+      // ミドルウェアでリダイレクトしたいが、
+      // ミドルウェア内ではfirebaseユーザIDが（ログイン状態でも）nullになってしまうためここでルーティング
+      this.routeToHomeIfNotLoggedin();
     },
   },
   mounted() {
@@ -155,6 +168,7 @@ export default Vue.extend({
     // The client-side rendered virtual DOM tree is not matching server-rendered content.
     const firebaseUserId = this.$accessor.firebaseAuthorization.userIdComputed;
     this.sideBarItems = this.decideSidebarItems(firebaseUserId);
+    this.routeToHomeIfNotLoggedin();
   },
   methods: {
     decideSidebarItems(firebaseUserId: string | null): SidebarItem[] {
@@ -162,12 +176,22 @@ export default Vue.extend({
         ? this.logoutSideBarItems
         : this.logginedSidebarItems;
     },
+    routeToHomeIfNotLoggedin(): void {
+      // ユーザIDが存在しない場合を未認証状態とみなす
+      // ホーム画面のみ、未認証でも閲覧可能
+      if (StringUtil.isEmpty(this.firebaseUserId)) {
+        this.routeToHome();
+      }
+    },
+    routeToHome(): void {
+      this.$router.push(this.homePath);
+    },
     onClickedNavigationBar(): void {
       this.isDrawerMini = !this.isDrawerMini;
     },
     async onClickedListItem(path: string): Promise<void> {
-      const isLoginPath = path === '#login';
-      const isLogoutPath = path === '/#logout';
+      const isLoginPath = path === this.loginPath;
+      const isLogoutPath = path === this.logoutPath;
       if (!(isLoginPath || isLogoutPath)) {
         return;
       }
