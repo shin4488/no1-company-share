@@ -9,6 +9,7 @@ CREATE TABLE public.user_master (
   -- firebaseのauthユーザid
   id VARCHAR(28) PRIMARY KEY,
   icon_image_url VARCHAR(2100),
+  displayed_name VARCHAR(100),
   created_at TIMESTAMP WITH TIME ZONE,
   updated_at TIMESTAMP WITH TIME ZONE
 );
@@ -27,8 +28,7 @@ CREATE TABLE public.company_master (
 CREATE TABLE public.division_master (
   id SERIAL PRIMARY KEY,
   column_physical_name VARCHAR(20),
-  division_value VARCHAR(20),
-  division_display_name VARCHAR(20),
+  division_displayed_name VARCHAR(20),
   created_at TIMESTAMP WITH TIME ZONE,
   updated_at TIMESTAMP WITH TIME ZONE
 );
@@ -76,4 +76,17 @@ INSERT INTO public.company_master (
   'C001',
   'サンプル株式会社',
   'http://example.com'
+);
+INSERT INTO public.division_master (
+  column_physical_name,
+  division_displayed_name
+) VALUES (
+  'NO1_DIVISION',
+  '世界一'
+), (
+  'NO1_DIVISION',
+  '日本一'
+), (
+  'NO1_DIVISION',
+  '福井一'
 );
