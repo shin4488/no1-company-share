@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
@@ -8,7 +8,7 @@ import CompanyMaster from '@s/common/sequelize/models/companyMaster';
 import UserMaster from '@s/common/sequelize/models/userMaster';
 import { BaseController } from '@s/common/controller/baseController';
 
-export class UserController extends BaseController {
+class UserController extends BaseController {
   public static userEndpoint: string = '/development/users';
   public static async getUsers(
     _request: express.Request,
@@ -45,3 +45,10 @@ export class UserController extends BaseController {
     super.success(response, { users, companies });
   }
 }
+
+const userDevelopmentRouter = Router();
+userDevelopmentRouter.post(
+  UserController.userEndpoint,
+  UserController.getUsers,
+);
+export { userDevelopmentRouter };

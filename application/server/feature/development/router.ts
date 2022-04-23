@@ -13,12 +13,12 @@ import {
   companyEndpoint,
   companyController,
 } from '@s/feature/development/company/controller';
-import { UserController } from '@s/feature/development/user/controller';
+import { userDevelopmentRouter } from '@s/feature/development/user/controller';
 
 const developmentRouter = Router();
 developmentRouter.post(companyEndpoint, companyController);
 developmentRouter.post(companyEndpoint, companyController);
-developmentRouter.post(UserController.userEndpoint, UserController.getUsers);
+developmentRouter.use(userDevelopmentRouter);
 developmentRouter.get(errorEndpoint1, errorController1);
 developmentRouter.get(errorEndpoint2, errorController2);
 developmentRouter.get(errorEndpoint3, errorController3);
