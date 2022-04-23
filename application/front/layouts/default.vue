@@ -1,6 +1,8 @@
 <template>
   <!-- https://vuetifyjs.com/ja/getting-started/wireframes/ -->
   <v-app>
+    <SnackBarError></SnackBarError>
+
     <template v-if="!shouldUseBottomBarComputed">
       <v-app-bar clipped-left fixed dense app>
         <v-app-bar-nav-icon @click.stop="onClickedNavigationBar" />
@@ -77,9 +79,13 @@ import {
   SidebarItem,
 } from '@f/definition/layouts/default/defaultData';
 import { StringUtil } from '@c/util/stringUtil';
+import SnackBarError from '@f/components/SnackBarError.vue';
 
 export default Vue.extend({
   name: 'DefaultLayout',
+  components: {
+    SnackBarError,
+  },
   data(): DefaultData {
     return {
       isDrawerOpened: true,
