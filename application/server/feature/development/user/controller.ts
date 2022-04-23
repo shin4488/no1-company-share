@@ -6,10 +6,14 @@ import { SequelizeHandler } from '@s/common/sequelize/interface/SequelizeHandler
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
 import CompanyMaster from '@s/common/sequelize/models/companyMaster';
 import UserMaster from '@s/common/sequelize/models/userMaster';
+import { BaseController } from '@s/common/controller/baseController';
 
-export const [userEndpoint, userController] = [
-  '/development/users',
-  async (_request: express.Request, response: express.Response) => {
+export class UserController extends BaseController {
+  public static userEndpoint: string = '/development/users';
+  public static async getUsers(
+    _request: express.Request,
+    response: express.Response,
+  ) {
     const logger = appContainer.get<LogHandler>(types.LogHandler);
     const sequelizeHandler = appContainer.get<SequelizeHandler>(
       types.SequelizeHandler,
@@ -37,6 +41,7 @@ export const [userEndpoint, userController] = [
     );
     console.log(companies);
     logger.log('debug', 'debug log');
-    response.send({ users, companies });
-  },
-];
+
+    super.success(response, { users, companies });
+  }
+}

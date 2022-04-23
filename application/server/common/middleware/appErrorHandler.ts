@@ -3,6 +3,7 @@ import { AppError } from '@s/common/error/appError';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
+import { ApiResponseHandler } from '@s/common/apiResponse/interface/ApiResponseHandler';
 
 export const catchError = (
   error: Error,
@@ -19,6 +20,9 @@ export const catchError = (
       ? error.statusCode
       : 500;
   const expressResponse = response.status(statusCode);
-  // TODO:例外メッセージの返却方法（レスポンスのデータ構造の考慮）が必要
-  expressResponse.send(error.message);
+  const responseHandler = appContainer.get<ApiResponseHandler>(
+    types.ApiResponseHandler,
+  );
+  responseHandler.addErrorMessages(error.message);
+  expressResponse.send(responseHandler.createResponse());
 };
