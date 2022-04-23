@@ -24,8 +24,8 @@ const responseBody = {
                 "companyHomepageUrl": "http://1.example.com",
                 "postingUserId": "cDYrCmleUFhpDok0klZxvCpZVJt1",
                 "postingUserIcomImageUrl": "http://i1.example.com",
+                "postingUserName": "Taro Yamada",
                 "numberOfBookmarks": 10,
-                "isReported": false,
                 "remarks": "テスト備考1",
                 "postDetails": [
                     {
@@ -39,6 +39,20 @@ const responseBody = {
                         "no1Division": 2
                     }
                 ]
+            }
+        ],
+        "no1Divisions": [
+            {
+                "text": "世界一",
+                "value": 1
+            },
+            {
+                "text": "日本一",
+                "value": 2
+            },
+            {
+                "text": "福井一",
+                "value": 3
             }
         ]
     }
