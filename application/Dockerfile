@@ -1,9 +1,13 @@
 FROM ubuntu:20.04
 
 # コンテナ間通信時は、コンテナ内部で使用されるポートを指定
+# postgreSQLはデフォルトで5432ポートを使用
 ENV DB_CONNECTION_URI postgres://company_share_admin:admin@database:5432/company_share
 # nuxtのサーバサイドプログラムもホットリロードを可能とする
 ENV CHOKIDAR_USEPOLLING true
+# firebase認証用
+ENV FIREBASE_CONFIG ./server/common/middleware/secret/no1-company-share-firebase-adminsdk-secret.json
+ENV GOOGLE_CLOUD_PROJECT no1-company-share
 
 RUN apt update
 RUN apt install sudo -y

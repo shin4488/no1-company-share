@@ -7,7 +7,16 @@ export class StringUtil {
    * @param text
    * @returns
    */
-  static isEmpty(text: string): Boolean {
+  static isEmpty(text: string | undefined | null): boolean {
     return text === null || text === undefined || text === '';
+  }
+
+  /**
+   * テキストが非空か
+   * @param text
+   * @returns
+   */
+  static isNotEmpty(text: string | undefined | null): boolean {
+    return !this.isEmpty(text);
   }
 }

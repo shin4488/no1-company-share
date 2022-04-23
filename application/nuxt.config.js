@@ -33,8 +33,12 @@ export default {
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [],
 
+  router: {
+    middleware: ['router'],
+  },
+
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: ['~/plugins/axios/axios.ts'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -45,18 +49,42 @@ export default {
     '@nuxt/typescript-build',
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
+    // storeをtypescriptで$accessインテリセンス可能とするため
+    'nuxt-typed-vuex',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    '@nuxtjs/firebase',
   ],
+
+  firebase: {
+    config: {
+      apiKey: 'AIzaSyCPvuvm4wNrjLlpixP2xyUgsaYnIj2cub0',
+      authDomain: 'no1-company-share.firebaseapp.com',
+      projectId: 'no1-company-share',
+      storageBucket: 'no1-company-share.appspot.com',
+      messagingSenderId: '650436262386',
+      appId: '1:650436262386:web:9a17e3aacca532fb82d36b',
+      measurementId: 'G-ZJVQSKLGQ0',
+    },
+    services: {
+      auth: {
+        initialize: {
+          onAuthStateChangedAction:
+            'firebaseAuthorization/onAuthStateChangedAction',
+        },
+      },
+      analytics: true,
+    },
+  },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: '/',
+    baseURL: '/api/v1',
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
@@ -99,5 +127,7 @@ export default {
       config.resolve.alias['@f'] = path.resolve(__dirname, 'front');
       config.resolve.alias['@c'] = path.resolve(__dirname, 'common');
     },
+    // storeをtypescriptで$accessインテリセンス可能とするため
+    transpile: [/typed-vuex/],
   },
 };

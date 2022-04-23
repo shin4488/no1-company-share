@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
@@ -6,15 +6,21 @@ import { SequelizeHandler } from '@s/common/sequelize/interface/SequelizeHandler
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
 import CompanyMaster from '@s/common/sequelize/models/companyMaster';
 import UserMaster from '@s/common/sequelize/models/userMaster';
+import { BaseController } from '@s/common/controller/baseController';
 
-export const [userEndpoint, userController] = [
-  '/development/users',
-  async (_req: express.Request, res: express.Response) => {
+class UserController extends BaseController {
+  public static userEndpoint: string = '/development/users';
+  public static async getUsers(
+    _request: express.Request,
+    response: express.Response,
+  ) {
     const logger = appContainer.get<LogHandler>(types.LogHandler);
     const sequelizeHandler = appContainer.get<SequelizeHandler>(
       types.SequelizeHandler,
     );
     const sequelize = sequelizeHandler.sequelize;
+
+    logger.log('debug', 'firebase user id', response.locals.firebaseUserId);
 
     console.log('ユーザ取得');
     const [users, metadata1] = await sequelize.query<UserMaster>(
@@ -35,6 +41,14 @@ export const [userEndpoint, userController] = [
     );
     console.log(companies);
     logger.log('debug', 'debug log');
-    res.send({ users, companies });
-  },
-];
+
+    super.success(response, { users, companies });
+  }
+}
+
+const userDevelopmentRouter = Router();
+userDevelopmentRouter.post(
+  UserController.userEndpoint,
+  UserController.getUsers,
+);
+export { userDevelopmentRouter };

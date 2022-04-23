@@ -2,18 +2,13 @@ import express from 'express';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
-import { FirebaseAuth } from '@s/common/middleware/firebaseAuth';
 import CompanyMaster from '@s/common/sequelize/models/companyMaster';
 
 export const [companyEndpoint, companyController] = [
   '/development/companies',
   async (_req: express.Request, res: express.Response) => {
     const logger = appContainer.get<LogHandler>(types.LogHandler);
-
-    const instance = new FirebaseAuth('ccdd');
-    const result = instance.validateToken();
-    console.log(result);
-    logger.log('info', 'test log', 123, { message: 455 });
+    logger.log('info', 'firebase user id', res.locals.firebaseUserId);
 
     try {
       console.log('会社取得（findAll）');
