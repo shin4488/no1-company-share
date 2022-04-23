@@ -1,50 +1,98 @@
 <template>
-  <v-row justify="center" align="center">
-    <v-col cols="12" sm="8" md="6">
-      <v-card>
-        <v-card-title class="headline"> APIテスト </v-card-title>
-        <v-card-text>
-          <v-btn color="primary" @click="onClickUserButton">Users</v-btn>
-          <v-btn color="primary" @click="onClickCompanyButton">Companies</v-btn>
-          <v-btn color="primary" @click="onClickErrorButton">Errors</v-btn>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="primary" @click="onClickSnackBarErrorButton"
-            >SnackBarError</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-col>
-  </v-row>
+  <AppCardList
+    v-model="sharedCompanyPosts"
+    :no1-divisions="no1Divisions"
+  ></AppCardList>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { Context } from '@nuxt/types';
+import { HomePageData } from '@f/definition/pages/home/data';
 
 export default Vue.extend({
   name: 'HomePage',
-  methods: {
-    async onClickUserButton() {
-      const a = await this.$axios.post('/development/users');
-      console.log(a);
-    },
-    async onClickCompanyButton() {
-      const a = await this.$axios.post('/development/companies');
-      console.log(a);
-    },
-    async onClickErrorButton() {
-      const a = await this.$axios
-        .get('/development/errors/1')
-        .catch((error) => error);
-      console.log(a);
-    },
-    onClickSnackBarErrorButton() {
-      const message =
-        'エラーです！！！ああああああああああ' +
-        'いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい';
-      this.$accessor.snackBarError.open(message);
-    },
+  asyncData(_context: Context) {
+    // const response = await $axios.post('', {});
+    // const responseBody = response.data;
+    const sharedCompanyPosts = [
+      {
+        postId: 'testpost1',
+        companyNumber: 'testcompany1',
+        companyName: 'テスト株式会社1',
+        companyHomepageUrl:
+          'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg',
+        postingUserId: 'testuser1',
+        postingUserName: '山田太郎',
+        postingUserIcomImageUrl:
+          'https://cdn.pixabay.com/photo/2020/06/24/19/12/cabbage-5337431_1280.jpg',
+        numberOfBookmarks: 10,
+        remarks: '2020年度3月期友好証券報告書',
+        postDetails: [
+          {
+            postDetailId: 1,
+            no1Content: '何かを作ること',
+            no1Division: '1',
+          },
+        ],
+      },
+      {
+        postId: 'testpost2',
+        companyNumber: 'testcompany2',
+        companyName: 'テスト株式会社2',
+        companyHomepageUrl:
+          'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg',
+        postingUserId: 'testuser1',
+        postingUserName: '山田太郎',
+        postingUserIcomImageUrl:
+          'https://cdn.pixabay.com/photo/2020/06/24/19/12/cabbage-5337431_1280.jpg',
+        numberOfBookmarks: 10,
+        remarks: '2020年度3月期友好証券報告書',
+        postDetails: [
+          {
+            postDetailId: 1,
+            no1Content: 'テストテストテスト',
+            no1Division: '1',
+          },
+          {
+            postDetailId: 2,
+            no1Content: 'テストテストテスト',
+            no1Division: '2',
+          },
+        ],
+      },
+    ];
+
+    const no1Divisions = [
+      {
+        text: '世界一',
+        value: '1',
+      },
+      {
+        text: '日本一',
+        value: '2',
+      },
+      {
+        text: '福井一',
+        value: '3',
+      },
+    ];
+
+    return {
+      sharedCompanyPosts,
+      no1Divisions,
+    };
+  },
+  data(): HomePageData {
+    return {
+      sharedCompanyPosts: [],
+      no1Divisions: [],
+    };
+  },
+  mounted() {
+    console.log('home');
+    console.log(this.sharedCompanyPosts);
+    console.log(this.no1Divisions);
   },
 });
 </script>
