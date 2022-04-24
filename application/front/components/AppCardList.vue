@@ -1,19 +1,25 @@
 <template>
   <v-row>
-    <v-col v-for="(item, index) in value" :key="index" cols="4" xs="12">
+    <v-col v-for="(item, index) in value" :key="index" md="4" sm="6" xs="12">
       <AppCard
         v-model="item.postId"
         :company-number="item.companyNumber"
         :company-name="item.companyName"
         :company-homepage-url="item.companyHomepageUrl"
+        :company-image-url="item.companyImageUrl"
         :posting-user-id="item.postingUserId"
         :posting-user-name="item.postingUserName"
         :posting-user-icom-image-url="item.postingUserIcomImageUrl"
+        :is-bookmarked-by-login-user="item.isBookmarkedByLoginUser"
         :number-of-bookmarks="item.numberOfBookmarks"
         :remarks="item.remarks"
         :post-details="item.postDetails"
         :no1-divisions="no1Divisions"
-        @click-bookmark="onClikedBookmarkButton"
+        @add-bookmark="onAddedBookmark"
+        @remove-bookmark="onRemovedBookmark"
+        @confirm-report="onConfirmedReport"
+        @click-edit="onEdited"
+        @confirm-delete="onDeleted"
       ></AppCard>
     </v-col>
   </v-row>
@@ -42,14 +48,21 @@ export default Vue.extend({
       ],
     },
   },
-  mounted() {
-    console.log('AppCardList');
-    console.log(this.value);
-    console.log(this.no1Divisions);
-  },
   methods: {
-    onClikedBookmarkButton(args) {
-      console.log(args);
+    onAddedBookmark(context: { postId: string }): void {
+      this.$emit('add-bookmark', context);
+    },
+    onRemovedBookmark(context: { postId: string }): void {
+      this.$emit('remove-bookmark', context);
+    },
+    onConfirmedReport(context: { postId: string }): void {
+      this.$emit('confirm-report', context);
+    },
+    onEdited(context: { postId: string }): void {
+      this.$emit('click-edit', context);
+    },
+    onDeleted(context: { postId: string }): void {
+      this.$emit('confirm-delete', context);
     },
   },
 });

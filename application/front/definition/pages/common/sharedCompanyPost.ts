@@ -15,9 +15,11 @@ export interface PageAppCardItem {
   companyNumber: string;
   companyName: string;
   companyHomepageUrl: string;
+  companyImageUrl: string;
   postingUserId: string;
   postingUserName: string;
   postingUserIcomImageUrl: string;
+  isBookmarkedByLoginUser: boolean;
   numberOfBookmarks: number;
   remarks: string;
   postDetails: PostDetail[];

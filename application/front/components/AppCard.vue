@@ -1,21 +1,98 @@
 <template>
   <v-card>
-    <!-- 会社名・oooで一位 -->
+    <!-- TODO:会社名が長い時の折り返し -->
+    <!-- 会社名 -->
     <v-card-title>
-      <v-btn text :href="companyHomepageUrl">{{ companyName }} </v-btn>
+      <a
+        color="secondary"
+        class="wrapped-button"
+        text
+        :href="companyHomepageUrl"
+        target="_blank"
+      >
+        {{ companyName }}
+      </a>
     </v-card-title>
-    <v-card-text class="text-h5 font-weight-bold">
-      <div v-for="(detailText, index) in postDetailsComputed" :key="index">
+
+    <!-- 一位内容 -->
+    <v-card-text>
+      <div
+        v-for="(detailText, index) in postDetailsComputed"
+        :key="index"
+        class="font-weight-bold"
+      >
         {{ detailText }}
+      </div>
+
+      <!-- 会社画像 -->
+      <v-img
+        v-show="hasCompanyImageUrl"
+        contain
+        height="100"
+        :src="companyImageUrl"
+      >
+      </v-img>
+
+      <!-- 備考（投稿説明） -->
+      <div class="text--primary">
+        {{ remarks }}
       </div>
     </v-card-text>
 
-    <!-- 会社画像 -->
-
-    <!-- 会社詳細・投稿説明詳細 -->
+    <v-divider></v-divider>
 
     <!-- 投稿者情報 -->
-    <v-card-actions> </v-card-actions>
+    <v-card-actions>
+      <v-list-item dense class="grow">
+        <v-list-item-avatar>
+          <v-img
+            class="elevation-6"
+            :alt="postingUserName"
+            :src="postingUserIcomImageUrl"
+          ></v-img>
+        </v-list-item-avatar>
+
+        <!-- <div style="white-space: normal"> -->
+        <!-- TODO:投稿者名が長い時の折り返し -->
+        <v-list-item-content>
+          <v-list-item-title>
+            {{ postingUserName }}
+          </v-list-item-title>
+        </v-list-item-content>
+
+        <v-row align="center" justify="end">
+          <v-icon dense color="bookmark" @click="onClickedBookmarkButton">
+            {{ isBookmarkedByLoginUser ? 'mdi-heart' : 'mdi-heart-outline' }}
+          </v-icon>
+          <span class="subheading mr-2">{{ numberOfBookmarks }}</span>
+
+          <v-icon
+            v-show="!isPostedByLoginUser"
+            dense
+            color="warning"
+            @click="onClickedAlertButton"
+          >
+            mdi-alert-outline
+          </v-icon>
+          <v-icon
+            v-show="isPostedByLoginUser"
+            dense
+            color="secondary"
+            @click="onClickedEditButton"
+          >
+            mdi-pencil
+          </v-icon>
+          <v-icon
+            v-show="isPostedByLoginUser"
+            dense
+            color="secondary"
+            @click="onClickedDeleteButton"
+          >
+            mdi-delete
+          </v-icon>
+        </v-row>
+      </v-list-item>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -23,6 +100,7 @@
 import Vue, { PropType } from 'vue';
 import { SelectItem } from '@f/definition/common/selectItem';
 import { AppCardPostDetail } from '@f/definition/components/appCard/data';
+import { StringUtil } from '@c/util/stringUtil';
 
 export default Vue.extend({
   name: 'AppCard',
@@ -48,6 +126,11 @@ export default Vue.extend({
       default: '',
       required: false,
     },
+    companyImageUrl: {
+      type: String,
+      default: '',
+      required: false,
+    },
     postingUserId: {
       type: String,
       default: '',
@@ -61,6 +144,11 @@ export default Vue.extend({
     postingUserIcomImageUrl: {
       type: String,
       default: '',
+      required: false,
+    },
+    isBookmarkedByLoginUser: {
+      type: Boolean,
+      default: false,
       required: false,
     },
     numberOfBookmarks: {
@@ -95,9 +183,18 @@ export default Vue.extend({
     },
   },
   computed: {
+    hasCompanyImageUrl(): boolean {
+      return StringUtil.isNotEmpty(this.companyImageUrl);
+    },
     postDetailsComputed(): string[] {
       return this.postDetails.map(
-        (x) => `${x.no1Content}で${this.getNo1Division(x.no1Division)}`,
+        (x) => `${x.no1Content} : ${this.getNo1Division(x.no1Division)}`,
+      );
+    },
+    isPostedByLoginUser(): boolean {
+      return (
+        this.postingUserId ===
+        this.$accessor.firebaseAuthorization.userIdComputed
       );
     },
   },
@@ -105,13 +202,8 @@ export default Vue.extend({
     console.log('AppCard');
     console.log(this.value);
     console.log(this.companyNumber);
-    console.log(this.companyName);
-    console.log(this.companyHomepageUrl);
     console.log(this.postingUserId);
-    console.log(this.postingUserName);
     console.log(this.postingUserIcomImageUrl);
-    console.log(this.numberOfBookmarks);
-    console.log(this.remarks);
     console.log(this.postDetails);
     console.log(this.no1Divisions);
   },
@@ -123,11 +215,39 @@ export default Vue.extend({
       return targetDivision?.text || '';
     },
     onClickedBookmarkButton(): void {
-      this.$emit('click-bookmark', {
+      // 「今お気に入り状態でお気に入りクリック」=「お気に入り解除」とみなす
+      if (this.isBookmarkedByLoginUser) {
+        this.$emit('remove-bookmark', {
+          postId: this.value,
+        });
+      } else {
+        this.$emit('add-bookmark', {
+          postId: this.value,
+        });
+      }
+    },
+    onClickedAlertButton(): void {
+      // TODO:報告してよいかの確認ダイアログ起動
+      this.$emit('confirm-report', {
         postId: this.value,
-        postingUserId: this.postingUserId,
+      });
+    },
+    onClickedEditButton(): void {
+      this.$emit('click-edit', {
+        postId: this.value,
+      });
+    },
+    onClickedDeleteButton(): void {
+      // TODO:削除してよいかの確認ダイアログ起動
+      this.$emit('confirm-delete', {
+        postId: this.value,
       });
     },
   },
 });
 </script>
+
+<style lang="sass" scoped>
+.wrapped-button
+  text-decoration: none
+</style>

@@ -102,15 +102,9 @@ export default Vue.extend({
     };
   },
   computed: {
-    homePath(): string {
-      return '/home';
-    },
-    loginPath(): string {
-      return '#login';
-    },
-    logoutPath(): string {
-      return '#logout';
-    },
+    homePath: (): string => '/home',
+    loginPath: (): string => '#login',
+    logoutPath: (): string => '#logout',
     /**
      * ログアウト状態でのサイドバーメニュー
      */
