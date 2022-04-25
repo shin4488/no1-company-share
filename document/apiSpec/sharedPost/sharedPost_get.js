@@ -24,9 +24,11 @@ const responseBody = {
                 "companyNumber": "C000000000001",
                 "companyName": "テスト1株式会社",
                 "companyHomepageUrl": "http://1.example.com",
+                "companyImageUrl": "http://11.example.com",
                 "postingUserId": "cDYrCmleUFhpDok0klZxvCpZVJt1",
-                "postingUserIcomImageUrl": "http://i1.example.com",
                 "postingUserName": "Taro Yamada",
+                "postingUserIcomImageUrl": "http://i1.example.com",
+                "isBookmarkedByLoginUser": false,
                 "numberOfBookmarks": 10,
                 "remarks": "テスト備考1",
                 "postDetails": [
