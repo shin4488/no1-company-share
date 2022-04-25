@@ -2,6 +2,9 @@ import colors from 'vuetify/es5/util/colors';
 // eslint-disable-next-line nuxt/no-cjs-in-config
 const path = require('path');
 
+const axiosBaseUrl = '/api/v1';
+const port = process.env.NUXT_PORT;
+
 export default {
   watchers: {
     webpack: {
@@ -11,6 +14,7 @@ export default {
   },
   server: {
     host: '0.0.0.0',
+    port,
   },
   srcDir: './front',
   serverMiddleware: ['~~/server/'],
@@ -84,7 +88,18 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: '/api/v1',
+    // baseUrlとproxyは同時に使用できないためprefixにしている
+    // https://axios.nuxtjs.org/options/#baseurl
+    prefix: axiosBaseUrl,
+    proxy: true,
+  },
+  // ssr時のservermiddleware呼び出しはnuxtサーバを指定しないといけない
+  // この指定がないとnginxサーバ向けのリクエストになる
+  proxy: {
+    [`${axiosBaseUrl}/localhost/`]: {
+      target: `http://localhost:${port}`,
+      pathRewrite: { '/localhost/': '/' },
+    },
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify

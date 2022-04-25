@@ -8,6 +8,7 @@ ENV CHOKIDAR_USEPOLLING true
 # firebase認証用
 ENV FIREBASE_CONFIG ./server/common/middleware/secret/no1-company-share-firebase-adminsdk-secret.json
 ENV GOOGLE_CLOUD_PROJECT no1-company-share
+ENV NUXT_PORT 3100
 
 RUN apt update
 RUN apt install sudo -y
