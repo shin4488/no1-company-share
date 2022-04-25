@@ -7,6 +7,8 @@ import { SequelizeHandlerImpl } from '@s/common/sequelize/sequelizeHandler';
 import { SequelizeHandler } from '@s/common/sequelize/interface/SequelizeHandler';
 import { ApiResponseHandler } from '@s/common/apiResponse/interface/ApiResponseHandler';
 import { ApiResponseHandlerImpl } from '@s/common/apiResponse/apiResponseHandler';
+import { SharedPostService } from '@s/feature/sharedPost/interface/sharedPostService';
+import { SharedPostServiceImpl } from '@s/feature/sharedPost/service';
 
 const appContainer = new Container();
 appContainer
@@ -17,8 +19,12 @@ appContainer
   .bind<SequelizeHandler>(types.SequelizeHandler)
   .to(SequelizeHandlerImpl)
   .inSingletonScope();
+
 appContainer
   .bind<ApiResponseHandler>(types.ApiResponseHandler)
   .to(ApiResponseHandlerImpl);
+appContainer
+  .bind<SharedPostService>(types.SharedPostService)
+  .to(SharedPostServiceImpl);
 
 export { appContainer };

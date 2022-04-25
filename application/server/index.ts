@@ -11,7 +11,7 @@ import { SequelizeHandler } from '@s/common/sequelize/interface/SequelizeHandler
 import { logRequestResponse } from '@s/common/middleware/logger';
 import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthorization';
 import { catchError } from '@s/common/middleware/appErrorHandler';
-import { developmentRouter } from '@s/feature/development/router';
+import { appRouter } from '@s/feature/router';
 
 // DIコンテナからインスタンス取得
 const logger = appContainer.get<LogHandler>(types.LogHandler);
@@ -34,11 +34,7 @@ app.use(accessLoggerMiddleware);
 app.use(logRequestResponse);
 app.use(authorizationFirebaseUser);
 
-const rootEndpoint = '/api/v1';
-
-if (process.env.NODE_ENV === 'development') {
-  app.use(rootEndpoint, developmentRouter);
-}
+app.use('/api/v1', appRouter);
 
 // 例外発生キャッチ用のミドルウェアはルーティング後に追加する必要がある
 // 参照：「エラー処理を記述する」：https://expressjs.com/ja/guide/error-handling.html

@@ -1,31 +1,57 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { RecordNotFoundError } from '@s/common/error/recordNotFoundError';
 import { AppError } from '@s/common/error/appError';
+import { BaseController } from '@s/common/controller/baseController';
 
-export const [errorEndpoint1, errorController1] = [
-  '/development/errors/1',
-  (_req: express.Request, _res: express.Response) => {
+class ErrorController extends BaseController {
+  public static recordNotFoundEndpoint: string = '/development/errors/1';
+  public static getRecordNotFound(
+    _request: express.Request,
+    _response: express.Response,
+  ) {
     throw new RecordNotFoundError();
-  },
-];
+  }
 
-export const [errorEndpoint2, errorController2] = [
-  '/development/errors/2',
-  (_req: express.Request, _res: express.Response) => {
+  public static recordNotFoundNoDataEndpoint: string = '/development/errors/2';
+  public static getRecordNotFoundNoData(
+    _request: express.Request,
+    _response: express.Response,
+  ) {
     throw new RecordNotFoundError('データなし');
-  },
-];
+  }
 
-export const [errorEndpoint3, errorController3] = [
-  '/development/errors/3',
-  (_req: express.Request, _res: express.Response) => {
+  public static appErrorEndpoint: string = '/development/errors/3';
+  public static getAppError(
+    _request: express.Request,
+    _response: express.Response,
+  ) {
     throw new AppError(404, 'Apperrorが発生');
-  },
-];
+  }
 
-export const [errorEndpoint4, errorController4] = [
-  '/development/errors/4',
-  (_req: express.Request, _res: express.Response) => {
+  public static errorEndpoint: string = '/development/errors/4';
+  public static getError(
+    _request: express.Request,
+    _response: express.Response,
+  ) {
     throw new Error('Errorが発生');
-  },
-];
+  }
+}
+
+const errorDevelopmentRouter = Router();
+errorDevelopmentRouter.get(
+  ErrorController.recordNotFoundEndpoint,
+  ErrorController.getRecordNotFound,
+);
+errorDevelopmentRouter.get(
+  ErrorController.recordNotFoundNoDataEndpoint,
+  ErrorController.getRecordNotFoundNoData,
+);
+errorDevelopmentRouter.get(
+  ErrorController.appErrorEndpoint,
+  ErrorController.getAppError,
+);
+errorDevelopmentRouter.get(
+  ErrorController.errorEndpoint,
+  ErrorController.getError,
+);
+export { errorDevelopmentRouter };
