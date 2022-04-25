@@ -74,10 +74,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import {
-  DefaultData,
-  SidebarItem,
-} from '@f/definition/layouts/default/defaultData';
+import { DefaultData, SidebarItem } from '@f/definition/layouts/default/data';
 import { StringUtil } from '@c/util/stringUtil';
 import SnackBarError from '@f/components/SnackBarError.vue';
 
