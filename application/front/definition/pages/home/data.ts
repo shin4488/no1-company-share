@@ -1,7 +1,7 @@
-import { PageAppCardItem } from '../common/sharedCompanyPost';
+import { SharedPost } from '@f/definition/common/sharedPost';
 import { SelectItem } from '@f/definition/common/selectItem';
 
 export interface HomePageData {
-  sharedCompanyPosts: PageAppCardItem[];
+  sharedCompanyPosts: SharedPost[];
   no1Divisions: SelectItem[];
 }

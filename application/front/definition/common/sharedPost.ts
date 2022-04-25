@@ -10,7 +10,7 @@ export interface PostDetail {
 /**
  * カードに表示する要素データ
  */
-export interface PageAppCardItem {
+export interface SharedPost {
   postId: string;
   companyNumber: string;
   companyName: string;
