@@ -5,11 +5,11 @@ export interface SharedPostGetRequestQuery {
   /**
    * 取得件数の上限
    */
-  limit: number | null;
+  limit: number;
   /**
    * 取得開始位置
    */
-  offset: number | null;
+  offset: number;
   /**
    * 取得基準日時
    * この時刻以前のデータを取得
@@ -20,12 +20,5 @@ export interface SharedPostGetRequestQuery {
    * ログインユーザの投稿のみ取得
    */
   // 「Authorization」にログインユーザIDトークンが有効なときのみ使用可能
-  isMyPostOnly: boolean | null;
-}
-
-/**
- * 投稿取得リクエストURL内のルートパラメータ
- */
-export interface SharedPostGetRequestParameter {
-  postId?: string;
+  isMyPostOnly: boolean;
 }
