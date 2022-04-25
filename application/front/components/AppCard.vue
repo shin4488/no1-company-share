@@ -76,6 +76,7 @@
           </v-icon>
           <v-icon
             v-show="isPostedByLoginUser"
+            class="mr-2"
             dense
             color="secondary"
             @click="onClickedEditButton"
