@@ -15,14 +15,27 @@ import Vue from 'vue';
 import { Context } from '@nuxt/types';
 import { SelectItem } from '@f/definition/common/selectItem';
 import { HomePageData } from '@f/definition/pages/home/data';
-import { PageAppCardItem } from '@f/definition/pages/common/sharedCompanyPost';
+import { SharedPost } from '@f/definition/common/sharedPost';
 
 export default Vue.extend({
   name: 'HomePage',
-  asyncData(_context: Context) {
-    // const response = await $axios.post('', {});
-    // const responseBody = response.data;
-    const sharedCompanyPosts: PageAppCardItem[] = [
+  async asyncData({ $axios }: Context) {
+    try {
+      const response = await $axios.get('/localhost/shared-posts', {
+        params: {
+          limit: 30,
+          offset: 61,
+          baseDateTime: '2022-04-31', // '2022-04-31 10:30:59.999',
+          isMyPostOnly: false,
+        },
+      });
+      const responseBody = response.data;
+      console.log(responseBody);
+    } catch (error) {
+      console.log(error);
+    }
+
+    const sharedCompanyPosts: SharedPost[] = [
       {
         postId: 'testpost1',
         companyNumber: 'testcompany1',
