@@ -28,4 +28,30 @@ export class StringUtil {
   public static toString(value: number | undefined | null): string {
     return value === null || value === undefined ? '' : value.toString();
   }
+
+  /**
+   * 文字列がisEmptyなら 他方の値を返します。
+   * @param value
+   * @param elseValue
+   */
+  public static ifEmpty(
+    value: string | null | undefined,
+    elseValue: string = '',
+  ): string {
+    return value === null || value === undefined || value === ''
+      ? elseValue
+      : value;
+  }
+
+  /**
+   * 非空の要素を連結し、一つの文字列にします。
+   * @param separator セパレータ
+   * @param args 要素一覧
+   */
+  public static joinNotEmpty(separator: string, ...args: unknown[]) {
+    const filterd = args.filter(
+      (x) => !(x === null || x === undefined || x === ''),
+    );
+    return filterd.join(separator);
+  }
 }
