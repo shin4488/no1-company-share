@@ -1,6 +1,13 @@
 <template>
   <v-row>
-    <v-col v-for="(item, index) in value" :key="index" md="4" sm="6" xs="12">
+    <v-col
+      v-for="(item, index) in value"
+      :key="index"
+      xl="3"
+      md="4"
+      sm="6"
+      xs="12"
+    >
       <AppCard
         v-model="item.postId"
         :company-number="item.companyNumber"
@@ -28,13 +35,13 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 import { SelectItem } from '@f/definition/common/selectItem';
-import { AppCardItem } from '@f/definition/components/appCardList/prop';
+import { SharedPost } from '@f/definition/common/sharedPost';
 
 export default Vue.extend({
   name: 'AppCardList',
   props: {
     value: {
-      type: Array as PropType<AppCardItem[]>,
+      type: Array as PropType<SharedPost[]>,
       default: () => [],
       required: true,
     },
