@@ -31,7 +31,6 @@ export const actions = actionTree(
   { state, mutations },
   {
     async onAuthStateChangedAction({ commit }, { authUser }) {
-      console.log(authUser);
       if (authUser === null) {
         commit('setUserId', null);
         commit('setIdToken', null);
