@@ -66,7 +66,7 @@ CREATE TABLE public.bookmark (
 
 -- 事前データ
 INSERT INTO public.user_master (id) VALUES (
-  'cDYrCmleUFhpDok0klZxvCpZVJt1'
+  'cDYrCmleUFhpDok0klZxvCpZVJt-'
 );
 INSERT INTO public.company_master (
   company_number,
