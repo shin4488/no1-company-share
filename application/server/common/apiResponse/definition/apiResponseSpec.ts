@@ -9,6 +9,6 @@ export interface ApiResponseMessage {
  * APIレスポンスの共通部分
  */
 export interface ApiResponseSpec<TReponse = unknown> {
-  messages: ApiResponseMessage[] | [];
+  messages: ApiResponseMessage[];
   data: TReponse | null;
 }
