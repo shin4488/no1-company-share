@@ -1,3 +1,6 @@
+// 本来はバリデーション用のクラス・マッピング用のクラスを使用したいがプロパティにデコれーたをつけるとエラーとなってしまう
+// https://github.com/nuxt/nuxt.js/issues/9677
+
 // serverMiddlewareに登録されたサーバ処理ではaliasを使用できないので、module-aliasというライブラリを使っている
 // https://github.com/nuxt/nuxt.js/issues/4580
 // https://github.com/nuxt/nuxt.js/issues/7017
@@ -12,6 +15,7 @@ import { logRequestResponse } from '@s/common/middleware/logger';
 import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthorization';
 import { catchError } from '@s/common/middleware/appErrorHandler';
 import { appRouter } from '@s/feature/router';
+import { ArrayUtil } from '@c/util/arrayUtil';
 
 // DIコンテナからインスタンス取得
 const logger = appContainer.get<LogHandler>(types.LogHandler);
@@ -20,7 +24,7 @@ appContainer.get<SequelizeHandler>(types.SequelizeHandler);
 
 // デフォルトで「FIREBASE_CONFIG」環境変数のパスにある秘密鍵を見に行くため、引数不要
 const firebaseApps = Admin.apps;
-if (firebaseApps === null || firebaseApps.length === 0) {
+if (ArrayUtil.isEmpty(firebaseApps)) {
   Admin.initializeApp();
 }
 

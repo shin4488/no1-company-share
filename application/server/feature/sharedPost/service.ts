@@ -22,6 +22,7 @@ export class SharedPostServiceImpl implements SharedPostService {
           isBookmarkedByLoginUser: false,
           numberOfBookmarks: 10,
           remarks: '2020年度3月期有価証券報告書',
+          updatedAt: '2022-04-10 10:30:59.999',
           postDetails: [
             {
               id: 1,
@@ -45,6 +46,7 @@ export class SharedPostServiceImpl implements SharedPostService {
           numberOfBookmarks: 10,
           remarks:
             'http://example.com/ 2020年度3月期有価証券報告書テストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテスト',
+          updatedAt: '2022-04-10 12:30:59.999',
           postDetails: [
             {
               id: 1,
@@ -72,6 +74,7 @@ export class SharedPostServiceImpl implements SharedPostService {
           isBookmarkedByLoginUser: false,
           numberOfBookmarks: 0,
           remarks: '',
+          updatedAt: '2022-04-10 15:30:59.999',
           postDetails: [
             {
               id: 1,
@@ -95,6 +98,7 @@ export class SharedPostServiceImpl implements SharedPostService {
           isBookmarkedByLoginUser: true,
           numberOfBookmarks: 100000,
           remarks: '2020年度3月期有価証券報告書',
+          updatedAt: '2022-04-11 10:30:59.999',
           postDetails: [
             {
               id: 1,

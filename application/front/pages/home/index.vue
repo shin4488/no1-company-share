@@ -7,71 +7,39 @@
     @confirm-report="onConfirmedReport"
     @click-edit="onEdited"
     @confirm-delete="onDeleted"
+    @load-more="onLoadMore"
   ></AppCardList>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { Context } from '@nuxt/types';
-import { SelectItem } from '@f/definition/common/selectItem';
 import { HomePageData } from '@f/definition/pages/home/data';
-import { PostDetail, SharedPost } from '@f/definition/common/sharedPost';
 import { SharedPostGetRequestQuery } from '@f/definition/pages/common/apiSpec/sharedPostGetRequest';
 import { SharedPostGetReponse } from '@f/definition/pages/common/apiSpec/sharedPostGetResponse';
-import { ApiResponse } from '@f/definition/common/apiSpec/apiResponse';
-import { StringUtil } from '@c/util/stringUtil';
+import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
+import { SharedPostHandler } from '@f/common/ajax/sharedPostHandler';
+import { ArrayUtil } from '@c/util/arrayUtil';
 
 export default Vue.extend({
   name: 'HomePage',
   async asyncData({ $axios }: Context) {
     const request: SharedPostGetRequestQuery = {
       limit: 30,
+      // 初回読み込み時は1ページ目
       offset: 1,
+      // 初回読み込み時は1ページ目であるため、取得基準時刻は無し
       baseDateTime: null,
       isMyPostOnly: false,
     };
-    const response = await $axios.get<ApiResponse<SharedPostGetReponse>>(
+    const response = await AjaxHelper.get<SharedPostGetReponse>(
+      $axios,
       '/localhost/shared-posts',
-      {
-        params: request,
-      },
+      request,
     );
-    const responseBody = response.data;
-    const responseBodyData = responseBody.data;
-    if (responseBodyData === null) {
-      return {
-        sharedCompanyPosts: [],
-        no1Divisions: [],
-      };
-    }
 
-    const responsePosts = responseBodyData.posts;
-    const responseDivisions = responseBodyData.no1Divisions;
-
-    const sharedCompanyPosts: SharedPost[] = responsePosts.map((x) => ({
-      postId: StringUtil.ifEmpty(x.id),
-      companyNumber: StringUtil.ifEmpty(x.companyNumber),
-      companyName: StringUtil.ifEmpty(x.companyName),
-      companyHomepageUrl: StringUtil.ifEmpty(x.companyHomepageUrl),
-      companyImageUrl: StringUtil.ifEmpty(x.companyImageUrl),
-      postingUserId: StringUtil.ifEmpty(x.postingUserId),
-      postingUserName: StringUtil.ifEmpty(x.postingUserName),
-      postingUserIcomImageUrl: StringUtil.ifEmpty(x.postingUserIcomImageUrl),
-      isBookmarkedByLoginUser: x.isBookmarkedByLoginUser || false,
-      numberOfBookmarks: x.numberOfBookmarks || 0,
-      remarks: StringUtil.ifEmpty(x.remarks),
-      postDetails: x.postDetails.map<PostDetail>((y, index) => ({
-        postDetailId: y.id || index,
-        no1Content: StringUtil.ifEmpty(y.no1Content),
-        no1Division: StringUtil.ifEmpty(y.no1Division),
-      })),
-    }));
-
-    const no1Divisions: SelectItem[] = responseDivisions?.map((x) => ({
-      text: StringUtil.ifEmpty(x.text),
-      value: StringUtil.ifEmpty(x.value),
-    }));
-
+    const { sharedCompanyPosts, no1Divisions } =
+      SharedPostHandler.handleResponse(response);
     return {
       sharedCompanyPosts,
       no1Divisions,
@@ -149,6 +117,34 @@ export default Vue.extend({
      */
     onDeleted({ postId }: { postId: string }): void {
       console.log(postId);
+    },
+    /**
+     * さらに表示処理
+     */
+    async onLoadMore(): Promise<void> {
+      let baseDateTime: string | null = null;
+      if (ArrayUtil.isNotEmpty(this.sharedCompanyPosts)) {
+        const firstPost = this.sharedCompanyPosts[0];
+        baseDateTime = firstPost.updatedAt;
+      }
+
+      const request: SharedPostGetRequestQuery = {
+        limit: this.limit,
+        // limit分増えていく
+        offset: this.limit * this.loadedPage + 1,
+        baseDateTime,
+        isMyPostOnly: false,
+      };
+      const response = await AjaxHelper.get<SharedPostGetReponse>(
+        this.$axios,
+        '/localhost/shared-posts',
+        request,
+      );
+
+      const { sharedCompanyPosts } = SharedPostHandler.handleResponse(response);
+      this.sharedCompanyPosts.push(...sharedCompanyPosts);
+
+      this.loadedPage++;
     },
   },
 });

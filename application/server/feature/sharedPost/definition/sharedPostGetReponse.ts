@@ -25,6 +25,7 @@ export interface SharedPostGetPostsReponse {
   isBookmarkedByLoginUser: boolean;
   numberOfBookmarks: number;
   remarks: string;
+  updatedAt: string;
   postDetails: SharedPostGetDetailsReponse[];
 }
 

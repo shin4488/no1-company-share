@@ -1,35 +1,47 @@
 <template>
-  <v-row>
-    <v-col
-      v-for="(item, index) in value"
-      :key="index"
-      xl="3"
-      md="4"
-      sm="6"
-      xs="12"
-    >
-      <AppCard
-        v-model="item.postId"
-        :company-number="item.companyNumber"
-        :company-name="item.companyName"
-        :company-homepage-url="item.companyHomepageUrl"
-        :company-image-url="item.companyImageUrl"
-        :posting-user-id="item.postingUserId"
-        :posting-user-name="item.postingUserName"
-        :posting-user-icom-image-url="item.postingUserIcomImageUrl"
-        :is-bookmarked-by-login-user="item.isBookmarkedByLoginUser"
-        :number-of-bookmarks="item.numberOfBookmarks"
-        :remarks="item.remarks"
-        :post-details="item.postDetails"
-        :no1-divisions="no1Divisions"
-        @add-bookmark="onAddedBookmark"
-        @remove-bookmark="onRemovedBookmark"
-        @confirm-report="onConfirmedReport"
-        @click-edit="onEdited"
-        @confirm-delete="onDeleted"
-      ></AppCard>
-    </v-col>
-  </v-row>
+  <div>
+    <v-row>
+      <v-col
+        v-for="(item, index) in value"
+        :key="index"
+        xl="3"
+        md="4"
+        sm="6"
+        xs="12"
+      >
+        <AppCard
+          v-model="item.postId"
+          :company-number="item.companyNumber"
+          :company-name="item.companyName"
+          :company-homepage-url="item.companyHomepageUrl"
+          :company-image-url="item.companyImageUrl"
+          :posting-user-id="item.postingUserId"
+          :posting-user-name="item.postingUserName"
+          :posting-user-icom-image-url="item.postingUserIcomImageUrl"
+          :is-bookmarked-by-login-user="item.isBookmarkedByLoginUser"
+          :number-of-bookmarks="item.numberOfBookmarks"
+          :remarks="item.remarks"
+          :post-details="item.postDetails"
+          :no1-divisions="no1Divisions"
+          @add-bookmark="onAddedBookmark"
+          @remove-bookmark="onRemovedBookmark"
+          @confirm-report="onConfirmedReport"
+          @click-edit="onEdited"
+          @confirm-delete="onDeleted"
+        ></AppCard>
+      </v-col>
+    </v-row>
+
+    <div class="d-flex justify-center mt-3">
+      <v-btn
+        color="primary"
+        elevation="7"
+        rounded
+        @click="onClickedLoadMoreButton"
+        >さらに表示</v-btn
+      >
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -70,6 +82,9 @@ export default Vue.extend({
     },
     onDeleted(context: { postId: string }): void {
       this.$emit('confirm-delete', context);
+    },
+    onClickedLoadMoreButton(): void {
+      this.$emit('load-more');
     },
   },
 });
