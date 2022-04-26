@@ -8,6 +8,7 @@
     @click-edit="onEdited"
     @confirm-delete="onDeleted"
     @load-more="onLoadMore"
+    @add-post="onAddPost"
   ></AppCardList>
 </template>
 
@@ -145,6 +146,9 @@ export default Vue.extend({
       this.sharedCompanyPosts.push(...sharedCompanyPosts);
 
       this.loadedPage++;
+    },
+    onAddPost(): void {
+      console.log('onAddPost');
     },
   },
 });

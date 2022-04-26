@@ -32,14 +32,35 @@
       </v-col>
     </v-row>
 
-    <div class="d-flex justify-center mt-3">
-      <v-btn
-        color="primary"
-        elevation="7"
-        rounded
-        @click="onClickedLoadMoreButton"
-        >さらに表示</v-btn
-      >
+    <div class="d-flex justify-space-around mt-6">
+      <div />
+      <div />
+      <div>
+        <v-btn
+          color="primary"
+          elevation="7"
+          rounded
+          @click="onClickedLoadMoreButton"
+          >さらに表示</v-btn
+        >
+      </div>
+
+      <div />
+      <div>
+        <!-- TODO:追加ボタン -->
+        <v-btn
+          dark
+          fixed
+          fab
+          bottom
+          right
+          color="primary"
+          :class="additionButtonClassComputed"
+          @click="onClickedAddPostButton"
+        >
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+      </div>
     </div>
   </div>
 </template>
@@ -67,6 +88,13 @@ export default Vue.extend({
       ],
     },
   },
+  computed: {
+    additionButtonClassComputed(): string {
+      return this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm
+        ? 'mb-12'
+        : '';
+    },
+  },
   methods: {
     onAddedBookmark(context: { postId: string }): void {
       this.$emit('add-bookmark', context);
@@ -85,6 +113,9 @@ export default Vue.extend({
     },
     onClickedLoadMoreButton(): void {
       this.$emit('load-more');
+    },
+    onClickedAddPostButton(): void {
+      this.$emit('add-post');
     },
   },
 });
