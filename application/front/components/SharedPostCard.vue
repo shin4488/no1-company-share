@@ -182,6 +182,7 @@ export default Vue.extend({
           value: '',
         },
       ],
+      required: true,
     },
   },
   computed: {
@@ -199,15 +200,6 @@ export default Vue.extend({
         this.$accessor.firebaseAuthorization.userIdComputed
       );
     },
-  },
-  mounted() {
-    console.log('AppCard');
-    console.log(this.value);
-    console.log(this.companyNumber);
-    console.log(this.postingUserId);
-    console.log(this.postingUserIcomImageUrl);
-    console.log(this.postDetails);
-    console.log(this.no1Divisions);
   },
   methods: {
     getNo1Division(divisionValue: string): string {
