@@ -15,6 +15,7 @@ export const actions = actionTree(
   { state, mutations },
   {
     async open({ commit }, action: Function) {
+      // actionを実行中のみスピナーをオン、実行後はオフとする
       commit('change', true);
       try {
         await action();
