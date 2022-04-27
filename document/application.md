@@ -413,6 +413,14 @@ const plugin: Plugin = ({ $axios, $accessor }: Context) => {
 };
 ```
 
+## dialogの結果をawaitで待っている実装
+https://qiita.com/minojiro/items/e7e3128c7c779ca09ec7
+https://v2.vuejs.org/v2/api/?redirect=true#vm-on
+コンポーネント内で$emitしたイベントは、同じコンポーネント内で$onでリッスン可能
+
+
+
+
 # Typescript
 ## 絶対パスでimport
 
