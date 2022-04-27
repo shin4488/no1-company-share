@@ -1,7 +1,8 @@
 <template>
   <!-- https://vuetifyjs.com/ja/getting-started/wireframes/ -->
   <v-app>
-    <SnackBarError></SnackBarError>
+    <SnackBarError />
+    <SpinnerOverlay />
 
     <template v-if="!shouldUseBottomBarComputed">
       <v-app-bar clipped-left fixed dense app>
@@ -77,11 +78,13 @@ import Vue from 'vue';
 import { DefaultData, SidebarItem } from '@f/definition/layouts/default/data';
 import { StringUtil } from '@c/util/stringUtil';
 import SnackBarError from '@f/components/SnackBarError.vue';
+import SpinnerOverlay from '@f/components/SpinnerOverlay.vue';
 
 export default Vue.extend({
   name: 'DefaultLayout',
   components: {
     SnackBarError,
+    SpinnerOverlay,
   },
   data(): DefaultData {
     return {
