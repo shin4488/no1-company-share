@@ -9,7 +9,7 @@
         sm="6"
         xs="12"
       >
-        <AppCard
+        <SharedPostCard
           v-model="item.postId"
           :company-number="item.companyNumber"
           :company-name="item.companyName"
@@ -28,7 +28,7 @@
           @confirm-report="onConfirmedReport"
           @click-edit="onEdited"
           @confirm-delete="onDeleted"
-        ></AppCard>
+        />
       </v-col>
     </v-row>
   </div>
@@ -40,7 +40,7 @@ import { SelectItem } from '@f/definition/common/selectItem';
 import { SharedPost } from '@f/definition/common/sharedPost';
 
 export default Vue.extend({
-  name: 'AppCardList',
+  name: 'SharedPostCardList',
   props: {
     value: {
       type: Array as PropType<SharedPost[]>,

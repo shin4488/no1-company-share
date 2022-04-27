@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <!-- TODO:会社名が長い時の折り返し -->
+    <!-- TODO:hrefにスクリプトインジェクションされた時の対応必要？ -->
     <!-- 会社名 -->
     <v-card-title>
       <a
@@ -24,6 +24,7 @@
         {{ detailText }}
       </div>
 
+      <!-- TODO:srcにスクリプトインジェクションされた時の対応必要？ -->
       <!-- 会社画像 -->
       <v-img
         v-show="hasCompanyImageUrl"
@@ -100,11 +101,11 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 import { SelectItem } from '@f/definition/common/selectItem';
-import { AppCardPostDetail } from '@f/definition/components/appCard/data';
+import { PostDetail } from '@f/definition/common/sharedPost';
 import { StringUtil } from '@c/util/stringUtil';
 
 export default Vue.extend({
-  name: 'AppCard',
+  name: 'SharedPostCard',
   props: {
     // postId
     value: {
@@ -163,7 +164,7 @@ export default Vue.extend({
       required: false,
     },
     postDetails: {
-      type: Array as PropType<AppCardPostDetail[]>,
+      type: Array as PropType<PostDetail[]>,
       default: () => [
         {
           postDetailId: 1,

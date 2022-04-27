@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AppCardList
+    <SharedPostCardList
       v-model="sharedCompanyPosts"
       :no1-divisions="no1Divisions"
       @add-bookmark="onAddedBookmark"
