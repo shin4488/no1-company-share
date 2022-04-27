@@ -1,3 +1,6 @@
+// 本来はバリデーション用のクラス・マッピング用のクラスを使用したいがプロパティにデコれーたをつけるとエラーとなってしまう
+// https://github.com/nuxt/nuxt.js/issues/9677
+
 // serverMiddlewareに登録されたサーバ処理ではaliasを使用できないので、module-aliasというライブラリを使っている
 // https://github.com/nuxt/nuxt.js/issues/4580
 // https://github.com/nuxt/nuxt.js/issues/7017
@@ -11,7 +14,8 @@ import { SequelizeHandler } from '@s/common/sequelize/interface/SequelizeHandler
 import { logRequestResponse } from '@s/common/middleware/logger';
 import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthorization';
 import { catchError } from '@s/common/middleware/appErrorHandler';
-import { developmentRouter } from '@s/feature/development/router';
+import { appRouter } from '@s/feature/router';
+import { ArrayUtil } from '@c/util/arrayUtil';
 
 // DIコンテナからインスタンス取得
 const logger = appContainer.get<LogHandler>(types.LogHandler);
@@ -20,7 +24,7 @@ appContainer.get<SequelizeHandler>(types.SequelizeHandler);
 
 // デフォルトで「FIREBASE_CONFIG」環境変数のパスにある秘密鍵を見に行くため、引数不要
 const firebaseApps = Admin.apps;
-if (firebaseApps === null || firebaseApps.length === 0) {
+if (ArrayUtil.isEmpty(firebaseApps)) {
   Admin.initializeApp();
 }
 
@@ -34,11 +38,7 @@ app.use(accessLoggerMiddleware);
 app.use(logRequestResponse);
 app.use(authorizationFirebaseUser);
 
-const rootEndpoint = '/api/v1';
-
-if (process.env.NODE_ENV === 'development') {
-  app.use(rootEndpoint, developmentRouter);
-}
+app.use('/api/v1', appRouter);
 
 // 例外発生キャッチ用のミドルウェアはルーティング後に追加する必要がある
 // 参照：「エラー処理を記述する」：https://expressjs.com/ja/guide/error-handling.html

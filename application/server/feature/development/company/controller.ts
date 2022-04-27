@@ -1,14 +1,18 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
 import CompanyMaster from '@s/common/sequelize/models/companyMaster';
+import { BaseController } from '@s/common/controller/baseController';
 
-export const [companyEndpoint, companyController] = [
-  '/development/companies',
-  async (_req: express.Request, res: express.Response) => {
+class CompanyController extends BaseController {
+  public static companyEndpoint: string = '/development/companies';
+  public static async createCompanies(
+    _request: express.Request,
+    response: express.Response,
+  ) {
     const logger = appContainer.get<LogHandler>(types.LogHandler);
-    logger.log('info', 'firebase user id', res.locals.firebaseUserId);
+    logger.log('info', 'firebase user id', response.locals.firebaseUserId);
 
     try {
       console.log('会社取得（findAll）');
@@ -36,10 +40,17 @@ export const [companyEndpoint, companyController] = [
       console.log('会社取得（findAll）');
       const records2 = await CompanyMaster.findAll<CompanyMaster>();
       console.log(records2);
-      res.send({ companies: records2 });
+      super.success(response, { companies: records2 });
     } catch (e) {
       console.log(e);
       logger.error(e);
     }
-  },
-];
+  }
+}
+
+const companyDevelopmentRouter = Router();
+companyDevelopmentRouter.post(
+  CompanyController.companyEndpoint,
+  CompanyController.createCompanies,
+);
+export { companyDevelopmentRouter };

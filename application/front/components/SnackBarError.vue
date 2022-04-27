@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SnackBarErrorData } from '@f/definition/components/snackBarError/snackBarErrorData';
+import { SnackBarErrorData } from '@f/definition/components/snackBarError/data';
 
 export default Vue.extend({
   name: 'SnackBarError',

@@ -6,6 +6,7 @@ import {
 } from 'typed-vuex';
 import * as firebaseAuthorization from './firebaseAuthorization';
 import * as snackBarError from './snackBarError';
+import * as spinnerOverlay from './spinnerOverlay';
 
 export const state = () => ({});
 export const getters = getterTree(state, {});
@@ -19,5 +20,6 @@ export const accessorType = getAccessorType({
   modules: {
     firebaseAuthorization,
     snackBarError,
+    spinnerOverlay,
   },
 });

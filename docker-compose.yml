@@ -17,7 +17,7 @@ services:
   application:
     build: ./application
     ports:
-      - 20000:3000
+      - 20000:3100
     tty: true
     volumes:
       - ./application:/home/app/companyshare

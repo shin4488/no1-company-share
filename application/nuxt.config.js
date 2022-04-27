@@ -2,6 +2,9 @@ import colors from 'vuetify/es5/util/colors';
 // eslint-disable-next-line nuxt/no-cjs-in-config
 const path = require('path');
 
+const axiosBaseUrl = '/api/v1';
+const port = process.env.NUXT_PORT;
+
 export default {
   watchers: {
     webpack: {
@@ -11,6 +14,7 @@ export default {
   },
   server: {
     host: '0.0.0.0',
+    port,
   },
   srcDir: './front',
   serverMiddleware: ['~~/server/'],
@@ -84,7 +88,18 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: '/api/v1',
+    // baseUrlとproxyは同時に使用できないためprefixにしている
+    // https://axios.nuxtjs.org/options/#baseurl
+    prefix: axiosBaseUrl,
+    proxy: true,
+  },
+  // ssr時のservermiddleware呼び出しはnuxtサーバを指定しないといけない
+  // この指定がないとnginxサーバ向けのリクエストになる
+  proxy: {
+    [`${axiosBaseUrl}/localhost/`]: {
+      target: `http://localhost:${port}`,
+      pathRewrite: { '/localhost/': '/' },
+    },
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
@@ -94,7 +109,7 @@ export default {
       dark: false,
       themes: {
         dark: {
-          primary: colors.blue.darken2,
+          primary: colors.blue.darken3,
           accent: colors.grey.darken3,
           secondary: colors.amber.darken3,
           info: colors.teal.lighten1,
@@ -103,8 +118,8 @@ export default {
           success: colors.green.accent3,
         },
         light: {
-          primary: colors.lightBlue.lighten4,
-          secondary: colors.grey.lighten4,
+          primary: '#6D9EEB',
+          secondary: colors.grey.darken2,
           accent: '#ECF2FD',
           error: '#E06666',
           success: '#B6D7A8',
@@ -112,10 +127,10 @@ export default {
           primaryText: '#a4a6a4',
           secondaryText: '#555555',
           accentText: '#555555',
-          errorText: '#000000',
-          successText: '#000000',
-          warningText: '#000000',
-          bookmark: '#d64d31',
+          errorText: colors.grey.darken4,
+          successText: colors.grey.darken4,
+          warningText: colors.grey.darken4,
+          bookmark: colors.red.lighten1,
         },
       },
     },

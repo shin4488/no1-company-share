@@ -8,6 +8,8 @@
 const requestQuery = {
     "limit": 30,
     "offset": 61,
+    // この時刻以前のデータを取得（これがないとページング時に取得結果のデータが1ページ目の2ページ目で整合性合わなくなる時あり）
+    "baseDateTime": "2022-04-31 10:30:59.999",
     // base.js記載の「Authorization」にログインユーザIDトークンが有効なときのみ使用可能
     "isMyPostOnly": false
 };
@@ -22,10 +24,12 @@ const responseBody = {
                 "companyNumber": "C000000000001",
                 "companyName": "テスト1株式会社",
                 "companyHomepageUrl": "http://1.example.com",
+                "companyImageUrl": "http://11.example.com",
                 "postingUserId": "cDYrCmleUFhpDok0klZxvCpZVJt1",
+                "postingUserName": "Taro Yamada",
                 "postingUserIcomImageUrl": "http://i1.example.com",
+                "isBookmarkedByLoginUser": false,
                 "numberOfBookmarks": 10,
-                "isReported": false,
                 "remarks": "テスト備考1",
                 "postDetails": [
                     {
@@ -39,6 +43,20 @@ const responseBody = {
                         "no1Division": 2
                     }
                 ]
+            }
+        ],
+        "no1Divisions": [
+            {
+                "text": "世界一",
+                "value": 1
+            },
+            {
+                "text": "日本一",
+                "value": 2
+            },
+            {
+                "text": "福井一",
+                "value": 3
             }
         ]
     }
