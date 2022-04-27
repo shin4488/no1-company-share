@@ -5,4 +5,5 @@ export interface HomePageData {
   sharedCompanyPosts: SharedPost[];
   no1Divisions: SelectItem[];
   loadedPage: number;
+  isLoadMoreButtonShown: boolean;
 }
