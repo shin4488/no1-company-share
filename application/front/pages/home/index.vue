@@ -9,6 +9,7 @@
       @click-edit="onEdited"
       @confirm-delete="onDeleted"
     />
+    <SharedPostDialog ref="sharedPostDialog" :no1-divisions="no1Divisions" />
 
     <LoadMoreButton
       v-if="isLoadMoreButtonShown"
@@ -31,6 +32,8 @@ import { ArrayUtil } from '@c/util/arrayUtil';
 import { postFetchedLimit } from '@f/common/constant/sharedPost';
 import { SharedPost } from '@f/definition/common/sharedPost';
 import { SelectItem } from '@f/definition/common/selectItem';
+import SharedPostDialog from '@f/components/SharedPostDialog.vue';
+import { SharedPostDialogParameter } from '@f/definition/components/sharedPostDialog/parameter';
 
 export default Vue.extend({
   name: 'HomePage',
@@ -120,9 +123,7 @@ export default Vue.extend({
     /**
      * 投稿編集時処理
      */
-    onEdited({ postId }: { postId: string }): void {
-      // TODO:編集画面起動
-      console.log(postId);
+    async onEdited({ postId }: { postId: string }): Promise<void> {
       const editedPost = this.sharedCompanyPosts.find(
         (x) => x.postId === postId,
       );
@@ -130,7 +131,29 @@ export default Vue.extend({
         return;
       }
 
-      console.log(editedPost);
+      const sharedPostDialog = this.$refs.sharedPostDialog as InstanceType<
+        typeof SharedPostDialog
+      >;
+      const parameter: SharedPostDialogParameter = {
+        postId: editedPost.postId,
+        companyNumber: editedPost.companyNumber,
+        companyName: editedPost.companyName,
+        companyHomepageUrl: editedPost.companyHomepageUrl,
+        companyImageUrl: editedPost.companyImageUrl,
+        remarks: editedPost.remarks,
+        updatedAt: editedPost.updatedAt,
+        postDetails: editedPost.postDetails.map((x) => ({
+          postDetailId: x.postDetailId,
+          no1Content: x.no1Content,
+          no1Division: x.no1Division,
+        })),
+      };
+      const result = await sharedPostDialog.open(parameter);
+      if (result === undefined) {
+        return;
+      }
+
+      console.log(result);
     },
     /**
      * 投稿削除時処理
@@ -171,8 +194,27 @@ export default Vue.extend({
         this.loadedPage++;
       });
     },
-    onClickedAddPostButton(): void {
-      console.log('onAddPost');
+    async onClickedAddPostButton(): Promise<void> {
+      const sharedPostDialog = this.$refs.sharedPostDialog as InstanceType<
+        typeof SharedPostDialog
+      >;
+
+      const parameter: SharedPostDialogParameter = {
+        postId: '',
+        companyNumber: '',
+        companyName: '',
+        companyHomepageUrl: '',
+        companyImageUrl: '',
+        remarks: '',
+        updatedAt: '',
+        postDetails: [],
+      };
+      const result = await sharedPostDialog.open(parameter);
+      if (result === undefined) {
+        return;
+      }
+
+      console.log(result);
     },
   },
 });
