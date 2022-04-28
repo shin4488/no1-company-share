@@ -34,14 +34,14 @@ import { SharedPost } from '@f/definition/common/sharedPost';
 import { SelectItem } from '@f/definition/common/selectItem';
 import SharedPostDialog from '@f/components/SharedPostDialog.vue';
 import { SharedPostDialogParameter } from '@f/definition/components/sharedPostDialog/parameter';
+import { SharedPostDialogResult } from '@f/definition/components/sharedPostDialog/result';
+import { StringUtil } from '@c/util/stringUtil';
 
 export default Vue.extend({
   name: 'HomePage',
   async asyncData({ $axios, $accessor }: Context) {
     const request: SharedPostGetRequestQuery = {
       limit: postFetchedLimit,
-      // 初回読み込み時は1ページ目
-      offset: 1,
       // 初回読み込み時は1ページ目であるため、取得基準時刻は無し
       baseDateTime: null,
       isMyPostOnly: false,
@@ -75,7 +75,6 @@ export default Vue.extend({
     return {
       sharedCompanyPosts: [],
       no1Divisions: [],
-      loadedPage: 1,
       isLoadMoreButtonShown: false,
     };
   },
@@ -124,16 +123,14 @@ export default Vue.extend({
      * 投稿編集時処理
      */
     async onEdited({ postId }: { postId: string }): Promise<void> {
-      const editedPost = this.sharedCompanyPosts.find(
+      const editedPostIndex = this.sharedCompanyPosts.findIndex(
         (x) => x.postId === postId,
       );
-      if (editedPost === undefined) {
+      if (editedPostIndex === -1) {
         return;
       }
 
-      const sharedPostDialog = this.$refs.sharedPostDialog as InstanceType<
-        typeof SharedPostDialog
-      >;
+      const editedPost = this.sharedCompanyPosts[editedPostIndex];
       const parameter: SharedPostDialogParameter = {
         postId: editedPost.postId,
         companyNumber: editedPost.companyNumber,
@@ -148,12 +145,25 @@ export default Vue.extend({
           no1Division: x.no1Division,
         })),
       };
-      const result = await sharedPostDialog.open(parameter);
+      const result = await this.openSharedPostDialog(parameter);
       if (result === undefined) {
         return;
       }
 
       console.log(result);
+      editedPost.postId = result.postId;
+      editedPost.companyNumber = result.companyNumber;
+      editedPost.companyName = result.companyName;
+      editedPost.companyHomepageUrl = result.companyHomepageUrl;
+      editedPost.companyImageUrl = result.companyImageUrl;
+      editedPost.remarks = result.remarks;
+      editedPost.updatedAt = result.updatedAt;
+      editedPost.postDetails = result.postDetails.map((x) => ({
+        postDetailId: x.postDetailId,
+        no1Content: x.no1Content,
+        no1Division: x.no1Division,
+      }));
+      this.sharedCompanyPosts[editedPostIndex] = editedPost;
     },
     /**
      * 投稿削除時処理
@@ -162,19 +172,83 @@ export default Vue.extend({
       console.log(postId);
     },
     /**
+     * 新規投稿追加ボタン押下処理
+     */
+    async onClickedAddPostButton(): Promise<void> {
+      const firebaseLoginUserId =
+        this.$accessor.firebaseAuthorization.userIdComputed;
+      if (StringUtil.isEmpty(firebaseLoginUserId)) {
+        this.$accessor.snackBarError.open('投稿するにはログインしてください。');
+        return;
+      }
+
+      let firstNo1Division = '';
+      if (ArrayUtil.isNotEmpty(this.no1Divisions)) {
+        firstNo1Division = this.no1Divisions[0].value;
+      }
+
+      const parameter: SharedPostDialogParameter = {
+        postId: '',
+        companyNumber: '',
+        companyName: '',
+        companyHomepageUrl: '',
+        companyImageUrl: '',
+        remarks: '',
+        updatedAt: '',
+        postDetails: [
+          {
+            postDetailId: null,
+            no1Content: '',
+            no1Division: firstNo1Division,
+          },
+        ],
+      };
+      const result = await this.openSharedPostDialog(parameter);
+      if (result === undefined) {
+        return;
+      }
+
+      const newPost: SharedPost = {
+        postId: result.postId,
+        companyNumber: result.companyNumber,
+        companyName: result.companyName,
+        companyHomepageUrl: result.companyHomepageUrl,
+        companyImageUrl: result.companyImageUrl,
+        postingUserId: StringUtil.ifEmpty(
+          this.$accessor.firebaseAuthorization.userIdComputed,
+        ),
+        postingUserName: StringUtil.ifEmpty(
+          this.$fireModule.auth().currentUser?.displayName,
+        ),
+        postingUserIcomImageUrl: StringUtil.ifEmpty(
+          this.$fireModule.auth().currentUser?.photoURL,
+        ),
+        isBookmarkedByLoginUser: false,
+        numberOfBookmarks: 0,
+        remarks: result.remarks,
+        updatedAt: result.updatedAt,
+        postDetails: result.postDetails.map((x) => ({
+          postDetailId: x.postDetailId,
+          no1Content: x.no1Content,
+          no1Division: x.no1Division,
+        })),
+      };
+      // 新規作成したデータは最新投稿であるため、最上位に表示
+      this.sharedCompanyPosts.unshift(newPost);
+    },
+    /**
      * さらに表示処理ボタン押下処理
      */
     async onClickedLoadMoreButton(): Promise<void> {
       let baseDateTime: string | null = null;
       if (ArrayUtil.isNotEmpty(this.sharedCompanyPosts)) {
-        const firstPost = this.sharedCompanyPosts[0];
-        baseDateTime = firstPost.updatedAt;
+        const lastPostIndex = this.sharedCompanyPosts.length - 1;
+        const lastPost = this.sharedCompanyPosts[lastPostIndex];
+        baseDateTime = lastPost.updatedAt;
       }
 
       const request: SharedPostGetRequestQuery = {
         limit: postFetchedLimit,
-        // limit分増えていく
-        offset: postFetchedLimit * this.loadedPage + 1,
         baseDateTime,
         isMyPostOnly: false,
       };
@@ -190,31 +264,17 @@ export default Vue.extend({
         this.sharedCompanyPosts.push(...sharedCompanyPosts);
         this.isLoadMoreButtonShown =
           sharedCompanyPosts.length === postFetchedLimit;
-
-        this.loadedPage++;
       });
     },
-    async onClickedAddPostButton(): Promise<void> {
+    async openSharedPostDialog(
+      parameter: SharedPostDialogParameter,
+    ): Promise<SharedPostDialogResult | void> {
       const sharedPostDialog = this.$refs.sharedPostDialog as InstanceType<
         typeof SharedPostDialog
       >;
 
-      const parameter: SharedPostDialogParameter = {
-        postId: '',
-        companyNumber: '',
-        companyName: '',
-        companyHomepageUrl: '',
-        companyImageUrl: '',
-        remarks: '',
-        updatedAt: '',
-        postDetails: [],
-      };
       const result = await sharedPostDialog.open(parameter);
-      if (result === undefined) {
-        return;
-      }
-
-      console.log(result);
+      return result;
     },
   },
 });

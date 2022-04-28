@@ -1,16 +1,11 @@
 /**
  * 投稿取得リクエストURLクエリパラメータ
  */
-export class SharedPostGetRequestQuery {
+export interface SharedPostGetRequestQuery {
   /**
    * 取得件数の上限
    */
   limit: number | null;
-
-  /**
-   * 取得開始位置
-   */
-  offset: number | null;
 
   /**
    * 取得基準日時
@@ -29,6 +24,6 @@ export class SharedPostGetRequestQuery {
 /**
  * 投稿取得リクエストURL内のルートパラメータ
  */
-export class SharedPostGetRequestParameter {
+export interface SharedPostGetRequestParameter {
   postId?: string;
 }

@@ -1,5 +1,5 @@
 export interface PostDialogDetailParameter {
-  postDetailId: number;
+  postDetailId: number | null;
   no1Content: string;
   no1Division: string;
 }

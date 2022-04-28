@@ -2,7 +2,7 @@
  * 投稿詳細
  */
 export interface PostDialogDetail {
-  postDetailId: number;
+  postDetailId: number | null;
   no1Content: string;
   no1Division: string;
 }
