@@ -1,7 +1,7 @@
 /**
  * 投稿詳細
  */
-export interface PostDialogDetail {
+export interface SharedPostDialogDetailData {
   postDetailId: number | null;
   no1Content: string;
   no1Division: string;
@@ -10,7 +10,7 @@ export interface PostDialogDetail {
 /**
  * カードに表示する要素データ
  */
-export interface SharedPostDialog {
+export interface SharedPostDialogData {
   isOpenDialog: boolean;
 
   // 投稿関連
@@ -21,5 +21,5 @@ export interface SharedPostDialog {
   companyImageUrl: string;
   remarks: string;
   updatedAt: string;
-  postDetails: PostDialogDetail[];
+  postDetails: SharedPostDialogDetailData[];
 }
