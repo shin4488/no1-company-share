@@ -1,10 +1,6 @@
 <template>
   <div>
-    <SharedPostCardList
-      v-model="sharedPosts"
-      :no1-divisions="no1Divisions"
-      @confirm-report="onConfirmedReport"
-    />
+    <SharedPostCardList v-model="sharedPosts" :no1-divisions="no1Divisions" />
     <LoadMoreButton
       v-if="isLoadMoreButtonShown"
       text="さらに表示"
@@ -16,25 +12,17 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Context } from '@nuxt/types';
-import { HomePageData } from '@f/definition/pages/home/data';
-import { SharedPostGetRequestQuery } from '@f/definition/pages/common/apiSpec/sharedPostGetRequest';
-import { SharedPostGetReponse } from '@f/definition/pages/common/apiSpec/sharedPostGetResponse';
+import { SelectItem } from '@f/definition/common/selectItem';
 import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
 import { SharedPostHandler } from '@f/common/ajax/sharedPostHandler';
-import { postFetchedLimit } from '@f/common/constant/sharedPost';
 import { SharedPost } from '@f/definition/common/sharedPost';
-import { SelectItem } from '@f/definition/common/selectItem';
+import { HomePageData } from '@f/definition/pages/home/data';
+import { SharedPostGetReponse } from '@f/definition/pages/common/apiSpec/sharedPostGetResponse';
+import { postFetchedLimit } from '@f/common/constant/sharedPost';
 
 export default Vue.extend({
   name: 'HomePage',
   async asyncData({ $axios, $accessor }: Context) {
-    const request: SharedPostGetRequestQuery = {
-      limit: postFetchedLimit,
-      // 初回読み込み時は1ページ目であるため、取得基準時刻は無し
-      baseDateTime: null,
-      isMyPostOnly: false,
-    };
-
     let sharedPosts: SharedPost[] = [];
     let no1Divisions: SelectItem[] = [];
     // コンポーネントマウント前はストアアクセス不可のためスピナーは表示されない
@@ -42,7 +30,12 @@ export default Vue.extend({
       const response = await AjaxHelper.get<SharedPostGetReponse>(
         $axios,
         '/localhost/shared-posts',
-        request,
+        {
+          limit: postFetchedLimit,
+          // 初回読み込み時は1ページ目であるため、取得基準時刻は無し
+          baseDateTime: null,
+          isMyPostOnly: false,
+        },
       );
       const results = SharedPostHandler.handleResponse(response);
       sharedPosts = results.sharedPosts;
@@ -70,25 +63,18 @@ export default Vue.extend({
   },
   methods: {
     /**
-     * 投稿通報時処理
-     */
-    onConfirmedReport({ postId }: { postId: string }): void {
-      console.log(postId);
-    },
-    /**
      * さらに表示処理ボタン押下処理
      */
     async onClickedLoadMoreButton(): Promise<void> {
-      const request: SharedPostGetRequestQuery = {
-        limit: postFetchedLimit,
-        baseDateTime: this.oldBaseDateTime,
-        isMyPostOnly: false,
-      };
       await this.$accessor.spinnerOverlay.open(async () => {
         const response = await AjaxHelper.get<SharedPostGetReponse>(
           this.$axios,
           '/localhost/shared-posts',
-          request,
+          {
+            limit: postFetchedLimit,
+            baseDateTime: this.oldBaseDateTime,
+            isMyPostOnly: false,
+          },
         );
 
         const { sharedPosts } = SharedPostHandler.handleResponse(response);

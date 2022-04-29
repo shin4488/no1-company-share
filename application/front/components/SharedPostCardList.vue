@@ -1,13 +1,14 @@
 <template>
   <div>
     <v-row>
+      <!-- xsだけは指定できないため、cols指定となる -->
       <v-col
         v-for="(item, index) in value"
         :key="index"
         xl="3"
         md="4"
         sm="6"
-        xs="12"
+        cols="12"
       >
         <SharedPostCard
           v-model="item.postId"
@@ -70,6 +71,13 @@ export default Vue.extend({
      * お気に入り追加処理
      */
     onAddedBookmark({ postId }: { postId: string }): void {
+      if (this.isNotLogined()) {
+        this.$accessor.snackBarError.open(
+          'お気に入り追加するにはログインしてください。',
+        );
+        return;
+      }
+
       const bookmarkedPostIndex = this.getTargetPostIndex(postId);
       if (bookmarkedPostIndex === -1) {
         return;
@@ -84,6 +92,7 @@ export default Vue.extend({
     /**
      * お気に入り削除処理
      */
+    // ログインしていない状態でお気に入り削除は画面上では考えられないため、ログインチェックを行っていない
     onRemovedBookmark({ postId }: { postId: string }): void {
       const bookmarkedPostIndex = this.getTargetPostIndex(postId);
       if (bookmarkedPostIndex === -1) {
@@ -97,16 +106,38 @@ export default Vue.extend({
       this.$emit('input', clonedPosts);
     },
     /**
-     * 通報確定処理
+     * 通報処理
      */
-    onConfirmedReport(context: { postId: string }): void {
+    onConfirmedReport({ postId }: { postId: string }): void {
+      if (this.isNotLogined()) {
+        this.$accessor.snackBarError.open(
+          '投稿を通報するにはログインしてください。',
+        );
+        return;
+      }
+
+      const reportedPostIndex = this.getTargetPostIndex(postId);
+      if (reportedPostIndex === -1) {
+        return;
+      }
+
       // TODO:通報ダイアログ起動
-      this.$emit('confirm-report', context);
+      // TODO:通報処理呼び出し
+      const clonedPosts = this.$cloner.deepClone(this.value);
+      clonedPosts.splice(reportedPostIndex, 1);
+      this.$emit('input', clonedPosts);
     },
     /**
      * 投稿削除処理
      */
     onDeleted({ postId }: { postId: string }): void {
+      if (this.isNotLogined()) {
+        this.$accessor.snackBarError.open(
+          '投稿を削除するにはログインしてください。',
+        );
+        return;
+      }
+
       const deletedPostIndex = this.getTargetPostIndex(postId);
       if (deletedPostIndex === -1) {
         return;
@@ -167,9 +198,7 @@ export default Vue.extend({
      * 新規投稿追加ボタン押下処理
      */
     async onClickedAddPostButton(): Promise<void> {
-      const firebaseLoginUserId =
-        this.$accessor.firebaseAuthorization.userIdComputed;
-      if (StringUtil.isEmpty(firebaseLoginUserId)) {
+      if (this.isNotLogined()) {
         this.$accessor.snackBarError.open('投稿するにはログインしてください。');
         return;
       }
@@ -233,6 +262,8 @@ export default Vue.extend({
       this.$emit('input', clonedPosts);
     },
 
+    // #region private
+
     /**
      * 投稿編集ダイアログ起動
      */
@@ -252,6 +283,15 @@ export default Vue.extend({
     getTargetPostIndex(keyPostId: string): number {
       return this.value.findIndex((x) => x.postId === keyPostId);
     },
+    /**
+     * ユーザがログイン済みであるか
+     */
+    isNotLogined(): boolean {
+      const firebaseLoginUserId =
+        this.$accessor.firebaseAuthorization.userIdComputed;
+      return StringUtil.isEmpty(firebaseLoginUserId);
+    },
+    // #endregion
   },
 });
 </script>
