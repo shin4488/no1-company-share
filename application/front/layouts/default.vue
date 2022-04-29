@@ -12,6 +12,10 @@
           @click="routeToHome"
           v-text="title"
         />
+        <v-spacer></v-spacer>
+        <v-list-item-avatar v-if="isLogined" dense>
+          <v-img class="elevation-6" :src="firebaseUserIconImage"></v-img>
+        </v-list-item-avatar>
       </v-app-bar>
 
       <!-- mini-variant:アイコンのみナビゲーション表示 -->
@@ -85,6 +89,7 @@ export default Vue.extend({
       isDrawerOpened: true,
       isDrawerMini: false,
       title: 'F1C',
+      firebaseUserIconImage: '',
       // https://materialdesignicons.com/
       sideBarItems: [
         {
@@ -140,6 +145,9 @@ export default Vue.extend({
         },
       ];
     },
+    isLogined(): boolean {
+      return StringUtil.isNotEmpty(this.firebaseUserId);
+    },
     firebaseUserId(): string | null {
       return this.$accessor.firebaseAuthorization.userIdComputed;
     },
@@ -149,8 +157,10 @@ export default Vue.extend({
   },
   watch: {
     // ログイン状態が変わればサイドバー表示内容も変更
-    firebaseUserId(updatedUserId) {
-      this.sideBarItems = this.decideSidebarItems(updatedUserId);
+    firebaseUserId() {
+      this.firebaseUserIconImage =
+        this.$fireModule.auth().currentUser?.photoURL || '';
+      this.sideBarItems = this.decideSidebarItems();
 
       // ミドルウェアでリダイレクトしたいが、
       // ミドルウェア内ではfirebaseユーザIDが（ログイン状態でも）nullになってしまうためここでルーティング
@@ -158,22 +168,23 @@ export default Vue.extend({
     },
   },
   mounted() {
+    this.firebaseUserIconImage =
+      this.$fireModule.auth().currentUser?.photoURL || '';
     // TODO:本当はsideBarItemsはdataではなくcomputedを使用したいが、computedでstoreにアクセスすると以下エラーとなるためmountedを使用
     // The client-side rendered virtual DOM tree is not matching server-rendered content.
-    const firebaseUserId = this.$accessor.firebaseAuthorization.userIdComputed;
-    this.sideBarItems = this.decideSidebarItems(firebaseUserId);
+    this.sideBarItems = this.decideSidebarItems();
     this.routeToHomeIfNotLoggedin();
   },
   methods: {
-    decideSidebarItems(firebaseUserId: string | null): SidebarItem[] {
-      return StringUtil.isEmpty(firebaseUserId)
-        ? this.logoutSideBarItems
-        : this.logginedSidebarItems;
+    decideSidebarItems(): SidebarItem[] {
+      return this.isLogined
+        ? this.logginedSidebarItems
+        : this.logoutSideBarItems;
     },
     routeToHomeIfNotLoggedin(): void {
       // ユーザIDが存在しない場合を未認証状態とみなす
       // ホーム画面のみ、未認証でも閲覧可能
-      if (StringUtil.isEmpty(this.firebaseUserId)) {
+      if (!this.isLogined) {
         this.routeToHome();
       }
     },
