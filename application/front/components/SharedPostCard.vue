@@ -45,6 +45,7 @@
         <v-list-item-avatar>
           <v-img
             class="elevation-6"
+            :title="postingUserName"
             :alt="postingUserName"
             :src="postingUserIcomImageUrl"
           ></v-img>
@@ -52,7 +53,7 @@
 
         <!-- <div style="white-space: normal"> -->
         <!-- TODO:投稿者名が長い時の折り返し -->
-        <v-list-item-content>
+        <v-list-item-content :title="postingUserName">
           <v-list-item-title>
             {{ postingUserName }}
           </v-list-item-title>
@@ -62,7 +63,7 @@
           <v-icon dense color="bookmark" @click="onClickedBookmarkButton">
             {{ isBookmarkedByLoginUser ? 'mdi-heart' : 'mdi-heart-outline' }}
           </v-icon>
-          <span class="subheading mr-2">{{ numberOfBookmarks }}</span>
+          <span class="subheading mr-2" v-text="numberOfBookmarksComputed" />
 
           <v-icon
             v-show="!isPostedByLoginUser"
@@ -199,6 +200,17 @@ export default Vue.extend({
         this.postingUserId ===
         this.$accessor.firebaseAuthorization.userIdComputed
       );
+    },
+    numberOfBookmarksComputed(): string {
+      const dividingNumber = 1000;
+      if (this.numberOfBookmarks < dividingNumber) {
+        return StringUtil.toString(this.numberOfBookmarks);
+      }
+
+      // 1000以上は「K」表示とする
+      const devidedValue = this.numberOfBookmarks / dividingNumber;
+      const flooredValue = Math.floor(devidedValue / 0.1) * 0.1;
+      return `${flooredValue}K`;
     },
   },
   methods: {
