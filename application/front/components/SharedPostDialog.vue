@@ -15,10 +15,14 @@
         <v-row dense>
           <v-col>
             <v-autocomplete
+              v-model="companyNumber"
+              :items="selectableCompanies"
               :readonly="isEditMode"
               label="会社名"
               clearable
               append-icon="mdi-magnify"
+              @keydown="onChangedSearchedCompanyText"
+              @change="onClickedCompany"
             ></v-autocomplete>
           </v-col>
         </v-row>
@@ -135,6 +139,10 @@ export default Vue.extend({
   data(): SharedPostDialogData {
     return {
       isOpenDialog: false,
+      selectableCompanies: [],
+      searchedCompanyText: '',
+
+      // 投稿関連
       postId: '',
       companyNumber: '',
       companyName: '',
@@ -160,6 +168,26 @@ export default Vue.extend({
       const hasNoOrOneDetail = this.postDetails.length <= 1;
       return hasNoOrOneDetail;
     },
+  },
+  mounted() {
+    this.selectableCompanies = [
+      {
+        text: 'あいうえお かきくけこ　さしすせそ',
+        value: 'aiueo',
+      },
+      {
+        text: 'あいうえお かき',
+        value: 'aiueo2',
+      },
+      {
+        text: 'aaaa bbb cccccccccccccccccc ddd',
+        value: 'alfa',
+      },
+      {
+        text: 'aaaa bbb ccccccccc ee',
+        value: 'alfa2',
+      },
+    ];
   },
   methods: {
     /**
@@ -221,6 +249,34 @@ export default Vue.extend({
      */
     onClickedCloseButton(): void {
       this.$emit('cancel');
+    },
+    /**
+     * 会社名入力処理
+     */
+    onChangedSearchedCompanyText(event: KeyboardEvent) {
+      if (event.code !== 'Enter') {
+        return;
+      }
+
+      const eventTarget = event.target;
+      if (!(eventTarget instanceof HTMLInputElement)) {
+        return;
+      }
+
+      console.log(eventTarget.value);
+      // TODO:企業検索処理呼び出し
+    },
+    /**
+     * 会社選択時処理
+     */
+    onClickedCompany(selectedCompanyNumber: string) {
+      const selectedCompanySelectItem = this.selectableCompanies.find(
+        (x) => x.value === selectedCompanyNumber,
+      );
+      const selectedCompanyName = selectedCompanySelectItem?.text;
+      this.companyName = StringUtil.ifEmpty(selectedCompanyName);
+      this.companyNumber = selectedCompanyNumber;
+      this.searchedCompanyText = this.companyName;
     },
     /**
      * No.1内容削除ボタン押下処理

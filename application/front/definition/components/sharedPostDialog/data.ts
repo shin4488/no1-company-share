@@ -1,3 +1,5 @@
+import { SelectItem } from '@f/definition/common/selectItem';
+
 /**
  * 投稿詳細
  */
@@ -12,6 +14,8 @@ export interface SharedPostDialogDetailData {
  */
 export interface SharedPostDialogData {
   isOpenDialog: boolean;
+  selectableCompanies: SelectItem[];
+  searchedCompanyText: string;
 
   // 投稿関連
   postId: string;
