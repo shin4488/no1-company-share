@@ -20,8 +20,8 @@ export default {
   serverMiddleware: ['~~/server/'],
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - no1-company-share',
-    title: 'no1-company-share',
+    titleTemplate: '%s - F1C',
+    title: 'F1C',
     htmlAttrs: {
       lang: 'en',
     },
@@ -42,7 +42,7 @@ export default {
   },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['~/plugins/axios/axios.ts'],
+  plugins: ['~/plugins/axios/axios.ts', '~/plugins/clone/lodash.ts'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
