@@ -1,17 +1,18 @@
 <template>
   <v-card>
-    <!-- TODO:hrefにスクリプトインジェクションされた時の対応必要？ -->
+    <!-- Vue側でエスケープ処理を行ってくれるため、onerrorやscriptタグなどの入力値処理は行っていない -->
+    <!-- https://jp.vuejs.org/v2/guide/security.html#HTML-%E3%82%B3%E3%83%B3%E3%83%86%E3%83%B3%E3%83%84 -->
     <!-- 会社名 -->
     <v-card-title>
       <a
-        color="secondary"
+        v-if="hasCompanyUrl"
         class="wrapped-button"
         text
         :href="companyHomepageUrl"
         target="_blank"
-      >
-        {{ companyName }}
-      </a>
+        v-text="companyName"
+      />
+      <a v-else class="auto-cursor wrapped-button" text v-text="companyName" />
     </v-card-title>
 
     <!-- 一位内容 -->
@@ -20,11 +21,9 @@
         v-for="(detailText, index) in postDetailsComputed"
         :key="index"
         class="font-weight-bold"
-      >
-        {{ detailText }}
-      </div>
+        v-text="detailText"
+      />
 
-      <!-- TODO:srcにスクリプトインジェクションされた時の対応必要？ -->
       <!-- 会社画像 -->
       <v-img
         v-show="hasCompanyImageUrl"
@@ -35,9 +34,7 @@
       </v-img>
 
       <!-- 備考（投稿説明） -->
-      <div class="text--primary">
-        {{ remarks }}
-      </div>
+      <div class="text--primary pre-wrap" v-text="remarks" />
     </v-card-text>
 
     <v-divider></v-divider>
@@ -186,6 +183,9 @@ export default Vue.extend({
     },
   },
   computed: {
+    hasCompanyUrl(): boolean {
+      return StringUtil.isNotEmpty(this.companyHomepageUrl);
+    },
     hasCompanyImageUrl(): boolean {
       return StringUtil.isNotEmpty(this.companyImageUrl);
     },
@@ -221,7 +221,6 @@ export default Vue.extend({
       }
     },
     onClickedAlertButton(): void {
-      // TODO:報告してよいかの確認ダイアログ起動
       this.$emit('confirm-report', {
         postId: this.value,
       });
@@ -232,7 +231,6 @@ export default Vue.extend({
       });
     },
     onClickedDeleteButton(): void {
-      // TODO:削除してよいかの確認ダイアログ起動
       this.$emit('confirm-delete', {
         postId: this.value,
       });
@@ -244,4 +242,8 @@ export default Vue.extend({
 <style lang="sass" scoped>
 .wrapped-button
   text-decoration: none
+.pre-wrap
+  white-space: pre-wrap
+.auto-cursor
+  cursor: auto
 </style>
