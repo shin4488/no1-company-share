@@ -1,7 +1,7 @@
 <template>
   <div>
     <SharedPostCardList
-      v-model="sharedCompanyPosts"
+      v-model="sharedPosts"
       :no1-divisions="no1Divisions"
       @confirm-report="onConfirmedReport"
     />
@@ -21,7 +21,6 @@ import { SharedPostGetRequestQuery } from '@f/definition/pages/common/apiSpec/sh
 import { SharedPostGetReponse } from '@f/definition/pages/common/apiSpec/sharedPostGetResponse';
 import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
 import { SharedPostHandler } from '@f/common/ajax/sharedPostHandler';
-import { ArrayUtil } from '@c/util/arrayUtil';
 import { postFetchedLimit } from '@f/common/constant/sharedPost';
 import { SharedPost } from '@f/definition/common/sharedPost';
 import { SelectItem } from '@f/definition/common/selectItem';
@@ -36,7 +35,7 @@ export default Vue.extend({
       isMyPostOnly: false,
     };
 
-    let sharedCompanyPosts: SharedPost[] = [];
+    let sharedPosts: SharedPost[] = [];
     let no1Divisions: SelectItem[] = [];
     // コンポーネントマウント前はストアアクセス不可のためスピナーは表示されない
     await $accessor.spinnerOverlay.open(async () => {
@@ -46,25 +45,27 @@ export default Vue.extend({
         request,
       );
       const results = SharedPostHandler.handleResponse(response);
-      sharedCompanyPosts = results.sharedCompanyPosts;
+      sharedPosts = results.sharedPosts;
       no1Divisions = results.no1Divisions;
     });
 
     // 1度に全データ取得しきれない場合は、さらに表示ボタンを表示
-    const isLoadMoreButtonShown =
-      sharedCompanyPosts.length === postFetchedLimit;
+    const isLoadMoreButtonShown = sharedPosts.length === postFetchedLimit;
+    const oldBaseDateTime = SharedPostHandler.getOldBaseDateTime(sharedPosts);
 
     return {
-      sharedCompanyPosts,
+      sharedPosts,
       no1Divisions,
       isLoadMoreButtonShown,
+      oldBaseDateTime,
     };
   },
   data(): HomePageData {
     return {
-      sharedCompanyPosts: [],
+      sharedPosts: [],
       no1Divisions: [],
       isLoadMoreButtonShown: false,
+      oldBaseDateTime: '',
     };
   },
   methods: {
@@ -78,16 +79,9 @@ export default Vue.extend({
      * さらに表示処理ボタン押下処理
      */
     async onClickedLoadMoreButton(): Promise<void> {
-      let baseDateTime: string | null = null;
-      if (ArrayUtil.isNotEmpty(this.sharedCompanyPosts)) {
-        const lastPostIndex = this.sharedCompanyPosts.length - 1;
-        const lastPost = this.sharedCompanyPosts[lastPostIndex];
-        baseDateTime = lastPost.updatedAt;
-      }
-
       const request: SharedPostGetRequestQuery = {
         limit: postFetchedLimit,
-        baseDateTime,
+        baseDateTime: this.oldBaseDateTime,
         isMyPostOnly: false,
       };
       await this.$accessor.spinnerOverlay.open(async () => {
@@ -97,11 +91,11 @@ export default Vue.extend({
           request,
         );
 
-        const { sharedCompanyPosts } =
-          SharedPostHandler.handleResponse(response);
-        this.sharedCompanyPosts.push(...sharedCompanyPosts);
-        this.isLoadMoreButtonShown =
-          sharedCompanyPosts.length === postFetchedLimit;
+        const { sharedPosts } = SharedPostHandler.handleResponse(response);
+        this.sharedPosts.push(...sharedPosts);
+        this.isLoadMoreButtonShown = sharedPosts.length === postFetchedLimit;
+        this.oldBaseDateTime =
+          SharedPostHandler.getOldBaseDateTime(sharedPosts);
       });
     },
   },
