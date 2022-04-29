@@ -6,11 +6,11 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SpinnerData } from '@f/definition/components/spinner/data';
+import { SpinnerOverlayData } from '@f/definition/components/spinnerOverlay/data';
 
 export default Vue.extend({
   name: 'SpinnerOverlay',
-  data(): SpinnerData {
+  data(): SpinnerOverlayData {
     return {
       isShown: false,
     };
