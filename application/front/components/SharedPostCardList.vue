@@ -100,6 +100,7 @@ export default Vue.extend({
      * 通報確定処理
      */
     onConfirmedReport(context: { postId: string }): void {
+      // TODO:通報ダイアログ起動
       this.$emit('confirm-report', context);
     },
     /**
@@ -112,6 +113,7 @@ export default Vue.extend({
       }
 
       const clonedPosts = this.$cloner.deepClone(this.value);
+      // TODO:削除確認ダイアログ起動
       // TODO:投稿削除処理呼び出し
       clonedPosts.splice(deletedPostIndex, 1);
       this.$emit('input', clonedPosts);
@@ -172,7 +174,7 @@ export default Vue.extend({
         return;
       }
 
-      // №1区分は選択肢の一番上を初期値とする
+      // No.1区分は選択肢の一番上を初期値とする
       let firstNo1Division = '';
       if (ArrayUtil.isNotEmpty(this.no1Divisions)) {
         firstNo1Division = this.no1Divisions[0].value;
