@@ -9,8 +9,8 @@ import { ApiResponseHandler } from '@s/common/apiResponse/interface/ApiResponseH
 import { ApiResponseHandlerImpl } from '@s/common/apiResponse/apiResponseHandler';
 import { SharedPostService } from '@s/feature/sharedPost/interface/sharedPostService';
 import { SharedPostServiceImpl } from '@s/feature/sharedPost/service';
-import { OpenGraphLogic } from '@s/feature/openGraph/interface/logic';
-import { OpenGraphLogicImpl } from '@s/feature/openGraph/logic';
+import { OpenGraphLogic } from '@s/commonBL/openGraph/interface/logic';
+import { OpenGraphLogicImpl } from '@s/commonBL/openGraph/logic';
 import { OpenGraphServiceImpl } from '@s/feature/openGraph/service';
 import { OpenGraphService } from '@s/feature/openGraph/interface/service';
 
