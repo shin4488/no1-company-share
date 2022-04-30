@@ -9,6 +9,10 @@ import { ApiResponseHandler } from '@s/common/apiResponse/interface/ApiResponseH
 import { ApiResponseHandlerImpl } from '@s/common/apiResponse/apiResponseHandler';
 import { SharedPostService } from '@s/feature/sharedPost/interface/sharedPostService';
 import { SharedPostServiceImpl } from '@s/feature/sharedPost/service';
+import { OpenGraphLogic } from '@s/feature/openGraph/interface/logic';
+import { OpenGraphLogicImpl } from '@s/feature/openGraph/logic';
+import { OpenGraphServiceImpl } from '@s/feature/openGraph/service';
+import { OpenGraphService } from '@s/feature/openGraph/interface/service';
 
 const appContainer = new Container();
 appContainer
@@ -26,5 +30,9 @@ appContainer
 appContainer
   .bind<SharedPostService>(types.SharedPostService)
   .to(SharedPostServiceImpl);
+appContainer.bind<OpenGraphLogic>(types.OpenGraphLogic).to(OpenGraphLogicImpl);
+appContainer
+  .bind<OpenGraphService>(types.OpenGraphService)
+  .to(OpenGraphServiceImpl);
 
 export { appContainer };

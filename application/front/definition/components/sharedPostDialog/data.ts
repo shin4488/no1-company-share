@@ -15,7 +15,8 @@ export interface SharedPostDialogDetailData {
 export interface SharedPostDialogData {
   isOpenDialog: boolean;
   selectableCompanies: SelectItem[];
-  searchedCompanyText: string;
+  imageAlternativeMessage: string;
+  isImageLoadingShown: boolean;
 
   // 投稿関連
   postId: string;

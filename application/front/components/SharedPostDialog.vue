@@ -17,7 +17,7 @@
             <v-autocomplete
               v-model="companyNumber"
               :items="selectableCompanies"
-              :readonly="isEditMode"
+              :disabled="isEditMode"
               label="会社名"
               clearable
               append-icon="mdi-magnify"
@@ -74,19 +74,36 @@
         </v-row>
 
         <v-row dense>
-          <v-col sm="6" cols="12">
+          <v-col sm="8" cols="9">
             <v-text-field
               v-model="companyHomepageUrl"
-              label="会社ホームページURL"
+              :label="companyHomePageUrlInputLabelComputed"
               clearable
+              @blur="onBluredCompanyHomePageUrl"
             ></v-text-field>
           </v-col>
-          <v-col sm="6" cols="12">
-            <v-text-field
-              v-model="companyImageUrl"
-              label="会社画像URL"
-              clearable
-            ></v-text-field>
+          <v-col class="d-flex align-start justify-center" sm="4" cols="3">
+            <div>
+              <v-progress-circular
+                v-if="isImageLoadingShown"
+                indeterminate
+                color="primary"
+              ></v-progress-circular>
+            </div>
+            <div
+              v-if="!isImageLoadingShown && hasImageAlternativeMessageComputed"
+              v-text="imageAlternativeMessage"
+            />
+            <v-img
+              v-if="
+                !(isImageLoadingShown || hasImageAlternativeMessageComputed)
+              "
+              contain
+              height="100"
+              :title="companyName"
+              :alt="companyName"
+              :src="companyImageUrl"
+            />
           </v-col>
         </v-row>
 
@@ -106,7 +123,12 @@
       </v-card-text>
 
       <v-card-actions class="justify-end">
-        <v-btn color="primary" @click="onClickedConfirmButton">確定</v-btn>
+        <v-btn
+          :disabled="disabledConfirmButton"
+          color="primary"
+          @click="onClickedConfirmButton"
+          >確定</v-btn
+        >
         <v-btn @click="onClickedCloseButton">閉じる</v-btn>
       </v-card-actions>
     </v-card>
@@ -116,11 +138,14 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 import { SelectItem } from '@f/definition/common/selectItem';
+import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
 import { StringUtil } from '@c/util/stringUtil';
+import { ArrayUtil } from '@c/util/arrayUtil';
 import { SharedPostDialogData } from '@f/definition/components/sharedPostDialog/data';
 import { SharedPostDialogParameter } from '@f/definition/components/sharedPostDialog/parameter';
 import { SharedPostDialogResult } from '@f/definition/components/sharedPostDialog/result';
-import { ArrayUtil } from '@c/util/arrayUtil';
+import { OpenGraphGetRequest } from '@f/definition/components/sharedPostDialog/apiSpec/openGraphGetRequest';
+import { OpenGraphGetResponse } from '@f/definition/components/sharedPostDialog/apiSpec/openGraphGetResponse';
 
 export default Vue.extend({
   name: 'SharedPostCard',
@@ -140,7 +165,8 @@ export default Vue.extend({
     return {
       isOpenDialog: false,
       selectableCompanies: [],
-      searchedCompanyText: '',
+      imageAlternativeMessage: '',
+      isImageLoadingShown: false,
 
       // 投稿関連
       postId: '',
@@ -160,13 +186,54 @@ export default Vue.extend({
     };
   },
   computed: {
+    /**
+     * 新規投稿の作成中ではなく、既存投稿の編集中である
+     */
     isEditMode(): boolean {
       return StringUtil.isNotEmpty(this.postId);
     },
+    /**
+     * No.1内容の削除が不可である
+     */
     disabledToDeleteDetail(): boolean {
       // 詳細1つのみの場合は消去できないようにする
       const hasNoOrOneDetail = this.postDetails.length <= 1;
       return hasNoOrOneDetail;
+    },
+    /**
+     * 確定ボタンが非活性である
+     */
+    disabledConfirmButton(): boolean {
+      return (
+        StringUtil.isEmpty(this.companyNumber) ||
+        this.postDetails.every(
+          (x) =>
+            StringUtil.isEmpty(x.no1Content) ||
+            StringUtil.isEmpty(x.no1Division),
+        ) ||
+        // 画像データ取得できるように、画像ローディング中は確定できない
+        this.isImageLoadingShown
+      );
+    },
+    /**
+     * 会社HPのURL入力ラベル
+     */
+    companyHomePageUrlInputLabelComputed: (): string => '会社ホームページURL',
+    /**
+     * 会社HP未入力時の画像代替メッセージ
+     */
+    imageAlternativeMessageWithoutHomepage(): string {
+      return `${this.companyHomePageUrlInputLabelComputed}入力後、画像が表示されます。`;
+    },
+    /**
+     * 会社HP入力済時の画像代替メッセージ
+     */
+    imageAlternativeMessageWithHomepage: (): string => '画像を取得できません。',
+    /**
+     * 画像代替メッセージが存在する
+     */
+    hasImageAlternativeMessageComputed(): boolean {
+      return StringUtil.isNotEmpty(this.imageAlternativeMessage);
     },
   },
   mounted() {
@@ -197,12 +264,34 @@ export default Vue.extend({
       parameter: SharedPostDialogParameter,
     ): Promise<SharedPostDialogResult | void> {
       this.isOpenDialog = true;
+      const homepageUrl = parameter.companyHomepageUrl;
+      const imageUrl = parameter.companyImageUrl;
+      const hasHomePage = StringUtil.isNotEmpty(homepageUrl);
+      const hasImage = StringUtil.isNotEmpty(imageUrl);
+      const hasHomePageNoImage = hasHomePage && !hasImage;
+      const hasNoHomePageNoImage = !(hasHomePage || hasImage);
+      this.imageAlternativeMessage = hasHomePageNoImage
+        ? this.imageAlternativeMessageWithHomepage
+        : hasNoHomePageNoImage
+        ? this.imageAlternativeMessageWithoutHomepage
+        : '';
+      // 起動時は設定されている会社名を選択状態とする
+      const companyNumber = parameter.companyNumber;
+      const companyName = parameter.companyName;
+      if (StringUtil.isNotEmpty(companyNumber)) {
+        this.selectableCompanies = [
+          {
+            text: companyName,
+            value: companyNumber,
+          },
+        ];
+      }
 
       this.postId = parameter.postId;
-      this.companyNumber = parameter.companyNumber;
-      this.companyName = parameter.companyName;
-      this.companyHomepageUrl = parameter.companyHomepageUrl;
-      this.companyImageUrl = parameter.companyImageUrl;
+      this.companyNumber = companyNumber;
+      this.companyName = companyName;
+      this.companyHomepageUrl = homepageUrl;
+      this.companyImageUrl = imageUrl;
       this.remarks = parameter.remarks;
       this.updatedAt = parameter.updatedAt;
       this.postDetails = parameter.postDetails.map((x) => ({
@@ -276,7 +365,6 @@ export default Vue.extend({
       const selectedCompanyName = selectedCompanySelectItem?.text;
       this.companyName = StringUtil.ifEmpty(selectedCompanyName);
       this.companyNumber = selectedCompanyNumber;
-      this.searchedCompanyText = this.companyName;
     },
     /**
      * No.1内容削除ボタン押下処理
@@ -296,6 +384,43 @@ export default Vue.extend({
         no1Content: '',
         no1Division: firstNo1Division,
       });
+    },
+    /**
+     * 会社ページURLフォーカスを外した時の処理
+     */
+    async onBluredCompanyHomePageUrl() {
+      if (StringUtil.isEmpty(this.companyHomepageUrl)) {
+        this.imageAlternativeMessage =
+          this.imageAlternativeMessageWithoutHomepage;
+        this.companyImageUrl = '';
+        return;
+      }
+
+      this.isImageLoadingShown = true;
+      this.imageAlternativeMessage = this.imageAlternativeMessageWithHomepage;
+      const parameterQuery: OpenGraphGetRequest = {
+        pageUris: [this.companyHomepageUrl],
+      };
+      const result = await AjaxHelper.get<OpenGraphGetResponse>(
+        this.$axios,
+        '/open-graph/',
+        parameterQuery,
+      );
+      this.isImageLoadingShown = false;
+      // 会社URLを入力したがOG画像を取得できない時は画像URLをクリアする
+      if (result === null) {
+        this.companyImageUrl = '';
+        return;
+      }
+
+      const results = result.openGraphList;
+      if (ArrayUtil.isEmpty(results)) {
+        this.companyImageUrl = '';
+        return;
+      }
+
+      this.imageAlternativeMessage = '';
+      this.companyImageUrl = results[0].imageUri;
     },
   },
 });
