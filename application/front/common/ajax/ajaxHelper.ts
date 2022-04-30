@@ -5,7 +5,7 @@ export class AjaxHelper {
   static async get<TResponse = {}, TRequest = {}>(
     axios: AxiosInstance,
     uri: string,
-    request: TRequest,
+    request?: TRequest,
   ): Promise<TResponse | null> {
     const response = await axios.get<ApiResponse<TResponse>>(uri, {
       params: request,
