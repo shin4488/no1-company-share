@@ -130,6 +130,8 @@
         <v-btn @click="onClickedCloseButton">閉じる</v-btn>
       </v-card-actions>
     </v-card>
+
+    <ConfirmDialog ref="confirmDialog" />
   </v-dialog>
 </template>
 
@@ -148,6 +150,7 @@ import { SharedPostDialogResult } from '@f/definition/components/sharedPostDialo
 import { OpenGraphGetRequest } from '@f/definition/components/sharedPostDialog/apiSpec/openGraphGetRequest';
 import { OpenGraphGetResponse } from '@f/definition/components/sharedPostDialog/apiSpec/openGraphGetResponse';
 import { CompanyGetResponse } from '@f/definition/components/sharedPostDialog/apiSpec/companyGetResponse';
+import ConfirmDialog from '@f/components/ConfirmDialog.vue';
 
 export default Vue.extend({
   name: 'SharedPostCard',
@@ -324,8 +327,16 @@ export default Vue.extend({
     /**
      * 閉じるボタン押下処理
      */
-    onClickedCloseButton(): void {
-      this.$emit('cancel');
+    async onClickedCloseButton(): Promise<void> {
+      const confirmDialog = this.$refs.confirmDialog as InstanceType<
+        typeof ConfirmDialog
+      >;
+      const isConfirmed = await confirmDialog.open(
+        '編集内容が破棄されます。よろしいですか。',
+      );
+      if (isConfirmed) {
+        this.$emit('cancel');
+      }
     },
     /**
      * 会社名入力処理

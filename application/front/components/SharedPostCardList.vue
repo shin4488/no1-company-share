@@ -33,6 +33,7 @@
       </v-col>
     </v-row>
 
+    <ConfirmDialog ref="confirmDialog" />
     <SharedPostDialog ref="sharedPostDialog" :no1-divisions="no1Divisions" />
     <AddIconFixedButton @click="onClickedAddPostButton" />
   </div>
@@ -40,9 +41,10 @@
 
 <script lang="ts">
 import Vue, { PropType } from 'vue';
+import SharedPostDialog from '@f/components/SharedPostDialog.vue';
+import ConfirmDialog from '@f/components/ConfirmDialog.vue';
 import { SelectItem } from '@f/definition/common/selectItem';
 import { SharedPost } from '@f/definition/common/sharedPost';
-import SharedPostDialog from '@f/components/SharedPostDialog.vue';
 import { SharedPostDialogParameter } from '@f/definition/components/sharedPostDialog/parameter';
 import { SharedPostDialogResult } from '@f/definition/components/sharedPostDialog/result';
 import { StringUtil } from '@c/util/stringUtil';
@@ -130,11 +132,21 @@ export default Vue.extend({
     /**
      * 投稿削除処理
      */
-    onDeleted({ postId }: { postId: string }): void {
+    async onDeleted({ postId }: { postId: string }): Promise<void> {
       if (this.isNotLogined()) {
         this.$accessor.snackBarError.open(
           '投稿を削除するにはログインしてください。',
         );
+        return;
+      }
+
+      const confirmDialog = this.$refs.confirmDialog as InstanceType<
+        typeof ConfirmDialog
+      >;
+      const isConfirmed = await confirmDialog.open(
+        '投稿を削除します。よろしいですか。',
+      );
+      if (!isConfirmed) {
         return;
       }
 
@@ -144,7 +156,6 @@ export default Vue.extend({
       }
 
       const clonedPosts = this.$cloner.deepClone(this.value);
-      // TODO:削除確認ダイアログ起動
       // TODO:投稿削除処理呼び出し
       clonedPosts.splice(deletedPostIndex, 1);
       this.$emit('input', clonedPosts);
