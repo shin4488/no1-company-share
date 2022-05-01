@@ -20,8 +20,10 @@
               :disabled="isEditMode"
               label="会社名"
               clearable
+              :loading="isAutocompleteLoadingShown"
               append-icon="mdi-magnify"
               @keydown="onChangedSearchedCompanyText"
+              @click:clear="onClickedAutocompleteClear"
               @change="onClickedCompany"
             ></v-autocomplete>
           </v-col>
@@ -61,7 +63,7 @@
           </v-col>
         </v-row>
         <v-row align="start" dense>
-          <v-col cols="1">
+          <v-col offset="1" cols="1">
             <v-icon
               title="1位内容の追加"
               dense
@@ -137,11 +139,15 @@ import { SelectItem } from '@f/definition/common/selectItem';
 import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
 import { StringUtil } from '@c/util/stringUtil';
 import { ArrayUtil } from '@c/util/arrayUtil';
-import { SharedPostDialogData } from '@f/definition/components/sharedPostDialog/data';
+import {
+  SelectItemAutoComplete,
+  SharedPostDialogData,
+} from '@f/definition/components/sharedPostDialog/data';
 import { SharedPostDialogParameter } from '@f/definition/components/sharedPostDialog/parameter';
 import { SharedPostDialogResult } from '@f/definition/components/sharedPostDialog/result';
 import { OpenGraphGetRequest } from '@f/definition/components/sharedPostDialog/apiSpec/openGraphGetRequest';
 import { OpenGraphGetResponse } from '@f/definition/components/sharedPostDialog/apiSpec/openGraphGetResponse';
+import { CompanyGetResponse } from '@f/definition/components/sharedPostDialog/apiSpec/companyGetResponse';
 
 export default Vue.extend({
   name: 'SharedPostCard',
@@ -161,6 +167,7 @@ export default Vue.extend({
     return {
       isOpenDialog: false,
       selectableCompanies: [],
+      isAutocompleteLoadingShown: false,
       imageAlternativeMessage: '',
       isImageLoadingShown: false,
 
@@ -232,37 +239,11 @@ export default Vue.extend({
       return StringUtil.isNotEmpty(this.imageAlternativeMessage);
     },
   },
-  mounted() {
-    this.selectableCompanies = [
-      {
-        text: 'あいうえお かきくけこ　さしすせそ',
-        value: 'aiueo',
-        disabled: false,
-      },
-      {
-        text: 'あいうえお かき',
-        value: 'aiueo2',
-        disabled: true,
-        subtitle: 'すでにこの会社は登録済みです。',
-      },
-      {
-        text: 'aaaa bbb cccccccccccccccccc ddd',
-        value: 'alfa',
-        disabled: true,
-        subtitle: 'すでにこの会社は登録済みです。',
-      },
-      {
-        text: 'aaaa bbb ccccccccc ee',
-        value: 'alfa2',
-        disabled: false,
-      },
-    ];
-  },
   methods: {
     /**
      * ダイアログ起動
      */
-    open(
+    async open(
       parameter: SharedPostDialogParameter,
     ): Promise<SharedPostDialogResult | void> {
       this.isOpenDialog = true;
@@ -277,19 +258,8 @@ export default Vue.extend({
         : hasNoHomePageNoImage
         ? this.imageAlternativeMessageWithoutHomepage
         : '';
-      // 起動時は設定されている会社名を選択状態とする
       const companyNumber = parameter.companyNumber;
       const companyName = parameter.companyName;
-      if (StringUtil.isNotEmpty(companyNumber)) {
-        this.selectableCompanies = [
-          {
-            text: companyName,
-            value: companyNumber,
-            disabled: true,
-          },
-        ];
-      }
-
       this.postId = parameter.postId;
       this.companyNumber = companyNumber;
       this.companyName = companyName;
@@ -303,13 +273,28 @@ export default Vue.extend({
         no1Division: x.no1Division,
       }));
 
+      // 起動時は、会社が選択済みの場合は選択した会社を表示、なければ会社リストを取得
+      if (StringUtil.isNotEmpty(companyNumber)) {
+        this.selectableCompanies = [
+          {
+            text: companyName,
+            value: companyNumber,
+            disabled: true,
+          },
+        ];
+      } else {
+        this.selectableCompanies = await this.getMatchedCompanies('');
+      }
+
       return new Promise((resolve) => {
         this.$on('confirm', (result: SharedPostDialogResult) => {
           this.isOpenDialog = false;
+          this.clear();
           resolve(result);
         });
         this.$on('cancel', () => {
           this.isOpenDialog = false;
+          this.clear();
           resolve();
         });
       });
@@ -345,7 +330,7 @@ export default Vue.extend({
     /**
      * 会社名入力処理
      */
-    onChangedSearchedCompanyText(event: KeyboardEvent) {
+    async onChangedSearchedCompanyText(event: KeyboardEvent): Promise<void> {
       if (event.code !== 'Enter') {
         return;
       }
@@ -355,8 +340,47 @@ export default Vue.extend({
         return;
       }
 
-      console.log(eventTarget.value);
-      // TODO:企業検索処理呼び出し
+      this.selectableCompanies = await this.getMatchedCompanies(
+        eventTarget.value,
+      );
+    },
+    /**
+     * 会社選択AutoCompleteのクリアアイコン押下処理
+     */
+    async onClickedAutocompleteClear(): Promise<void> {
+      // 入力欄をクリアしているため、検索条件は空文字としている
+      this.selectableCompanies = await this.getMatchedCompanies('');
+    },
+    /**
+     * 検索条件に一致する会社を取得
+     */
+    async getMatchedCompanies(
+      companyNameText: string,
+    ): Promise<SelectItemAutoComplete[]> {
+      this.isAutocompleteLoadingShown = true;
+
+      const request = {
+        companyName: companyNameText,
+      };
+      const response = await AjaxHelper.get<CompanyGetResponse>(
+        this.$axios,
+        '/companies/',
+        request,
+      );
+      if (response === null) {
+        return [];
+      }
+
+      const companyResonses = response.companies;
+      const companies = companyResonses.map<SelectItemAutoComplete>((x) => ({
+        text: x.name,
+        value: x.number,
+        disabled: x.isRegistered,
+        header: x.isRegistered ? `${x.name} （登録済みです）` : '',
+      }));
+
+      this.isAutocompleteLoadingShown = false;
+      return companies;
     },
     /**
      * 会社選択時処理
@@ -368,6 +392,13 @@ export default Vue.extend({
       const selectedCompanyName = selectedCompanySelectItem?.text;
       this.companyName = StringUtil.ifEmpty(selectedCompanyName);
       this.companyNumber = selectedCompanyNumber;
+      this.selectableCompanies = [
+        {
+          text: this.companyName,
+          value: this.companyNumber,
+          disabled: false,
+        },
+      ];
     },
     /**
      * No.1内容削除ボタン押下処理
@@ -424,6 +455,26 @@ export default Vue.extend({
 
       this.imageAlternativeMessage = '';
       this.companyImageUrl = results[0].imageUri;
+    },
+    clear(): void {
+      this.selectableCompanies = [];
+      this.isAutocompleteLoadingShown = false;
+      this.imageAlternativeMessage = '';
+      this.isImageLoadingShown = false;
+
+      this.postId = '';
+      this.companyNumber = '';
+      this.companyName = '';
+      this.companyHomepageUrl = '';
+      this.companyImageUrl = '';
+      this.remarks = '';
+      this.postDetails = [
+        {
+          postDetailId: 0,
+          no1Content: '',
+          no1Division: '',
+        },
+      ];
     },
   },
 });
