@@ -11,9 +11,6 @@ export const authorizationFirebaseUser = async (
   response: express.Response,
   next: express.NextFunction,
 ) => {
-  const requestMethod = request.method;
-  const isGet = requestMethod === 'GET';
-
   const firebaseIdToken = request.headers.authorization;
   const token =
     StringUtil.isEmpty(firebaseIdToken) ||
@@ -30,12 +27,6 @@ export const authorizationFirebaseUser = async (
     response.locals.firebaseUserId = firebaseUserId;
     next();
   } catch {
-    // データ更新系のみ認証チェックを行う
-    if (isGet) {
-      next();
-      return;
-    }
-
     const error = new NotAuthorizedError();
     next(error);
   }
