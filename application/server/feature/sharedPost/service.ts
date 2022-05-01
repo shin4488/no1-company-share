@@ -22,8 +22,7 @@ export class SharedPostServiceImpl implements SharedPostService {
           companyName: 'テスト株式会社1',
           companyHomepageUrl:
             'https://zenn.dev/littleforest/articles/scrape-og-tags',
-          companyImageUrl:
-            'ttps://upload.wikimedia.org/wikipedia/commons/f/ff/Wikipedia_logo_593.jpg',
+          companyImageUrl: '',
           postingUserId: '0yC8iU1797VrDALJsG4siIU6C382',
           postingUserName: 'S. U.',
           postingUserIcomImageUrl:
@@ -45,8 +44,7 @@ export class SharedPostServiceImpl implements SharedPostService {
           companyNumber: 'testcompany2',
           companyName: 'qwertyuiop asdfghjkl zxcvbnm qwertyuiop',
           companyHomepageUrl: 'http://example.com/',
-          companyImageUrl:
-            'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg',
+          companyImageUrl: '',
           postingUserId: 'testuser1',
           postingUserName: 'abcdefghijklmn opqrstu vvvvvvv',
           postingUserIcomImageUrl:
@@ -98,8 +96,7 @@ export class SharedPostServiceImpl implements SharedPostService {
           companyName: 'テスト株式会社4',
           companyHomepageUrl:
             'https://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8',
-          companyImageUrl:
-            'https://upload.wikimedia.org/wikipedia/commons/f/ff/Wikipedia_logo_593.jpg',
+          companyImageUrl: '',
           postingUserId: '0yC8iU1797VrDALJsG4siIU6C382',
           postingUserName: 'abcdefghijklmn opqrstu vvvvvvv',
           postingUserIcomImageUrl:
@@ -126,8 +123,7 @@ export class SharedPostServiceImpl implements SharedPostService {
           companyNumber: 'testcompany5',
           companyName: 'テスト株式会社5',
           companyHomepageUrl: '',
-          companyImageUrl:
-            'https://upload.wikimedia.org/wikipedia/commons/f/ff/Wikipedia_logo_593.jpg',
+          companyImageUrl: '',
           postingUserId: '0yC8iU1797VrDALJsG4siIU6C382',
           postingUserName: 'あいうえおかきくけこ　さしすせそたちつてと',
           postingUserIcomImageUrl:
