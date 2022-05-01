@@ -23,7 +23,7 @@ export default {
     titleTemplate: '%s - F1C',
     title: 'F1C',
     htmlAttrs: {
-      lang: 'en',
+      lang: 'ja',
     },
     meta: [
       { charset: 'utf-8' },
