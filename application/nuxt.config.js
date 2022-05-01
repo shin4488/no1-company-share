@@ -1,4 +1,5 @@
 import colors from 'vuetify/es5/util/colors';
+import ja from 'vuetify/es5/locale/ja';
 // eslint-disable-next-line nuxt/no-cjs-in-config
 const path = require('path');
 
@@ -105,6 +106,10 @@ export default {
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
+    lang: {
+      locales: { ja },
+      current: 'ja',
+    },
     theme: {
       dark: false,
       themes: {
