@@ -64,19 +64,7 @@ CREATE TABLE public.bookmark (
   PRIMARY KEY (post_id, user_id)
 );
 
--- 事前データ
-INSERT INTO public.user_master (id) VALUES (
-  'cDYrCmleUFhpDok0klZxvCpZVJt-'
-);
-INSERT INTO public.company_master (
-  company_number,
-  company_name,
-  homepage_url
-) VALUES (
-  'C001',
-  'サンプル株式会社',
-  'http://example.com'
-);
+-- 本番時の事前データ
 INSERT INTO public.division_master (
   column_physical_name,
   division_displayed_name
@@ -89,4 +77,30 @@ INSERT INTO public.division_master (
 ), (
   'NO1_DIVISION',
   '福井一'
+);
+
+-- 開発時の事前データ
+INSERT INTO public.user_master (id) VALUES (
+  'cDYrCmleUFhpDok0klZxvCpZVJt-'
+);
+INSERT INTO public.company_master (
+  company_number,
+  company_name,
+  homepage_url
+) VALUES (
+  '1210001013425',
+  '酒井化学株式会社',
+  'http://example.com'
+), (
+  '1210002013036',
+  '有限会社酒井制御',
+  'http://example.com'
+), (
+  '3210001001361',
+  '株式会社酒井建設',
+  'http://www.sakai-kensetsu1925.co.jp/'
+), (
+  '4210001017778',
+  '酒井石材工業株式会社',
+  'http://sakai.tokyosekizai.jp/'
 );
