@@ -7,6 +7,7 @@ import { LogHandler } from '@s/common/logger/interface/LogHandler';
 import CompanyMaster from '@s/common/sequelize/models/companyMaster';
 import UserMaster from '@s/common/sequelize/models/userMaster';
 import { BaseController } from '@s/common/controller/baseController';
+import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthorization';
 
 class UserController extends BaseController {
   public static userEndpoint: string = '/development/users';
@@ -49,6 +50,7 @@ class UserController extends BaseController {
 const userDevelopmentRouter = Router();
 userDevelopmentRouter.post(
   UserController.userEndpoint,
+  authorizationFirebaseUser,
   UserController.getUsers,
 );
 export { userDevelopmentRouter };
