@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, AxiosResponse } from 'axios';
 import { ApiResponse } from '@f/definition/common/apiSpec/apiResponse';
 
 export class AjaxHelper {
@@ -7,10 +7,18 @@ export class AjaxHelper {
     uri: string,
     request?: TRequest,
   ): Promise<TResponse | null> {
-    const response = await axios.get<ApiResponse<TResponse>>(uri, {
-      params: request,
-    });
+    const response: AxiosResponse<ApiResponse<TResponse> | undefined> =
+      await axios
+        .get<ApiResponse<TResponse>>(uri, {
+          params: request,
+        })
+        .catch((error) => error);
+
     const responseBody = response.data;
+    if (responseBody === undefined) {
+      return null;
+    }
+
     const responseBodyData = responseBody.data;
     return responseBodyData;
   }
