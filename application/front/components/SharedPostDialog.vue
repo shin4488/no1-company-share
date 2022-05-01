@@ -84,11 +84,7 @@
           </v-col>
           <v-col class="d-flex align-start justify-center" sm="4" cols="3">
             <div>
-              <v-progress-circular
-                v-if="isImageLoadingShown"
-                indeterminate
-                color="primary"
-              ></v-progress-circular>
+              <Spinner :show="isImageLoadingShown" />
             </div>
             <div
               v-if="!isImageLoadingShown && hasImageAlternativeMessageComputed"
@@ -241,18 +237,24 @@ export default Vue.extend({
       {
         text: 'あいうえお かきくけこ　さしすせそ',
         value: 'aiueo',
+        disabled: false,
       },
       {
         text: 'あいうえお かき',
         value: 'aiueo2',
+        disabled: true,
+        subtitle: 'すでにこの会社は登録済みです。',
       },
       {
         text: 'aaaa bbb cccccccccccccccccc ddd',
         value: 'alfa',
+        disabled: true,
+        subtitle: 'すでにこの会社は登録済みです。',
       },
       {
         text: 'aaaa bbb ccccccccc ee',
         value: 'alfa2',
+        disabled: false,
       },
     ];
   },
@@ -283,6 +285,7 @@ export default Vue.extend({
           {
             text: companyName,
             value: companyNumber,
+            disabled: true,
           },
         ];
       }

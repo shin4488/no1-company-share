@@ -1,6 +1,6 @@
 <template>
   <v-overlay :value="isShown">
-    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    <Spinner show />
   </v-overlay>
 </template>
 
