@@ -25,7 +25,7 @@ class ErrorController extends BaseController {
     _request: express.Request,
     _response: express.Response,
   ) {
-    throw new AppError(404, 'Apperrorが発生');
+    throw new AppError('Apperrorが発生');
   }
 
   public static errorEndpoint: string = '/development/errors/4';
