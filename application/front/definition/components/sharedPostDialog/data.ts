@@ -1,4 +1,12 @@
-import { SelectItem } from '@f/definition/common/selectItem';
+/**
+ * 会社選択肢のAutoComplete内容
+ */
+export interface SelectItemAutoComplete {
+  text: string;
+  value: string;
+  disabled: boolean;
+  header?: string;
+}
 
 /**
  * 投稿詳細
@@ -14,7 +22,8 @@ export interface SharedPostDialogDetailData {
  */
 export interface SharedPostDialogData {
   isOpenDialog: boolean;
-  selectableCompanies: SelectItem[];
+  selectableCompanies: SelectItemAutoComplete[];
+  isAutocompleteLoadingShown: boolean;
   imageAlternativeMessage: string;
   isImageLoadingShown: boolean;
 
