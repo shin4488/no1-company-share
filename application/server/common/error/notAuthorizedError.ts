@@ -7,6 +7,6 @@ export class NotAuthorizedError extends AppError {
   constructor() {
     // エラーメッセージは固定
     const errorMessage = 'ログインしてください。';
-    super(401, errorMessage);
+    super(errorMessage);
   }
 }

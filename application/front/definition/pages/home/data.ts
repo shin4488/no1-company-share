@@ -2,8 +2,8 @@ import { SharedPost } from '@f/definition/common/sharedPost';
 import { SelectItem } from '@f/definition/common/selectItem';
 
 export interface HomePageData {
-  sharedCompanyPosts: SharedPost[];
+  sharedPosts: SharedPost[];
   no1Divisions: SelectItem[];
-  loadedPage: number;
   isLoadMoreButtonShown: boolean;
+  oldBaseDateTime: string | null;
 }

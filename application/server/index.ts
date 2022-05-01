@@ -12,7 +12,6 @@ import { types } from '@s/common/dependencyInjection/types';
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
 import { SequelizeHandler } from '@s/common/sequelize/interface/SequelizeHandler';
 import { logRequestResponse } from '@s/common/middleware/logger';
-import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthorization';
 import { catchError } from '@s/common/middleware/appErrorHandler';
 import { appRouter } from '@s/feature/router';
 import { ArrayUtil } from '@c/util/arrayUtil';
@@ -36,7 +35,6 @@ app.use(urlencoded({ extended: true }));
 const accessLoggerMiddleware = logger.getAccessLoggerMiddleware();
 app.use(accessLoggerMiddleware);
 app.use(logRequestResponse);
-app.use(authorizationFirebaseUser);
 
 app.use('/api/v1', appRouter);
 

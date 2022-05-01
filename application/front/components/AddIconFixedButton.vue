@@ -21,8 +21,9 @@ export default Vue.extend({
   computed: {
     additionButtonClassComputed(): string {
       return this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm
-        ? 'mb-12'
-        : '';
+        ? // 追加ボタンでカード側のアイコンボタンが押せなくなるのを防ぐため、マージンを設定
+          'mb-16'
+        : 'mb-10';
     },
   },
   methods: {

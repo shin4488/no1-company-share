@@ -1,17 +1,18 @@
 <template>
   <v-card>
-    <!-- TODO:会社名が長い時の折り返し -->
+    <!-- Vue側でエスケープ処理を行ってくれるため、onerrorやscriptタグなどの入力値処理は行っていない -->
+    <!-- https://jp.vuejs.org/v2/guide/security.html#HTML-%E3%82%B3%E3%83%B3%E3%83%86%E3%83%B3%E3%83%84 -->
     <!-- 会社名 -->
     <v-card-title>
       <a
-        color="secondary"
+        v-if="hasCompanyUrl"
         class="wrapped-button"
         text
         :href="companyHomepageUrl"
         target="_blank"
-      >
-        {{ companyName }}
-      </a>
+        v-text="companyName"
+      />
+      <a v-else class="auto-cursor wrapped-button" text v-text="companyName" />
     </v-card-title>
 
     <!-- 一位内容 -->
@@ -20,9 +21,8 @@
         v-for="(detailText, index) in postDetailsComputed"
         :key="index"
         class="font-weight-bold"
-      >
-        {{ detailText }}
-      </div>
+        v-text="detailText"
+      />
 
       <!-- 会社画像 -->
       <v-img
@@ -34,9 +34,7 @@
       </v-img>
 
       <!-- 備考（投稿説明） -->
-      <div class="text--primary">
-        {{ remarks }}
-      </div>
+      <div class="text--primary pre-wrap" v-text="remarks" />
     </v-card-text>
 
     <v-divider></v-divider>
@@ -47,6 +45,7 @@
         <v-list-item-avatar>
           <v-img
             class="elevation-6"
+            :title="postingUserName"
             :alt="postingUserName"
             :src="postingUserIcomImageUrl"
           ></v-img>
@@ -54,7 +53,7 @@
 
         <!-- <div style="white-space: normal"> -->
         <!-- TODO:投稿者名が長い時の折り返し -->
-        <v-list-item-content>
+        <v-list-item-content :title="postingUserName">
           <v-list-item-title>
             {{ postingUserName }}
           </v-list-item-title>
@@ -64,7 +63,7 @@
           <v-icon dense color="bookmark" @click="onClickedBookmarkButton">
             {{ isBookmarkedByLoginUser ? 'mdi-heart' : 'mdi-heart-outline' }}
           </v-icon>
-          <span class="subheading mr-2">{{ numberOfBookmarks }}</span>
+          <span class="subheading mr-2" v-text="numberOfBookmarksComputed" />
 
           <v-icon
             v-show="!isPostedByLoginUser"
@@ -100,11 +99,11 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 import { SelectItem } from '@f/definition/common/selectItem';
-import { AppCardPostDetail } from '@f/definition/components/appCard/data';
+import { PostDetail } from '@f/definition/common/sharedPost';
 import { StringUtil } from '@c/util/stringUtil';
 
 export default Vue.extend({
-  name: 'AppCard',
+  name: 'SharedPostCard',
   props: {
     // postId
     value: {
@@ -163,7 +162,7 @@ export default Vue.extend({
       required: false,
     },
     postDetails: {
-      type: Array as PropType<AppCardPostDetail[]>,
+      type: Array as PropType<PostDetail[]>,
       default: () => [
         {
           postDetailId: 1,
@@ -181,9 +180,13 @@ export default Vue.extend({
           value: '',
         },
       ],
+      required: true,
     },
   },
   computed: {
+    hasCompanyUrl(): boolean {
+      return StringUtil.isNotEmpty(this.companyHomepageUrl);
+    },
     hasCompanyImageUrl(): boolean {
       return StringUtil.isNotEmpty(this.companyImageUrl);
     },
@@ -198,15 +201,17 @@ export default Vue.extend({
         this.$accessor.firebaseAuthorization.userIdComputed
       );
     },
-  },
-  mounted() {
-    console.log('AppCard');
-    console.log(this.value);
-    console.log(this.companyNumber);
-    console.log(this.postingUserId);
-    console.log(this.postingUserIcomImageUrl);
-    console.log(this.postDetails);
-    console.log(this.no1Divisions);
+    numberOfBookmarksComputed(): string {
+      const dividingNumber = 1000;
+      if (this.numberOfBookmarks < dividingNumber) {
+        return StringUtil.toString(this.numberOfBookmarks);
+      }
+
+      // 1000以上は「K」表示とする
+      const devidedValue = this.numberOfBookmarks / dividingNumber;
+      const flooredValue = Math.floor(devidedValue / 0.1) * 0.1;
+      return `${flooredValue}K`;
+    },
   },
   methods: {
     getNo1Division(divisionValue: string): string {
@@ -228,7 +233,6 @@ export default Vue.extend({
       }
     },
     onClickedAlertButton(): void {
-      // TODO:報告してよいかの確認ダイアログ起動
       this.$emit('confirm-report', {
         postId: this.value,
       });
@@ -239,7 +243,6 @@ export default Vue.extend({
       });
     },
     onClickedDeleteButton(): void {
-      // TODO:削除してよいかの確認ダイアログ起動
       this.$emit('confirm-delete', {
         postId: this.value,
       });
@@ -251,4 +254,8 @@ export default Vue.extend({
 <style lang="sass" scoped>
 .wrapped-button
   text-decoration: none
+.pre-wrap
+  white-space: pre-wrap
+.auto-cursor
+  cursor: auto
 </style>

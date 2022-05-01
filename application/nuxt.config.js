@@ -1,4 +1,5 @@
 import colors from 'vuetify/es5/util/colors';
+import ja from 'vuetify/es5/locale/ja';
 // eslint-disable-next-line nuxt/no-cjs-in-config
 const path = require('path');
 
@@ -20,10 +21,10 @@ export default {
   serverMiddleware: ['~~/server/'],
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - no1-company-share',
-    title: 'no1-company-share',
+    titleTemplate: '%s - F1C',
+    title: 'F1C',
     htmlAttrs: {
-      lang: 'en',
+      lang: 'ja',
     },
     meta: [
       { charset: 'utf-8' },
@@ -42,7 +43,7 @@ export default {
   },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['~/plugins/axios/axios.ts'],
+  plugins: ['~/plugins/axios/axios.ts', '~/plugins/clone/lodash.ts'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -105,6 +106,10 @@ export default {
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
+    lang: {
+      locales: { ja },
+      current: 'ja',
+    },
     theme: {
       dark: false,
       themes: {

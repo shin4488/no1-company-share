@@ -413,6 +413,48 @@ const plugin: Plugin = ({ $axios, $accessor }: Context) => {
 };
 ```
 
+## dialogの結果をawaitで待っている実装
+https://qiita.com/minojiro/items/e7e3128c7c779ca09ec7
+https://v2.vuejs.org/v2/api/?redirect=true#vm-on
+コンポーネント内で$emitしたイベントは、同じコンポーネント内で$onでリッスン可能
+
+## v-for内で同じ親を持つ要素のkey指定
+https://qiita.com/ysKuga/items/fa2ba12b10bade86da36
+
+うまくいかない
+
+```html
+<template v-for="(item, index) in items">
+  <v-col :key="index">
+    内容1
+  </v-col>
+  <v-col :key="index">
+    内容2
+  </v-col>
+</template>
+```
+
+うまくいく
+
+```html
+<template v-for="(item, index) in items">
+  <v-col :key="`first-col-${index}`">
+    内容1
+  </v-col>
+  <v-col :key="`second-col-${index}`">
+    内容2
+  </v-col>
+</template>
+```
+
+## Vuetifyのxs指定ができない
+https://qiita.com/rubytomato@github/items/07fe07e64482f8f03ef3
+
+```
+プロパティ名の接尾辞にsmやmdなど、Viewport Breakpointsのコードが付くものがあります。ただしxsについてはデフォルト扱いなのか接尾辞に付きません。
+```
+
+
 # Typescript
 ## 絶対パスでimport
 
