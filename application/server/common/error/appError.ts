@@ -4,14 +4,17 @@
  * 新しい例外クラスを作成する際は、このクラスを継承してください
  */
 export class AppError extends Error {
-  public statusCode?: number;
+  private messages: string[];
 
-  constructor(statusCode?: number, message?: string) {
-    super(message);
+  get errorMessages(): string[] {
+    return this.messages;
+  }
+
+  constructor(...messages: string[]) {
+    super();
+    this.messages = messages;
     this.name = new.target.name;
     // 下記の行はTypeScriptの出力ターゲットがES2015より古い場合(ES3, ES5)のみ必要
     Object.setPrototypeOf(this, new.target.prototype);
-
-    this.statusCode = statusCode;
   }
 }
