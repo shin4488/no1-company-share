@@ -7,6 +7,7 @@ import {
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { BaseController } from '@s/common/controller/baseController';
+import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthorization';
 
 /**
  * 投稿処理に関するコントローラクラス
@@ -26,6 +27,7 @@ class SharedPostController extends BaseController {
     const requestParameter = request.params;
     console.log(requestQuery);
     console.log(requestParameter);
+    console.log(response.locals.firebaseUserId);
     const service = appContainer.get<SharedPostService>(
       types.SharedPostService,
     );
@@ -37,6 +39,7 @@ class SharedPostController extends BaseController {
 const sharedPostRouter = Router();
 sharedPostRouter.get(
   SharedPostController.sharedPostsGetEndpoint,
+  authorizationFirebaseUser(false),
   SharedPostController.getSharedPosts,
 );
 export { sharedPostRouter };

@@ -2,6 +2,7 @@
 // https://typescript.nuxtjs.org/ja/cookbook/store/#vuex-module-decorators
 
 import { getterTree, mutationTree, actionTree } from 'typed-vuex';
+import { StringUtil } from '@c/util/stringUtil';
 
 export const state = () => ({
   userId: null as string | null,
@@ -37,8 +38,13 @@ export const actions = actionTree(
       } else {
         const userId = authUser.uid;
         commit('setUserId', userId);
-        const idToken = await authUser.getIdToken();
-        commit('setIdToken', idToken);
+        // ログイン中でもIDトークンが送られてこない時はfirebaseから取得
+        // firebaseから取得できない時に引数でIDトークンを送ってもらう
+        const idToken = authUser.idToken;
+        const token = StringUtil.isNotEmpty(idToken)
+          ? idToken
+          : await authUser.getIdToken();
+        commit('setIdToken', token);
       }
     },
     async loginByGoogle() {

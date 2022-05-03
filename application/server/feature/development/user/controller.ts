@@ -50,7 +50,7 @@ class UserController extends BaseController {
 const userDevelopmentRouter = Router();
 userDevelopmentRouter.post(
   UserController.userEndpoint,
-  authorizationFirebaseUser,
+  authorizationFirebaseUser(),
   UserController.getUsers,
 );
 export { userDevelopmentRouter };
