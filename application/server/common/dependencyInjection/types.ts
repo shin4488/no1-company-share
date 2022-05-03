@@ -1,15 +1,18 @@
 const types = {
   LogHandler: Symbol.for('LogHandler'),
   SequelizeHandler: Symbol.for('SequelizeHandler'),
-  ApiResponseHandler: Symbol.for('ApiResponseHandler'),
 
+  SequelizeTransaction: Symbol.for('SequelizeTransaction'),
   CompanyMasterDao: Symbol.for('CompanyMasterDao'),
+  UserMasterDao: Symbol.for('UserMasterDao'),
 
-  SharedPostService: Symbol.for('SharedPostService'),
+  ApiResponseHandler: Symbol.for('ApiResponseHandler'),
   OpenGraphService: Symbol.for('OpenGraphService'),
   OpenGraphLogic: Symbol.for('OpenGraphLogic'),
+  SharedPostService: Symbol.for('SharedPostService'),
   CompanyService: Symbol.for('CompanyService'),
   CompanyLogic: Symbol.for('CompanyLogic'),
+  UserService: Symbol.for('UserService'),
 };
 
 export { types };

@@ -1,7 +1,7 @@
 import { Model, Sequelize, DataTypes } from 'sequelize';
 import { CommonModelAttribute } from './commonModelAttribute';
 
-interface UserMasterModelAttribute {
+export interface UserMasterModelAttribute {
   id: string;
   iconImageUrl: string;
   displayedName: string;

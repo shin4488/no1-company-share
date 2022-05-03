@@ -10,7 +10,7 @@ import Admin from 'firebase-admin';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
-import { SequelizeHandler } from '@s/common/sequelize/interface/SequelizeHandler';
+import { SequelizeHandler } from '@s/common/sequelize/logic/interface/SequelizeHandler';
 import { logRequestResponse } from '@s/common/middleware/logger';
 import { catchError } from '@s/common/middleware/appErrorHandler';
 import { appRouter } from '@s/feature/router';

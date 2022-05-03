@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
 import { injectable, inject } from 'inversify';
-import CompanyMaster from './models/companyMaster';
-import UserMaster from './models/userMaster';
+import CompanyMaster from '../models/companyMaster';
+import UserMaster from '../models/userMaster';
 import { SequelizeHandler } from './interface/SequelizeHandler';
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
 import { types } from '@s/common/dependencyInjection/types';

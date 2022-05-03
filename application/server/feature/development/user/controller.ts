@@ -2,7 +2,7 @@ import express, { Router } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
-import { SequelizeHandler } from '@s/common/sequelize/interface/SequelizeHandler';
+import { SequelizeHandler } from '@s/common/sequelize/logic/interface/SequelizeHandler';
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
 import CompanyMaster from '@s/common/sequelize/models/companyMaster';
 import UserMaster from '@s/common/sequelize/models/userMaster';
@@ -24,12 +24,11 @@ class UserController extends BaseController {
     logger.log('debug', 'firebase user id', response.locals.firebaseUserId);
 
     console.log('ユーザ取得');
-    const [users, metadata1] = await sequelize.query<UserMaster>(
+    const users = await sequelize.query<UserMaster>(
       'SELECT * FROM public.user_master',
       { type: QueryTypes.SELECT },
     );
     console.log(users);
-    console.log(metadata1);
     const userWhere = await UserMaster.findAll({
       where: { id: { [Op.like]: 'eUFhpDok0k' } },
     });
