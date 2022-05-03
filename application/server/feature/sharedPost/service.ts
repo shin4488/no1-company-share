@@ -146,20 +146,6 @@ export class SharedPostServiceImpl implements SharedPostService {
           ],
         },
       ],
-      no1Divisions: [
-        {
-          text: '世界一',
-          value: '1',
-        },
-        {
-          text: '日本一',
-          value: '2',
-        },
-        {
-          text: '福井一',
-          value: '3',
-        },
-      ],
     };
 
     // 会社ホームページURLからOG画像取得

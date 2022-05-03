@@ -1,5 +1,3 @@
-import { ApiSelectItem } from '@f/definition/common/apiSpec/selectItem';
-
 /**
  * 投稿詳細取得レスポンス
  */
@@ -35,5 +33,4 @@ export interface SharedPostGetPostsReponse {
  */
 export interface SharedPostGetReponse {
   posts: SharedPostGetPostsReponse[];
-  no1Divisions: ApiSelectItem[];
 }

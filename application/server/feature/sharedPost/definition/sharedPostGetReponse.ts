@@ -1,5 +1,3 @@
-import { SelectItem } from '@s/common/selectItem/data';
-
 /**
  * 投稿詳細取得レスポンス
  */
@@ -35,5 +33,4 @@ export interface SharedPostGetPostsReponse {
  */
 export interface SharedPostGetReponse {
   posts: SharedPostGetPostsReponse[];
-  no1Divisions: SelectItem[];
 }
