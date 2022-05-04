@@ -1,6 +1,6 @@
 <template>
   <v-snackbar v-model="isShown" top max-width="60%" color="error">
-    {{ message }}
+    <div class="pre-wrap" v-text="message" />
 
     <template #action="{ attrs }">
       <v-btn
@@ -44,3 +44,8 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="sass" scoped>
+.pre-wrap
+  white-space: pre-wrap
+</style>
