@@ -1,7 +1,9 @@
 import { injectable } from 'inversify';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { CompanyMasterDao } from './interface/dao';
-import CompanyMaster from '@s/common/sequelize/models/companyMaster';
+import CompanyMaster, {
+  CompanyMasterModelAttribute,
+} from '@s/common/sequelize/models/companyMaster';
 
 @injectable()
 export class CompanyMasterDaoImpl implements CompanyMasterDao {
@@ -18,5 +20,19 @@ export class CompanyMasterDaoImpl implements CompanyMasterDao {
     });
 
     return companies;
+  }
+
+  public async upsertCompany(
+    company: CompanyMasterModelAttribute,
+    transaction: Transaction,
+  ): Promise<void> {
+    await CompanyMaster.upsert(
+      {
+        companyNumber: company.companyNumber,
+        companyName: company.companyName,
+        homepageUrl: company.homepageUrl,
+      },
+      { transaction },
+    );
   }
 }
