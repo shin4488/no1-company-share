@@ -26,6 +26,7 @@ export default Vue.extend({
   async asyncData({ $axios, $accessor }: Context) {
     let sharedPosts: SharedPost[] = [];
     let no1Divisions: SelectItem[] = [];
+
     // コンポーネントマウント前はストアアクセス不可のためスピナーは表示されない
     await $accessor.spinnerOverlay.open(async () => {
       const no1DivisionsReponse =
@@ -39,7 +40,7 @@ export default Vue.extend({
 
       const response = await AjaxHelper.get<SharedPostGetReponse>(
         $axios,
-        '/localhost/shared-posts',
+        '/localhost/shared-posts/',
         {
           limit: postFetchedLimit,
           // 初回読み込み時は1ページ目であるため、取得基準時刻は無し
@@ -78,7 +79,7 @@ export default Vue.extend({
       await this.$accessor.spinnerOverlay.open(async () => {
         const response = await AjaxHelper.get<SharedPostGetReponse>(
           this.$axios,
-          '/localhost/shared-posts',
+          '/localhost/shared-posts/',
           {
             limit: postFetchedLimit,
             baseDateTime: this.oldBaseDateTime,
