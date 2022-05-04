@@ -3,7 +3,7 @@ import { AppError } from '@s/common/error/appError';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
-import { ApiResponseHandler } from '@s/common/apiResponse/interface/ApiResponseHandler';
+import { ApiResponseHandler } from '@s/common/apiResponse/interface/apiResponseHandler';
 import { NotAuthorizedError } from '@s/common/error/notAuthorizedError';
 import { RecordNotFoundError } from '@s/common/error/recordNotFoundError';
 
@@ -31,9 +31,8 @@ export const catchError = (
     types.ApiResponseHandler,
   );
   if (appErrorInstance) {
-    (error as AppError).errorMessages.forEach((message) => {
-      responseHandler.addErrorMessages(message);
-    });
+    const errorMessages = (error as AppError).errorMessages;
+    responseHandler.addErrorMessages(...errorMessages);
   } else {
     responseHandler.addErrorMessages(error.message);
   }

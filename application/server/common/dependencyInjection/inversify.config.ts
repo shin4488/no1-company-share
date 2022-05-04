@@ -13,7 +13,7 @@ import { UserMasterDao } from '@s/commonBL/dao/user/interface/dao';
 import { UserMasterDaoImpl } from '@s/commonBL/dao/user/dao';
 import { DivisionMasterDao } from '@s/commonBL/dao/division/interface/dao';
 import { DivisionMasterDaoImpl } from '@s/commonBL/dao/division/dao';
-import { ApiResponseHandler } from '@s/common/apiResponse/interface/ApiResponseHandler';
+import { ApiResponseHandler } from '@s/common/apiResponse/interface/apiResponseHandler';
 import { ApiResponseHandlerImpl } from '@s/common/apiResponse/apiResponseHandler';
 import { OpenGraphService } from '@s/feature/openGraph/interface/service';
 import { OpenGraphServiceImpl } from '@s/feature/openGraph/service';

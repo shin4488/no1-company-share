@@ -3,7 +3,8 @@ import {
   ApiResponseSpec,
   ApiResponseMessage,
 } from './definition/apiResponseSpec';
-import { ApiResponseHandler } from './interface/ApiResponseHandler';
+import { ApiResponseHandler } from './interface/apiResponseHandler';
+import { ArrayUtil } from '@c/util/arrayUtil';
 
 @injectable()
 export class ApiResponseHandlerImpl implements ApiResponseHandler {
@@ -12,8 +13,7 @@ export class ApiResponseHandlerImpl implements ApiResponseHandler {
   createResponse<TResponse = unknown>(
     data?: TResponse,
   ): ApiResponseSpec<TResponse> {
-    const hasErrorMessage = this.actionMessages.length !== 0;
-    if (hasErrorMessage) {
+    if (ArrayUtil.isNotEmpty(this.actionMessages)) {
       return {
         messages: this.actionMessages,
         data: null,
