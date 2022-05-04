@@ -2,7 +2,6 @@ const types = {
   LogHandler: Symbol.for('LogHandler'),
   SequelizeHandler: Symbol.for('SequelizeHandler'),
 
-  SequelizeTransaction: Symbol.for('SequelizeTransaction'),
   CompanyMasterDao: Symbol.for('CompanyMasterDao'),
   UserMasterDao: Symbol.for('UserMasterDao'),
   DivisionMasterDao: Symbol.for('DivisionMasterDao'),
@@ -11,6 +10,7 @@ const types = {
   OpenGraphService: Symbol.for('OpenGraphService'),
   OpenGraphLogic: Symbol.for('OpenGraphLogic'),
   DivisionSelectItemLogic: Symbol.for('DivisionSelectItemLogic'),
+  DateHandler: Symbol.for('DateHandler'),
 
   SharedPostService: Symbol.for('SharedPostService'),
   CompanyService: Symbol.for('CompanyService'),

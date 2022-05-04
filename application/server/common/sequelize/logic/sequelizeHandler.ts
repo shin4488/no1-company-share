@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize, Transaction } from 'sequelize';
 import { injectable, inject } from 'inversify';
 import CompanyMaster from '../models/companyMaster';
 import UserMaster from '../models/userMaster';
@@ -40,5 +40,16 @@ export class SequelizeHandlerImpl implements SequelizeHandler {
     CompanyMaster.initialize(SequelizeHandlerImpl._sequelize);
     UserMaster.initialize(SequelizeHandlerImpl._sequelize);
     DivisionMaster.initialize(SequelizeHandlerImpl._sequelize);
+  }
+
+  public async transact(
+    process: (transaction: Transaction) => Promise<void> | void,
+  ): Promise<void> {
+    const transaction = await this.sequelize.transaction();
+    try {
+      await process(transaction);
+    } catch {
+      transaction.rollback();
+    }
   }
 }

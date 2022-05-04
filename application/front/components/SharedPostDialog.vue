@@ -22,9 +22,9 @@
               clearable
               :loading="isAutocompleteLoadingShown"
               append-icon="mdi-magnify"
-              @keydown="onChangedSearchedCompanyText"
               @click:clear="onClickedAutocompleteClear"
               @change="onClickedCompany"
+              @update:search-input="onChangedSearchedCompanyText"
             ></v-autocomplete>
           </v-col>
         </v-row>
@@ -151,6 +151,8 @@ import { OpenGraphGetRequest } from '@f/definition/components/sharedPostDialog/a
 import { OpenGraphGetResponse } from '@f/definition/components/sharedPostDialog/apiSpec/openGraphGetResponse';
 import { CompanyGetResponse } from '@f/definition/components/sharedPostDialog/apiSpec/companyGetResponse';
 import ConfirmDialog from '@f/components/ConfirmDialog.vue';
+import { SharedPostPostRequest } from '@f/definition/components/sharedPostDialog/apiSpec/sharedPostPostRequest';
+import { SharedPostPostResponse } from '@f/definition/components/sharedPostDialog/apiSpec/sharedPostPostResponse';
 
 export default Vue.extend({
   name: 'SharedPostCard',
@@ -305,8 +307,55 @@ export default Vue.extend({
     /**
      * 確定ボタン押下処理
      */
-    onClickedConfirmButton(): void {
+    async onClickedConfirmButton(): Promise<void> {
+      let hasError = false;
       // TODO:投稿登録（postIdが空）・更新（postIdが非空）処理
+      await this.$accessor.spinnerOverlay.open(async () => {
+        const request: SharedPostPostRequest = {
+          posts: [
+            {
+              companyNumber: this.companyNumber,
+              companyName: this.companyName,
+              companyHomepageUrl: this.companyHomepageUrl,
+              remarks: this.remarks,
+              postDetails: this.postDetails.map((detail, index) => ({
+                key: StringUtil.toString(index),
+                no1Content: detail.no1Content,
+                no1Division: detail.no1Division,
+              })),
+            },
+          ],
+        };
+        const response = await AjaxHelper.post<SharedPostPostResponse>(
+          this.$axios,
+          '/shared-posts/',
+          request,
+        );
+        if (response === null) {
+          hasError = true;
+          return;
+        }
+
+        const responsePosts = response.posts;
+        if (ArrayUtil.isEmpty(responsePosts)) {
+          hasError = true;
+          return;
+        }
+
+        const responsePost = responsePosts[0];
+        this.postId = StringUtil.ifEmpty(responsePost.id);
+        this.updatedAt = StringUtil.ifEmpty(responsePost.updatedAt);
+        const responsePostDetails = responsePost.postDetails;
+        responsePostDetails.forEach((detail) => {
+          this.postDetails[Number(detail.key)].postDetailId = detail.id;
+        });
+      });
+
+      // レスポンスボディや投稿レスポンスが存在しない場合はエラーとみなしてダイアログを閉じない
+      if (hasError) {
+        return;
+      }
+
       const result: SharedPostDialogResult = {
         postId: this.postId,
         companyNumber: this.companyNumber,
@@ -322,6 +371,7 @@ export default Vue.extend({
           no1Division: x.no1Division,
         })),
       };
+      console.log(result);
       this.$emit('confirm', result);
     },
     /**
@@ -341,19 +391,8 @@ export default Vue.extend({
     /**
      * 会社名入力処理
      */
-    async onChangedSearchedCompanyText(event: KeyboardEvent): Promise<void> {
-      if (event.code !== 'Enter') {
-        return;
-      }
-
-      const eventTarget = event.target;
-      if (!(eventTarget instanceof HTMLInputElement)) {
-        return;
-      }
-
-      this.selectableCompanies = await this.getMatchedCompanies(
-        eventTarget.value,
-      );
+    async onChangedSearchedCompanyText(text: string): Promise<void> {
+      this.selectableCompanies = await this.getMatchedCompanies(text);
     },
     /**
      * 会社選択AutoCompleteのクリアアイコン押下処理
@@ -384,9 +423,15 @@ export default Vue.extend({
 
       const companyResonses = response.companies;
       const companies = companyResonses.map<SelectItemAutoComplete>((x) => ({
-        text: x.name,
-        value: x.number,
-        disabled: x.isRegistered,
+        // 英数字が全角で返却されるが、autocompleteは半角・全角も区別するため、結果に表示されるように英数字を全角→半角に返却
+        text: StringUtil.ifEmpty(x.name)
+          .replace(/[Ａ-Ｚａ-ｚ０-９－．＆]/g, (char) =>
+            String.fromCharCode(char.charCodeAt(0) - 0xfee0),
+          )
+          // eslint-disable-next-line no-irregular-whitespace
+          .replace(/　/g, ' '),
+        value: StringUtil.ifEmpty(x.number),
+        disabled: x.isRegistered || false,
         header: x.isRegistered ? `${x.name} （登録済みです）` : '',
       }));
 
@@ -465,7 +510,7 @@ export default Vue.extend({
       }
 
       this.imageAlternativeMessage = '';
-      this.companyImageUrl = results[0].imageUri;
+      this.companyImageUrl = StringUtil.ifEmpty(results[0].imageUri);
     },
     clear(): void {
       this.selectableCompanies = [];

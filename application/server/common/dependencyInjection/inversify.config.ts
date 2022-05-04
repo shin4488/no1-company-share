@@ -1,12 +1,12 @@
 import { Container } from 'inversify';
 import 'reflect-metadata';
+import { DateHandler } from '@s/common/date/interface/dateHandler';
+import { DateHandlerImpl } from '@s/common/date/dateHandler';
 import { types } from '@s/common/dependencyInjection/types';
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
 import { LogHandlerImpl } from '@s/common/logger/logHandler';
 import { SequelizeHandler } from '@s/common/sequelize/logic/interface/SequelizeHandler';
 import { SequelizeHandlerImpl } from '@s/common/sequelize/logic/sequelizeHandler';
-import { SequelizeTransaction } from '@s/common/sequelize/logic/interface/sequelizeTransaction';
-import { SequelizeTransactionImpl } from '@s/common/sequelize/logic/transaction';
 import { CompanyMasterDao } from '@s/commonBL/dao/company/interface/dao';
 import { CompanyMasterDaoImpl } from '@s/commonBL/dao/company/dao';
 import { UserMasterDao } from '@s/commonBL/dao/user/interface/dao';
@@ -33,6 +33,7 @@ import { DivisionService } from '@s/feature/division/interface/service';
 import { DivisionServiceImpl } from '@s/feature/division/service';
 
 const appContainer = new Container();
+
 appContainer
   .bind<LogHandler>(types.LogHandler)
   .to(LogHandlerImpl)
@@ -42,9 +43,6 @@ appContainer
   .to(SequelizeHandlerImpl)
   .inSingletonScope();
 
-appContainer
-  .bind<SequelizeTransaction>(types.SequelizeTransaction)
-  .to(SequelizeTransactionImpl);
 appContainer
   .bind<CompanyMasterDao>(types.CompanyMasterDao)
   .to(CompanyMasterDaoImpl);
@@ -63,6 +61,7 @@ appContainer.bind<OpenGraphLogic>(types.OpenGraphLogic).to(OpenGraphLogicImpl);
 appContainer
   .bind<DivisionSelectItemLogic>(types.DivisionSelectItemLogic)
   .to(DivisionSelectItemLogicImpl);
+appContainer.bind<DateHandler>(types.DateHandler).to(DateHandlerImpl);
 
 appContainer
   .bind<SharedPostService>(types.SharedPostService)

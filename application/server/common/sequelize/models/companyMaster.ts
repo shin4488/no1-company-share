@@ -1,7 +1,7 @@
 import { Model, Sequelize, DataTypes } from 'sequelize';
 import { CommonModelAttribute } from './commonModelAttribute';
 
-interface CompanyMasterModelAttribute {
+export interface CompanyMasterModelAttribute {
   companyNumber: string;
   companyName: string;
   homepageUrl: string;

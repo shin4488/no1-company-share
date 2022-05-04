@@ -28,7 +28,7 @@ export class CompanyLogicImpl implements CompanyLogic {
       // 「JIS X 0401都道府県コード」の「18」は「福井県」
       prefecture: '18',
       page: 1,
-      limit: 70,
+      limit: 30,
     };
     const gbizRequestHeader: Record<string, string> = {
       'X-hojinInfo-api-token': StringUtil.ifEmpty(process.env.GBIZ_API_KEY),
