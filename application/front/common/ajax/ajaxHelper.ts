@@ -22,4 +22,22 @@ export class AjaxHelper {
     const responseBodyData = responseBody.data;
     return responseBodyData;
   }
+
+  static async post<TResponse = {}, TRequest = {}>(
+    axios: AxiosInstance,
+    uri: string,
+    request?: TRequest,
+  ): Promise<TResponse | null> {
+    const response: AxiosResponse<ApiResponse<TResponse>> = await axios
+      .post(uri, request)
+      .catch((error) => error);
+
+    const responseBody = response.data;
+    if (responseBody === undefined) {
+      return null;
+    }
+
+    const responseBodyData = responseBody.data;
+    return responseBodyData;
+  }
 }

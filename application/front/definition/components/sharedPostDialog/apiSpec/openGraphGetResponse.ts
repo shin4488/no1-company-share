@@ -1,6 +1,6 @@
 export interface OpenGraph {
-  pageUri: string;
-  imageUri: string;
+  pageUri: string | null;
+  imageUri: string | null;
 }
 
 export interface OpenGraphGetResponse {

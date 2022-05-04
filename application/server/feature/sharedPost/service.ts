@@ -1,16 +1,36 @@
 import { inject, injectable } from 'inversify';
 import { SharedPostGetReponse } from './definition/sharedPostGetReponse';
 import { SharedPostService } from './interface/sharedPostService';
+import { SharedPostPostParameter } from './definition/sharedPostPostParameter';
+import {
+  SharedPostDetailResponse,
+  SharedPostPostResponse,
+  SharedPostPostResponseItem,
+} from './definition/sharedPostPostResponse';
 import { OpenGraphLogic } from '@s/commonBL/openGraph/interface/logic';
 import { types } from '@s/common/dependencyInjection/types';
 import { OpenGraphType } from '@s/commonBL/openGraph/definition/openGraphType';
+import { CompanyMasterDao } from '@s/commonBL/dao/company/interface/dao';
+import { SequelizeHandler } from '@s/common/sequelize/logic/interface/SequelizeHandler';
+import { DateHandler } from '@s/common/date/interface/dateHandler';
 
 @injectable()
 export class SharedPostServiceImpl implements SharedPostService {
   private openGraphLogic: OpenGraphLogic;
+  private companyMasterDao: CompanyMasterDao;
+  private sequelizeHandler: SequelizeHandler;
+  private dateHandler: DateHandler;
 
-  constructor(@inject(types.OpenGraphLogic) openGraphLogic: OpenGraphLogic) {
+  constructor(
+    @inject(types.OpenGraphLogic) openGraphLogic: OpenGraphLogic,
+    @inject(types.CompanyMasterDao) companyMasterDao: CompanyMasterDao,
+    @inject(types.SequelizeHandler) sequelizeHandler: SequelizeHandler,
+    @inject(types.DateHandler) dateHandler: DateHandler,
+  ) {
     this.openGraphLogic = openGraphLogic;
+    this.companyMasterDao = companyMasterDao;
+    this.sequelizeHandler = sequelizeHandler;
+    this.dateHandler = dateHandler;
   }
 
   public async getSharedPosts(): Promise<SharedPostGetReponse> {
@@ -30,7 +50,7 @@ export class SharedPostServiceImpl implements SharedPostService {
           isBookmarkedByLoginUser: false,
           numberOfBookmarks: 4321,
           remarks: '2020年度3月期有価証券報告書',
-          updatedAt: '2022-04-10 10:30:59.999',
+          updatedAt: '2022-05-03T03:19:17.238Z',
           postDetails: [
             {
               id: 1,
@@ -53,7 +73,7 @@ export class SharedPostServiceImpl implements SharedPostService {
           numberOfBookmarks: 999,
           remarks:
             'http://example.com/ 2020年度3月期有価証券報告書テストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテストテスト',
-          updatedAt: '2022-04-10 12:30:59.999',
+          updatedAt: '2022-05-02T03:19:17.238Z',
           postDetails: [
             {
               id: 1,
@@ -81,7 +101,7 @@ export class SharedPostServiceImpl implements SharedPostService {
           isBookmarkedByLoginUser: false,
           numberOfBookmarks: 0,
           remarks: '',
-          updatedAt: '2022-04-10 15:30:59.999',
+          updatedAt: '2022-05-01T03:19:17.238Z',
           postDetails: [
             {
               id: 1,
@@ -104,7 +124,7 @@ export class SharedPostServiceImpl implements SharedPostService {
           isBookmarkedByLoginUser: true,
           numberOfBookmarks: 1000,
           remarks: '2020年度3月期有価証券報告書',
-          updatedAt: '2022-04-11 10:30:59.999',
+          updatedAt: '2022-05-01T00:19:17.238Z',
           postDetails: [
             {
               id: 1,
@@ -146,20 +166,6 @@ export class SharedPostServiceImpl implements SharedPostService {
           ],
         },
       ],
-      no1Divisions: [
-        {
-          text: '世界一',
-          value: '1',
-        },
-        {
-          text: '日本一',
-          value: '2',
-        },
-        {
-          text: '福井一',
-          value: '3',
-        },
-      ],
     };
 
     // 会社ホームページURLからOG画像取得
@@ -173,6 +179,55 @@ export class SharedPostServiceImpl implements SharedPostService {
         return post;
       }),
     );
+
+    return response;
+  }
+
+  public async save(
+    parameter: SharedPostPostParameter,
+  ): Promise<SharedPostPostResponse> {
+    const posts = parameter.posts;
+    const response: SharedPostPostResponse = { posts: [] };
+    await this.sequelizeHandler.transact(async (transaction) => {
+      // 会社マスタ更新
+      // ホームページURLや会社名変更対応できるように、投稿ごとに書き換える
+      // TODO:将来的には複数件一括でupsertしたい
+      await Promise.all(
+        posts.map(async (post) => {
+          await this.companyMasterDao.upsertCompany(
+            {
+              companyNumber: post.companyNumber,
+              companyName: post.companyName,
+              homepageUrl: post.companyHomepageUrl,
+            },
+            transaction,
+          );
+        }),
+      );
+
+      // TODO:投稿・投稿詳細への書き込み
+      // 投稿詳細は、送られたもののみを残すため、delete→insertで更新
+      response.posts = await Promise.all(
+        posts.map<SharedPostPostResponseItem>((post) => {
+          const currentDate = this.dateHandler.getCurrentDate();
+          const joinedDateTimeString =
+            `${currentDate.getFullYear()}${currentDate.getMonth()}${currentDate.getDate()}` +
+            `${currentDate.getHours()}${currentDate.getMinutes()}${currentDate.getSeconds()}${currentDate.getMilliseconds()}`;
+          const postId = `${post.companyNumber}${parameter.userId}${joinedDateTimeString}`;
+          const details = post.postDetails;
+
+          const postDetails = details.map<SharedPostDetailResponse>(
+            (detail, index) => {
+              return { key: detail.key, id: index };
+            },
+          );
+
+          return { key: post.key, id: postId, updatedAt: '', postDetails };
+        }),
+      );
+
+      transaction.commit();
+    });
 
     return response;
   }

@@ -1,5 +1,5 @@
 import express from 'express';
-import { ApiResponseHandler } from '@s/common/apiResponse/interface/ApiResponseHandler';
+import { ApiResponseHandler } from '@s/common/apiResponse/interface/apiResponseHandler';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 

@@ -1,5 +1,6 @@
 <template>
-  <v-overlay :value="isShown">
+  <!-- モーダルダイアログよりも上に表示できるようにz-indexを大きめに設定 -->
+  <v-overlay z-index="10000" :value="isShown">
     <Spinner show />
   </v-overlay>
 </template>

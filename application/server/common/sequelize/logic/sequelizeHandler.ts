@@ -1,7 +1,8 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize, Transaction } from 'sequelize';
 import { injectable, inject } from 'inversify';
-import CompanyMaster from './models/companyMaster';
-import UserMaster from './models/userMaster';
+import CompanyMaster from '../models/companyMaster';
+import UserMaster from '../models/userMaster';
+import DivisionMaster from '../models/divisionMaster';
 import { SequelizeHandler } from './interface/SequelizeHandler';
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
 import { types } from '@s/common/dependencyInjection/types';
@@ -38,5 +39,17 @@ export class SequelizeHandlerImpl implements SequelizeHandler {
   private initialize(): void {
     CompanyMaster.initialize(SequelizeHandlerImpl._sequelize);
     UserMaster.initialize(SequelizeHandlerImpl._sequelize);
+    DivisionMaster.initialize(SequelizeHandlerImpl._sequelize);
+  }
+
+  public async transact(
+    process: (transaction: Transaction) => Promise<void> | void,
+  ): Promise<void> {
+    const transaction = await this.sequelize.transaction();
+    try {
+      await process(transaction);
+    } catch {
+      transaction.rollback();
+    }
   }
 }

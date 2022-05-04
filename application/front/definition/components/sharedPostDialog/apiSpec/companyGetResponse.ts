@@ -1,7 +1,7 @@
 export interface CompanyResponse {
-  number: string;
-  name: string;
-  isRegistered: boolean;
+  number: string | null;
+  name: string | null;
+  isRegistered: boolean | null;
 }
 
 export interface CompanyGetResponse {

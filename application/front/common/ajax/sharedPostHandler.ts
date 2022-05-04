@@ -3,22 +3,30 @@ import { PostDetail, SharedPost } from '@f/definition/common/sharedPost';
 import { SelectItem } from '@f/definition/common/selectItem';
 import { StringUtil } from '@c/util/stringUtil';
 import { ArrayUtil } from '@c/util/arrayUtil';
+import { ApiSelectItem } from '@f/definition/common/apiSpec/selectItem';
 
 export class SharedPostHandler {
+  static handleDivisionResponse(
+    responseSelectItem: ApiSelectItem[] | null | undefined,
+  ): SelectItem[] {
+    if (ArrayUtil.isEmpty(responseSelectItem)) {
+      return [];
+    }
+
+    return (responseSelectItem as ApiSelectItem[]).map<SelectItem>((x) => ({
+      text: StringUtil.ifEmpty(x.text),
+      value: StringUtil.ifEmpty(x.value),
+    }));
+  }
+
   static handleResponse(response: SharedPostGetReponse | null): {
     sharedPosts: SharedPost[];
-    no1Divisions: SelectItem[];
   } {
     if (response === null) {
-      return {
-        sharedPosts: [],
-        no1Divisions: [],
-      };
+      return { sharedPosts: [] };
     }
 
     const responsePosts = response.posts;
-    const responseDivisions = response.no1Divisions;
-
     const sharedPosts: SharedPost[] = responsePosts.map((x) => ({
       postId: StringUtil.ifEmpty(x.id),
       companyNumber: StringUtil.ifEmpty(x.companyNumber),
@@ -39,15 +47,7 @@ export class SharedPostHandler {
       })),
     }));
 
-    const no1Divisions: SelectItem[] = responseDivisions?.map((x) => ({
-      text: StringUtil.ifEmpty(x.text),
-      value: StringUtil.ifEmpty(x.value),
-    }));
-
-    return {
-      sharedPosts,
-      no1Divisions,
-    };
+    return { sharedPosts };
   }
 
   /**

@@ -19,17 +19,28 @@ import { SharedPost } from '@f/definition/common/sharedPost';
 import { HomePageData } from '@f/definition/pages/home/data';
 import { SharedPostGetReponse } from '@f/definition/pages/common/apiSpec/sharedPostGetResponse';
 import { postFetchedLimit } from '@f/common/constant/sharedPost';
+import { No1DivisionSelectItemGetResponse } from '@s/feature/division/definition/no1DivisionSelectItemGetResponse';
 
 export default Vue.extend({
   name: 'HomePage',
   async asyncData({ $axios, $accessor }: Context) {
     let sharedPosts: SharedPost[] = [];
     let no1Divisions: SelectItem[] = [];
+
     // コンポーネントマウント前はストアアクセス不可のためスピナーは表示されない
     await $accessor.spinnerOverlay.open(async () => {
+      const no1DivisionsReponse =
+        await AjaxHelper.get<No1DivisionSelectItemGetResponse>(
+          $axios,
+          '/divisions/no1/',
+        );
+      no1Divisions = SharedPostHandler.handleDivisionResponse(
+        no1DivisionsReponse?.no1DivisionSelectItems,
+      );
+
       const response = await AjaxHelper.get<SharedPostGetReponse>(
         $axios,
-        '/localhost/shared-posts',
+        '/localhost/shared-posts/',
         {
           limit: postFetchedLimit,
           // 初回読み込み時は1ページ目であるため、取得基準時刻は無し
@@ -39,7 +50,6 @@ export default Vue.extend({
       );
       const results = SharedPostHandler.handleResponse(response);
       sharedPosts = results.sharedPosts;
-      no1Divisions = results.no1Divisions;
     });
 
     // 1度に全データ取得しきれない場合は、さらに表示ボタンを表示
@@ -69,7 +79,7 @@ export default Vue.extend({
       await this.$accessor.spinnerOverlay.open(async () => {
         const response = await AjaxHelper.get<SharedPostGetReponse>(
           this.$axios,
-          '/localhost/shared-posts',
+          '/localhost/shared-posts/',
           {
             limit: postFetchedLimit,
             baseDateTime: this.oldBaseDateTime,
