@@ -41,7 +41,7 @@
 
     <!-- 投稿者情報 -->
     <v-card-actions>
-      <v-list-item dense class="grow">
+      <v-list-item dense class="grow full-width">
         <v-list-item-avatar>
           <v-img
             class="elevation-6"
@@ -51,7 +51,6 @@
           ></v-img>
         </v-list-item-avatar>
 
-        <!-- <div style="white-space: normal"> -->
         <!-- TODO:投稿者名が長い時の折り返し -->
         <v-list-item-content :title="postingUserName">
           <v-list-item-title>
@@ -258,4 +257,6 @@ export default Vue.extend({
   white-space: pre-wrap
 .auto-cursor
   cursor: auto
+.full-width
+  width: 100%
 </style>
