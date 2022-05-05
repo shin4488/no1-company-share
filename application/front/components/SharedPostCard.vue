@@ -51,7 +51,6 @@
           ></v-img>
         </v-list-item-avatar>
 
-        <!-- TODO:投稿者名が長い時の折り返し -->
         <v-list-item-content :title="postingUserName">
           <v-list-item-title>
             {{ postingUserName }}
