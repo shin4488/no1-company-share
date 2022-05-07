@@ -11,8 +11,11 @@ const types = {
   OpenGraphLogic: Symbol.for('OpenGraphLogic'),
   DivisionSelectItemLogic: Symbol.for('DivisionSelectItemLogic'),
   DateHandler: Symbol.for('DateHandler'),
+  BadParameterErrorHandler: Symbol.for('BadParameterErrorHandler'),
 
   SharedPostService: Symbol.for('SharedPostService'),
+  SharedPostSaveLogic: Symbol.for('SharedPostSaveLogic'),
+  SharedPostComplexValidator: Symbol.for('SharedPostComplexValidator'),
   CompanyService: Symbol.for('CompanyService'),
   CompanyLogic: Symbol.for('CompanyLogic'),
   UserService: Symbol.for('UserService'),
