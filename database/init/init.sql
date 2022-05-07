@@ -48,7 +48,8 @@ CREATE TABLE public.shared_post (
 -- 投稿詳細：投稿詳細ID、投稿ID、一位内容、一位区分
 CREATE TABLE public.shared_post_detail (
   id INTEGER,
-  shared_post_id VARCHAR(48) REFERENCES public.shared_post (id) ON DELETE RESTRICT,
+  -- 投稿削除時に投稿詳細も削除
+  shared_post_id VARCHAR(58) REFERENCES public.shared_post (id) ON DELETE CASCADE,
   no1_content VARCHAR(100),
   no1_division INTEGER REFERENCES public.division_master (id) ON DELETE RESTRICT,
   created_at TIMESTAMP WITH TIME ZONE,
@@ -57,7 +58,8 @@ CREATE TABLE public.shared_post_detail (
 );
 -- お気に入り：投稿ID、お気に入りユーザID
 CREATE TABLE public.bookmark (
-  shared_post_id VARCHAR(10) REFERENCES public.shared_post (id) ON DELETE RESTRICT,
+  -- 投稿削除時にお気に入りも削除
+  shared_post_id VARCHAR(58) REFERENCES public.shared_post (id) ON DELETE CASCADE,
   user_id VARCHAR(28) REFERENCES public.user_master (id) ON DELETE RESTRICT,
   created_at TIMESTAMP WITH TIME ZONE,
   updated_at TIMESTAMP WITH TIME ZONE,
