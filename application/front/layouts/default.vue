@@ -2,6 +2,7 @@
   <!-- https://vuetifyjs.com/ja/getting-started/wireframes/ -->
   <v-app>
     <SnackBarError />
+    <SnackBarInfo />
     <SpinnerOverlay />
 
     <template v-if="!shouldUseBottomBarComputed">
