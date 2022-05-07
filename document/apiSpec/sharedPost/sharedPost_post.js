@@ -39,16 +39,7 @@ const responseBody = {
             {
                 "key": "C0001",
                 "id": "C000000000001cDYrCmleUFhpDok0klZxvCpZVJt120220515103059999",
-                "postDetails": [
-                    {
-                        "key": "1",
-                        "id": 1
-                    },
-                    {
-                        "key": "2",
-                        "id": 2
-                    }
-                ]
+                "updatedAt": "",
             }
         ]
     }
