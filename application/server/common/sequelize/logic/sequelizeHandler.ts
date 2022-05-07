@@ -3,6 +3,9 @@ import { injectable, inject } from 'inversify';
 import CompanyMaster from '../models/companyMaster';
 import UserMaster from '../models/userMaster';
 import DivisionMaster from '../models/divisionMaster';
+import SharedPost from '../models/sharedPost';
+import SharedPostDetail from '../models/sharedPostDetail';
+import Bookmark from '../models/bookmark';
 import { SequelizeHandler } from './interface/SequelizeHandler';
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
 import { types } from '@s/common/dependencyInjection/types';
@@ -37,9 +40,20 @@ export class SequelizeHandlerImpl implements SequelizeHandler {
    * @returns Sequelizeインスタンス
    */
   private initialize(): void {
+    // モデル作成後に、外部キーなどテーブル間情報の結びつきを行う
     CompanyMaster.initialize(SequelizeHandlerImpl._sequelize);
     UserMaster.initialize(SequelizeHandlerImpl._sequelize);
     DivisionMaster.initialize(SequelizeHandlerImpl._sequelize);
+    SharedPost.initialize(SequelizeHandlerImpl._sequelize);
+    SharedPostDetail.initialize(SequelizeHandlerImpl._sequelize);
+    Bookmark.initialize(SequelizeHandlerImpl._sequelize);
+
+    CompanyMaster.associate();
+    UserMaster.associate();
+    DivisionMaster.associate();
+    SharedPost.associate();
+    SharedPostDetail.associate();
+    Bookmark.associate();
   }
 
   public async transact(
@@ -48,8 +62,10 @@ export class SequelizeHandlerImpl implements SequelizeHandler {
     const transaction = await this.sequelize.transaction();
     try {
       await process(transaction);
-    } catch {
+    } catch (error) {
+      this.logger.error(error);
       transaction.rollback();
+      throw error;
     }
   }
 }

@@ -10,13 +10,26 @@ import {
   SharedPostPostParameterItem,
 } from './definition/sharedPostPostParameter';
 import { SharedPostPostResponse } from './definition/sharedPostPostResponse';
-import { sharedPostSimpleValidators } from './simpleValidator';
+import {
+  sharedPostPostSimpleValidators,
+  sharedPostPutSimpleValidators,
+} from './simpleValidator';
+import {
+  SharedPostPutRequest,
+  SharedPostPutRequestParameter,
+} from './definition/sharedPostPutRequest';
+import { SharedPostPutResponse } from './definition/sharedPostPutResponse';
+import {
+  SharedPostPutParameter,
+  SharedPostPutParameterItem,
+} from './definition/sharedPostPutParameter';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { BaseController } from '@s/common/controller/baseController';
 import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthorization';
 import { StringUtil } from '@c/util/stringUtil';
 import { throwIfHasSimpleValidationResult } from '@s/common/middleware/simpleValidationResult';
+import { ArrayUtil } from '@c/util/arrayUtil';
 
 /**
  * 投稿処理に関するコントローラクラス
@@ -36,7 +49,6 @@ class SharedPostController extends BaseController {
     const requestParameter = request.params;
     console.log(requestQuery);
     console.log(requestParameter);
-    console.log(response.locals.firebaseUserId);
     const service = appContainer.get<SharedPostService>(
       types.SharedPostService,
     );
@@ -45,7 +57,7 @@ class SharedPostController extends BaseController {
   }
 
   public static sharedPostsPostEndpoint: string = '/shared-posts/';
-  public static async save(
+  public static async insert(
     request: express.Request<
       Record<string, any> | undefined,
       SharedPostPostResponse,
@@ -77,7 +89,55 @@ class SharedPostController extends BaseController {
     const service = appContainer.get<SharedPostService>(
       types.SharedPostService,
     );
-    const responseDataBody = await service.save(parameter);
+    const responseDataBody = await service.insert(parameter);
+    super.success(response, responseDataBody);
+  }
+
+  public static sharedPostsPutEndpoint: string = '/shared-posts/:sharedPostId?';
+  public static async update(
+    request: express.Request<
+      SharedPostPutRequestParameter,
+      SharedPostPutResponse,
+      SharedPostPutRequest,
+      Record<string, any> | undefined
+    >,
+    response: express.Response,
+  ) {
+    const requestBody = request.body;
+    let postsParameter: SharedPostPutParameterItem[] =
+      requestBody.posts?.map((request) => ({
+        id: StringUtil.ifEmpty(request.id),
+        companyNumber: StringUtil.ifEmpty(request.companyNumber),
+        companyName: StringUtil.ifEmpty(request.companyName),
+        companyHomepageUrl: StringUtil.ifEmpty(request.companyHomepageUrl),
+        remarks: StringUtil.ifEmpty(request.remarks),
+        postDetails:
+          request.postDetails?.map((detail) => ({
+            id: StringUtil.ifEmpty(detail.id),
+            no1Content: StringUtil.ifEmpty(detail.no1Content),
+            no1Division: StringUtil.ifEmpty(detail.no1Division),
+          })) || [],
+      })) || [];
+    const requestParameter = request.params;
+    const targetSharedPostId = requestParameter.sharedPostId;
+    if (
+      StringUtil.isNotEmpty(targetSharedPostId) &&
+      ArrayUtil.isNotEmpty(postsParameter)
+    ) {
+      postsParameter[0].id = targetSharedPostId as string;
+      // 投稿ID指定時には指定された投稿1件のみを更新する
+      postsParameter = [postsParameter[0]];
+    }
+
+    const parameter: SharedPostPutParameter = {
+      userId: StringUtil.ifEmpty(response.locals.firebaseUserId),
+      posts: postsParameter,
+    };
+
+    const service = appContainer.get<SharedPostService>(
+      types.SharedPostService,
+    );
+    const responseDataBody = await service.update(parameter);
     super.success(response, responseDataBody);
   }
 }
@@ -91,8 +151,15 @@ sharedPostRouter.get(
 sharedPostRouter.post(
   SharedPostController.sharedPostsPostEndpoint,
   authorizationFirebaseUser(),
-  sharedPostSimpleValidators,
+  sharedPostPostSimpleValidators,
   throwIfHasSimpleValidationResult,
-  SharedPostController.save,
+  SharedPostController.insert,
+);
+sharedPostRouter.put(
+  SharedPostController.sharedPostsPutEndpoint,
+  authorizationFirebaseUser(),
+  sharedPostPutSimpleValidators,
+  throwIfHasSimpleValidationResult,
+  SharedPostController.update,
 );
 export { sharedPostRouter };

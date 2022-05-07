@@ -1,14 +1,14 @@
 <template>
-  <SnackBarBase v-model="isShown" :message="message" color="error" />
+  <SnackBarBase v-model="isShown" :message="message" color="primary" />
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SnackBarErrorData } from '@f/definition/components/snackBarError/data';
+import { SnackBarInfoData } from '@f/definition/components/snackBarInfo/data';
 
 export default Vue.extend({
-  name: 'SnackBarError',
-  data(): SnackBarErrorData {
+  name: 'SnackBarInfo',
+  data(): SnackBarInfoData {
     return {
       isShown: false,
       message: '',
@@ -16,8 +16,8 @@ export default Vue.extend({
   },
   created() {
     this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'snackBarError/open') {
-        this.message = state.snackBarError.message;
+      if (mutation.type === 'snackBarInfo/open') {
+        this.message = state.snackBarInfo.message;
         this.isShown = true;
       }
     });

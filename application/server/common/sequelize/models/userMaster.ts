@@ -1,5 +1,6 @@
 import { Model, Sequelize, DataTypes } from 'sequelize';
 import { CommonModelAttribute } from './commonModelAttribute';
+import SharedPost from './sharedPost';
 
 export interface UserMasterModelAttribute {
   id: string;
@@ -45,5 +46,9 @@ export default class UserMaster extends Model<
         timestamps: true,
       },
     );
+  }
+
+  static associate() {
+    this.hasMany(SharedPost, { sourceKey: 'id', foreignKey: 'userId' });
   }
 }

@@ -152,7 +152,15 @@ import { OpenGraphGetResponse } from '@f/definition/components/sharedPostDialog/
 import { CompanyGetResponse } from '@f/definition/components/sharedPostDialog/apiSpec/companyGetResponse';
 import ConfirmDialog from '@f/components/ConfirmDialog.vue';
 import { SharedPostPostRequest } from '@f/definition/components/sharedPostDialog/apiSpec/sharedPostPostRequest';
-import { SharedPostPostResponse } from '@f/definition/components/sharedPostDialog/apiSpec/sharedPostPostResponse';
+import {
+  SharedPostPostResponse,
+  SharedPostPostResponseItem,
+} from '@f/definition/components/sharedPostDialog/apiSpec/sharedPostPostResponse';
+import { SharedPostPutRequest } from '@f/definition/components/sharedPostDialog/apiSpec/sharedPostPutRequest';
+import {
+  SharedPostPutResponse,
+  SharedPostPutResponseItem,
+} from '@f/definition/components/sharedPostDialog/apiSpec/sharedPostPutResponse';
 
 export default Vue.extend({
   name: 'SharedPostCard',
@@ -311,44 +319,17 @@ export default Vue.extend({
       let hasError = false;
       // TODO:投稿登録（postIdが空）・更新（postIdが非空）処理
       await this.$accessor.spinnerOverlay.open(async () => {
-        const request: SharedPostPostRequest = {
-          posts: [
-            {
-              companyNumber: this.companyNumber,
-              companyName: this.companyName,
-              companyHomepageUrl: this.companyHomepageUrl,
-              remarks: this.remarks,
-              postDetails: this.postDetails.map((detail, index) => ({
-                key: StringUtil.toString(index),
-                no1Content: detail.no1Content,
-                no1Division: detail.no1Division,
-              })),
-            },
-          ],
-        };
-        const response = await AjaxHelper.post<SharedPostPostResponse>(
-          this.$axios,
-          '/shared-posts/',
-          request,
-        );
-        if (response === null) {
+        try {
+          if (StringUtil.isEmpty(this.postId)) {
+            await this.calloutForNewPost();
+            this.$accessor.snackBarInfo.open('投稿が完了しました。');
+          } else {
+            await this.calloutForExistingPost();
+            this.$accessor.snackBarInfo.open('投稿の更新が完了しました。');
+          }
+        } catch {
           hasError = true;
-          return;
         }
-
-        const responsePosts = response.posts;
-        if (ArrayUtil.isEmpty(responsePosts)) {
-          hasError = true;
-          return;
-        }
-
-        const responsePost = responsePosts[0];
-        this.postId = StringUtil.ifEmpty(responsePost.id);
-        this.updatedAt = StringUtil.ifEmpty(responsePost.updatedAt);
-        const responsePostDetails = responsePost.postDetails;
-        responsePostDetails.forEach((detail) => {
-          this.postDetails[Number(detail.key)].postDetailId = detail.id;
-        });
       });
 
       // レスポンスボディや投稿レスポンスが存在しない場合はエラーとみなしてダイアログを閉じない
@@ -364,15 +345,79 @@ export default Vue.extend({
         companyImageUrl: this.companyImageUrl,
         remarks: this.remarks,
         updatedAt: this.updatedAt,
-        postDetails: this.postDetails.map((x) => ({
-          // TODO:dataではなくAPIレスポンスを返却値に指定
-          postDetailId: x.postDetailId || 0,
+        postDetails: this.postDetails.map((x, index) => ({
+          postDetailId: x.postDetailId || index,
           no1Content: x.no1Content,
           no1Division: x.no1Division,
         })),
       };
-      console.log(result);
       this.$emit('confirm', result);
+    },
+    /**
+     * 新規投稿作成用のサーバ処理呼び出し
+     */
+    async calloutForNewPost() {
+      const request: SharedPostPostRequest = {
+        posts: [
+          {
+            companyNumber: this.companyNumber,
+            companyName: this.companyName,
+            companyHomepageUrl: this.companyHomepageUrl,
+            remarks: this.remarks,
+            postDetails: this.postDetails.map((detail) => ({
+              no1Content: detail.no1Content,
+              no1Division: detail.no1Division,
+            })),
+          },
+        ],
+      };
+      const response = await AjaxHelper.post<SharedPostPostResponse>(
+        this.$axios,
+        '/shared-posts/',
+        request,
+      );
+      const responsePosts = response?.posts;
+      if (response === null && ArrayUtil.isEmpty(responsePosts)) {
+        throw new Error('api error');
+      }
+
+      const responsePost = (responsePosts as SharedPostPostResponseItem[])[0];
+      this.postId = StringUtil.ifEmpty(responsePost.id);
+      this.updatedAt = StringUtil.ifEmpty(responsePost.updatedAt);
+    },
+    /**
+     * 既存投稿更新用のサーバ処理呼び出し
+     */
+    async calloutForExistingPost() {
+      const request: SharedPostPutRequest = {
+        posts: [
+          {
+            id: this.postId,
+            companyNumber: this.companyNumber,
+            companyName: this.companyName,
+            companyHomepageUrl: this.companyHomepageUrl,
+            remarks: this.remarks,
+            postDetails: this.postDetails.map((detail, index) => ({
+              id: detail.postDetailId || index,
+              no1Content: detail.no1Content,
+              no1Division: detail.no1Division,
+            })),
+          },
+        ],
+      };
+      const response = await AjaxHelper.put<SharedPostPutResponse>(
+        this.$axios,
+        `/shared-posts/${this.postId}`,
+        request,
+      );
+      const responsePosts = response?.posts;
+      if (response === null && ArrayUtil.isEmpty(responsePosts)) {
+        throw new Error('api error');
+      }
+
+      const responsePost = (responsePosts as SharedPostPutResponseItem[])[0];
+      this.postId = StringUtil.ifEmpty(responsePost.id);
+      this.updatedAt = StringUtil.ifEmpty(responsePost.updatedAt);
     },
     /**
      * 閉じるボタン押下処理

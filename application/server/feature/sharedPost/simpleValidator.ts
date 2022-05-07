@@ -8,7 +8,7 @@ const companyHomePageUrlLength = 2100;
 const remarksLength = 500;
 const no1ContentLength = 100;
 
-export const sharedPostSimpleValidators = [
+export const sharedPostBaseSimpleValidators = [
   body('posts.*.companyNumber')
     .notEmpty()
     .withMessage(`法人番号:${Message.notEmpty}`)
@@ -63,4 +63,13 @@ export const sharedPostSimpleValidators = [
     // 区分値マスタの存在チェックはBL処理側で行う（そのため長さチェックも行わない）
     .notEmpty()
     .withMessage(`No.1の内容:${Message.notEmpty}`),
+];
+
+export const sharedPostPostSimpleValidators = [
+  ...sharedPostBaseSimpleValidators,
+];
+
+export const sharedPostPutSimpleValidators = [
+  body('posts.*.id').notEmpty().withMessage(`投稿ID:${Message.notEmpty}`),
+  ...sharedPostBaseSimpleValidators,
 ];
