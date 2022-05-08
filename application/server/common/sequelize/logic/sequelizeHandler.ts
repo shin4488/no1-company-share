@@ -63,7 +63,6 @@ export class SequelizeHandlerImpl implements SequelizeHandler {
     try {
       await process(transaction);
     } catch (error) {
-      this.logger.error(error);
       transaction.rollback();
       throw error;
     }
