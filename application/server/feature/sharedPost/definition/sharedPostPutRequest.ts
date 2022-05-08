@@ -1,5 +1,4 @@
 export interface SharedPostDetailPutRequest {
-  id?: string | null;
   no1Content?: string | null;
   no1Division?: string | null;
 }

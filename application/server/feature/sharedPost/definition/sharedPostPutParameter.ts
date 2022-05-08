@@ -1,5 +1,4 @@
 export interface SharedPutDetailPutParameter {
-  id: string;
   no1Content: string;
   no1Division: string;
 }
