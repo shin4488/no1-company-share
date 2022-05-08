@@ -65,6 +65,7 @@ class SharedPostController extends BaseController {
       Record<string, any> | undefined
     >,
     response: express.Response,
+    next: express.NextFunction,
   ) {
     const requestBody = request.body;
     const postsParameter: SharedPostPostParameterItem[] =
@@ -89,8 +90,12 @@ class SharedPostController extends BaseController {
     const service = appContainer.get<SharedPostService>(
       types.SharedPostService,
     );
-    const responseDataBody = await service.insert(parameter);
-    super.success(response, responseDataBody);
+    try {
+      const responseDataBody = await service.insert(parameter);
+      super.success(response, responseDataBody);
+    } catch (error) {
+      next(error);
+    }
   }
 
   public static sharedPostsPutEndpoint: string = '/shared-posts/:sharedPostId?';
@@ -102,6 +107,7 @@ class SharedPostController extends BaseController {
       Record<string, any> | undefined
     >,
     response: express.Response,
+    next: express.NextFunction,
   ) {
     const requestBody = request.body;
     let postsParameter: SharedPostPutParameterItem[] =
@@ -113,7 +119,6 @@ class SharedPostController extends BaseController {
         remarks: StringUtil.ifEmpty(request.remarks),
         postDetails:
           request.postDetails?.map((detail) => ({
-            id: StringUtil.ifEmpty(detail.id),
             no1Content: StringUtil.ifEmpty(detail.no1Content),
             no1Division: StringUtil.ifEmpty(detail.no1Division),
           })) || [],
@@ -137,8 +142,12 @@ class SharedPostController extends BaseController {
     const service = appContainer.get<SharedPostService>(
       types.SharedPostService,
     );
-    const responseDataBody = await service.update(parameter);
-    super.success(response, responseDataBody);
+    try {
+      const responseDataBody = await service.update(parameter);
+      super.success(response, responseDataBody);
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

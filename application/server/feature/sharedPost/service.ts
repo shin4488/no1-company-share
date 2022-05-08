@@ -193,7 +193,7 @@ export class SharedPostServiceImpl implements SharedPostService {
   public async insert(
     parameter: SharedPostPostParameter,
   ): Promise<SharedPostPostResponse> {
-    this.complexValidator.validateForInsert(parameter);
+    await this.complexValidator.validateForInsert(parameter);
 
     const posts = parameter.posts;
     const response: SharedPostPostResponse = { posts: [] };
@@ -245,7 +245,7 @@ export class SharedPostServiceImpl implements SharedPostService {
   public async update(
     parameter: SharedPostPutParameter,
   ): Promise<SharedPostPutResponse> {
-    this.complexValidator.validateForUpdate(parameter);
+    await this.complexValidator.validateForUpdate(parameter);
 
     const posts = parameter.posts;
     const response: SharedPostPutResponse = { posts: [] };

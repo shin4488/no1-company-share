@@ -62,7 +62,9 @@ export const sharedPostBaseSimpleValidators = [
   body('posts.*.postDetails.*.no1Division')
     // 区分値マスタの存在チェックはBL処理側で行う（そのため長さチェックも行わない）
     .notEmpty()
-    .withMessage(`No.1の内容:${Message.notEmpty}`),
+    .withMessage(`No.1区分:${Message.notEmpty}`)
+    .isNumeric()
+    .withMessage(`No.1区分:${Message.isNumericString}`),
 ];
 
 export const sharedPostPostSimpleValidators = [
