@@ -2,6 +2,7 @@ import { injectable } from 'inversify';
 import { BadParameterError } from '../badParameterError';
 import { BadParameterErrorHandler } from './interface/badParameterErrorHandler';
 import { StringUtil } from '@c/util/stringUtil';
+import { ArrayUtil } from '@c/util/arrayUtil';
 
 @injectable()
 export class BadParameterErrorHandlerImpl implements BadParameterErrorHandler {
@@ -29,6 +30,10 @@ export class BadParameterErrorHandlerImpl implements BadParameterErrorHandler {
   }
 
   public throwIfHasError() {
+    if (ArrayUtil.isEmpty(this.messages)) {
+      return;
+    }
+
     const nonEmptyMessages = this.messages.filter((x) =>
       StringUtil.isNotEmpty(x),
     );
