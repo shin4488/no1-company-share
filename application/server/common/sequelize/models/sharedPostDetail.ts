@@ -5,6 +5,7 @@ import SharedPost from './sharedPost';
 
 export interface SharedPostDetailModelAttribute {
   id: number;
+  sharedPostId: string;
   no1Content: string;
 }
 
@@ -36,18 +37,14 @@ export default class SharedPostDetail extends Model<
           type: DataTypes.INTEGER,
           primaryKey: true,
         },
-        // sharedPostId: {
-        //   type: new DataTypes.STRING(58),
-        //   primaryKey: true,
-        // },
+        sharedPostId: {
+          type: new DataTypes.STRING(58),
+          primaryKey: true,
+        },
         no1Content: {
           type: new DataTypes.STRING(100),
           allowNull: false,
         },
-        // no1Division: {
-        //   type: new DataTypes.INTEGER(),
-        //   allowNull: false,
-        // },
       },
       {
         sequelize,
