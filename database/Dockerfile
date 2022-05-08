@@ -6,3 +6,5 @@ RUN apt install sudo
 # https://tkrd.hatenablog.com/entry/2017/04/23/015216
 RUN sudo pg_createcluster --port=5432 12 companyshare
 RUN sudo pg_ctlcluster 12 companyshare start
+
+ENV TZ Asia/Tokyo
