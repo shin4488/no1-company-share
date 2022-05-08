@@ -317,7 +317,6 @@ export default Vue.extend({
      */
     async onClickedConfirmButton(): Promise<void> {
       let hasError = false;
-      // TODO:投稿登録（postIdが空）・更新（postIdが非空）処理
       await this.$accessor.spinnerOverlay.open(async () => {
         try {
           if (StringUtil.isEmpty(this.postId)) {
@@ -397,8 +396,7 @@ export default Vue.extend({
             companyName: this.companyName,
             companyHomepageUrl: this.companyHomepageUrl,
             remarks: this.remarks,
-            postDetails: this.postDetails.map((detail, index) => ({
-              id: detail.postDetailId || index,
+            postDetails: this.postDetails.map((detail) => ({
               no1Content: detail.no1Content,
               no1Division: detail.no1Division,
             })),
