@@ -1,5 +1,6 @@
 <template>
-  <v-dialog v-model="isOpenDialog" scrollable persistent>
+  <!-- ダイアログ閉じるごとに入力ボックスのrulesをリセットしたいためv-ifでコンポーネントを再構築している -->
+  <v-dialog v-if="isOpenDialog" v-model="isOpenDialog" scrollable persistent>
     <v-card>
       <v-toolbar color="primary" dark
         >No.1企業投稿
@@ -18,14 +19,19 @@
               v-model="companyNumber"
               :items="selectableCompanies"
               :disabled="isEditMode"
-              label="会社名"
               clearable
               :loading="isAutocompleteLoadingShown"
               append-icon="mdi-magnify"
+              :rules="[requiredRule]"
               @click:clear="onClickedAutocompleteClear"
               @change="onClickedCompany"
               @update:search-input="onChangedSearchedCompanyText"
-            ></v-autocomplete>
+            >
+              <template #label>
+                <span class="required"><strong>* </strong></span
+                >会社名</template
+              >
+            </v-autocomplete>
           </v-col>
         </v-row>
 
@@ -49,16 +55,22 @@
           <v-col sm="7" cols="6">
             <v-text-field
               v-model="item.no1Content"
-              label="No.1の内容"
+              class="required"
+              :rules="[requiredRule]"
               clearable
-              required
-            ></v-text-field>
+            >
+              <template #label>
+                <span class="required"><strong>* </strong></span
+                >No.1の内容</template
+              >
+            </v-text-field>
           </v-col>
           <v-col sm="4" cols="5">
             <v-select
               v-model="item.no1Division"
               :items="no1Divisions"
-              required
+              class="required"
+              :rules="[requiredRule]"
             ></v-select>
           </v-col>
         </v-row>
@@ -202,6 +214,10 @@ export default Vue.extend({
     };
   },
   computed: {
+    requiredRule() {
+      return (value: string) =>
+        StringUtil.isNotEmpty(value) || '必須項目です。';
+    },
     /**
      * 新規投稿の作成中ではなく、既存投稿の編集中である
      */
@@ -435,6 +451,10 @@ export default Vue.extend({
      * 会社名入力処理
      */
     async onChangedSearchedCompanyText(text: string): Promise<void> {
+      if (StringUtil.isNotEmpty(this.postId)) {
+        return;
+      }
+
       this.selectableCompanies = await this.getMatchedCompanies(text);
     },
     /**
@@ -578,3 +598,8 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="sass" scoped>
+.required
+  color: red
+</style>
