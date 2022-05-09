@@ -30,14 +30,13 @@
         contain
         height="100"
         :src="companyImageUrl"
-      >
-      </v-img>
+      />
 
       <!-- 備考（投稿説明） -->
       <div class="text--primary pre-wrap" v-text="remarks" />
     </v-card-text>
 
-    <v-divider></v-divider>
+    <v-divider />
 
     <!-- 投稿者情報 -->
     <v-card-actions>
@@ -48,7 +47,7 @@
             :title="postingUserName"
             :alt="postingUserName"
             :src="postingUserIcomImageUrl"
-          ></v-img>
+          />
         </v-list-item-avatar>
 
         <v-list-item-content :title="postingUserName">
@@ -64,7 +63,7 @@
           <span class="subheading mr-2" v-text="numberOfBookmarksComputed" />
 
           <v-icon
-            v-show="!isPostedByLoginUser"
+            v-show="isLogined && !isPostedByLoginUser"
             dense
             color="warning"
             @click="onClickedAlertButton"
@@ -72,7 +71,7 @@
             mdi-alert-outline
           </v-icon>
           <v-icon
-            v-show="isPostedByLoginUser"
+            v-show="isLogined && isPostedByLoginUser"
             class="mr-2"
             dense
             color="secondary"
@@ -81,7 +80,7 @@
             mdi-pencil
           </v-icon>
           <v-icon
-            v-show="isPostedByLoginUser"
+            v-show="isLogined && isPostedByLoginUser"
             dense
             color="secondary"
             @click="onClickedDeleteButton"
@@ -182,6 +181,11 @@ export default Vue.extend({
     },
   },
   computed: {
+    isLogined(): boolean {
+      return StringUtil.isNotEmpty(
+        this.$accessor.firebaseAuthorization.userIdComputed,
+      );
+    },
     hasCompanyUrl(): boolean {
       return StringUtil.isNotEmpty(this.companyHomepageUrl);
     },
