@@ -11,12 +11,18 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { PageHeadData } from '@f/definition/pages/common/headData';
 
 export default Vue.extend({
   name: 'MyPostPage',
   data: () => {
     return {
       message: 'aaaaaa',
+    };
+  },
+  head(): PageHeadData {
+    return {
+      title: 'マイ投稿',
     };
   },
 });

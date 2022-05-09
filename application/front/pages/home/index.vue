@@ -20,6 +20,7 @@ import { HomePageData } from '@f/definition/pages/home/data';
 import { SharedPostGetReponse } from '@f/definition/pages/common/apiSpec/sharedPostGetResponse';
 import { postFetchedLimit } from '@f/common/constant/sharedPost';
 import { No1DivisionSelectItemGetResponse } from '@s/feature/division/definition/no1DivisionSelectItemGetResponse';
+import { PageHeadData } from '@f/definition/pages/common/headData';
 
 export default Vue.extend({
   name: 'HomePage',
@@ -69,6 +70,11 @@ export default Vue.extend({
       no1Divisions: [],
       isLoadMoreButtonShown: false,
       oldBaseDateTime: '',
+    };
+  },
+  head(): PageHeadData {
+    return {
+      title: 'ホーム',
     };
   },
   methods: {
