@@ -30,6 +30,7 @@ import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthoriz
 import { StringUtil } from '@c/util/stringUtil';
 import { throwIfHasSimpleValidationResult } from '@s/common/middleware/simpleValidationResult';
 import { ArrayUtil } from '@c/util/arrayUtil';
+import { wrapAction } from '@s/common/middleware/controllerCatcher';
 
 /**
  * 投稿処理に関するコントローラクラス
@@ -46,9 +47,7 @@ class SharedPostController extends BaseController {
     response: express.Response,
   ) {
     const requestQuery = request.query;
-    const requestParameter = request.params;
     console.log(requestQuery);
-    console.log(requestParameter);
     const service = appContainer.get<SharedPostService>(
       types.SharedPostService,
     );
@@ -65,7 +64,6 @@ class SharedPostController extends BaseController {
       Record<string, any> | undefined
     >,
     response: express.Response,
-    next: express.NextFunction,
   ) {
     const requestBody = request.body;
     const postsParameter: SharedPostPostParameterItem[] =
@@ -90,12 +88,8 @@ class SharedPostController extends BaseController {
     const service = appContainer.get<SharedPostService>(
       types.SharedPostService,
     );
-    try {
-      const responseDataBody = await service.insert(parameter);
-      super.success(response, responseDataBody);
-    } catch (error) {
-      next(error);
-    }
+    const responseDataBody = await service.insert(parameter);
+    super.success(response, responseDataBody);
   }
 
   public static sharedPostsPutEndpoint: string = '/shared-posts/:sharedPostId?';
@@ -107,7 +101,6 @@ class SharedPostController extends BaseController {
       Record<string, any> | undefined
     >,
     response: express.Response,
-    next: express.NextFunction,
   ) {
     const requestBody = request.body;
     let postsParameter: SharedPostPutParameterItem[] =
@@ -142,12 +135,8 @@ class SharedPostController extends BaseController {
     const service = appContainer.get<SharedPostService>(
       types.SharedPostService,
     );
-    try {
-      const responseDataBody = await service.update(parameter);
-      super.success(response, responseDataBody);
-    } catch (error) {
-      next(error);
-    }
+    const responseDataBody = await service.update(parameter);
+    super.success(response, responseDataBody);
   }
 }
 
@@ -155,20 +144,20 @@ const sharedPostRouter = Router();
 sharedPostRouter.get(
   SharedPostController.sharedPostsGetEndpoint,
   authorizationFirebaseUser(false),
-  SharedPostController.getSharedPosts,
+  wrapAction(SharedPostController.getSharedPosts),
 );
 sharedPostRouter.post(
   SharedPostController.sharedPostsPostEndpoint,
   authorizationFirebaseUser(),
   sharedPostPostSimpleValidators,
   throwIfHasSimpleValidationResult,
-  SharedPostController.insert,
+  wrapAction(SharedPostController.insert),
 );
 sharedPostRouter.put(
   SharedPostController.sharedPostsPutEndpoint,
   authorizationFirebaseUser(),
   sharedPostPutSimpleValidators,
   throwIfHasSimpleValidationResult,
-  SharedPostController.update,
+  wrapAction(SharedPostController.update),
 );
 export { sharedPostRouter };

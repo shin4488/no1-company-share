@@ -3,6 +3,7 @@ import { DivisionService } from './interface/service';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { BaseController } from '@s/common/controller/baseController';
+import { wrapAction } from '@s/common/middleware/controllerCatcher';
 
 /**
  * 投稿処理に関するコントローラクラス
@@ -22,6 +23,6 @@ class DivisionController extends BaseController {
 const divisionRouter = Router();
 divisionRouter.get(
   DivisionController.no1DivisionSelectItemsGetEndpoint,
-  DivisionController.getNo1DivisionSelectItems,
+  wrapAction(DivisionController.getNo1DivisionSelectItems),
 );
 export { divisionRouter };

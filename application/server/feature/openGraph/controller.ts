@@ -6,6 +6,7 @@ import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { BaseController } from '@s/common/controller/baseController';
 import { throwIfHasSimpleValidationResult } from '@s/common/middleware/simpleValidationResult';
+import { wrapAction } from '@s/common/middleware/controllerCatcher';
 
 /**
  * 投稿処理に関するコントローラクラス
@@ -37,6 +38,6 @@ openGraphRouter.get(
   OpenGraphController.openGraphGetEndpoint,
   openGraphSimpleValidators,
   throwIfHasSimpleValidationResult,
-  OpenGraphController.getOpenGraph,
+  wrapAction(OpenGraphController.getOpenGraph),
 );
 export { openGraphRouter };
