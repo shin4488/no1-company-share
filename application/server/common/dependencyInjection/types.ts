@@ -9,6 +9,7 @@ const types = {
   ApiResponseHandler: Symbol.for('ApiResponseHandler'),
   OpenGraphService: Symbol.for('OpenGraphService'),
   OpenGraphLogic: Symbol.for('OpenGraphLogic'),
+  ExternalCompanyLogic: Symbol.for('ExternalCompanyLogic'),
   DivisionSelectItemLogic: Symbol.for('DivisionSelectItemLogic'),
   DateHandler: Symbol.for('DateHandler'),
   BadParameterErrorHandler: Symbol.for('BadParameterErrorHandler'),

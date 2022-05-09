@@ -37,6 +37,8 @@ import { SharedPostComplexValidator } from '@s/feature/sharedPost/interface/comp
 import { SharedPostComplexValidatorImple } from '@s/feature/sharedPost/complexValidator';
 import { BadParameterErrorHandlerImpl } from '@s/common/error/handler/badParameterErrorHandler';
 import { BadParameterErrorHandler } from '@s/common/error/handler/interface/badParameterErrorHandler';
+import { ExternalCompanyLogicImpl } from '@s/commonBL/externalCompany/logic';
+import { ExternalCompanyLogic } from '@s/commonBL/externalCompany/interface/logic';
 
 const appContainer = new Container();
 
@@ -64,6 +66,9 @@ appContainer
   .bind<OpenGraphService>(types.OpenGraphService)
   .to(OpenGraphServiceImpl);
 appContainer.bind<OpenGraphLogic>(types.OpenGraphLogic).to(OpenGraphLogicImpl);
+appContainer
+  .bind<ExternalCompanyLogic>(types.ExternalCompanyLogic)
+  .to(ExternalCompanyLogicImpl);
 appContainer
   .bind<DivisionSelectItemLogic>(types.DivisionSelectItemLogic)
   .to(DivisionSelectItemLogicImpl);
