@@ -1,35 +1,55 @@
 import { inject, injectable } from 'inversify';
 import { CompanyGetParameter } from './definition/companyGetParameter';
 import { CompanyGetResponse } from './definition/companyGetResponse';
-import { GbizCompanyResponseItem } from './definition/externalApiSpec/gbizCompanyResponse';
 import { CompanyService } from './interface/service';
 import { CompanyLogic } from './interface/logic';
+import { CompanyResponseCreationParameterItem } from './definition/companyResponseCreationParameter';
 import { ArrayUtil } from '@c/util/arrayUtil';
 import { types } from '@s/common/dependencyInjection/types';
+import { ExternalCompanyLogic } from '@s/commonBL/externalCompany/interface/logic';
+import { ExternalCompanyParameter } from '@s/commonBL/externalCompany/definition/externalCompanyParameter';
 
 @injectable()
 export class CompanyServiceImpl implements CompanyService {
   private logic: CompanyLogic;
+  private externalCompanyLogic: ExternalCompanyLogic;
 
-  constructor(@inject(types.CompanyLogic) logic: CompanyLogic) {
+  constructor(
+    @inject(types.CompanyLogic) logic: CompanyLogic,
+    @inject(types.ExternalCompanyLogic)
+    externalCompanyLogic: ExternalCompanyLogic,
+  ) {
     this.logic = logic;
+    this.externalCompanyLogic = externalCompanyLogic;
   }
 
   public async getCompanies(
     parameter: CompanyGetParameter,
   ): Promise<CompanyGetResponse> {
-    const companyDataList = await this.logic.sendCompanyRequest(parameter);
-    if (ArrayUtil.isEmpty(companyDataList)) {
+    const externalCompanyParameter: ExternalCompanyParameter = {
+      companyName: parameter.companyName,
+      limit: 30,
+    };
+    const companyResult = await this.externalCompanyLogic.getExternalCompany(
+      externalCompanyParameter,
+    );
+    const companyResultItems = companyResult.companies;
+    if (ArrayUtil.isEmpty(companyResultItems)) {
       return {
         companies: [],
       };
     }
 
-    const castedCompanyDataList = companyDataList as GbizCompanyResponseItem[];
     // この時点では会社リストはundefinedにはなり得ない
+    const responseCreationParameters =
+      companyResultItems.map<CompanyResponseCreationParameterItem>((x) => ({
+        companyNumber: x.companyNumber,
+        japaneseName: x.japaneseName,
+        englishName: x.englishName,
+      }));
     const companiesResponse =
       await this.logic.createCompanyResponseByFetchingCompanyMaster(
-        castedCompanyDataList,
+        responseCreationParameters,
       );
     return {
       companies: companiesResponse,

@@ -11,18 +11,24 @@ import companyMaster from '@s/common/sequelize/models/companyMaster';
 import sharedPost from '@s/common/sequelize/models/sharedPost';
 import { CompanyMasterDao } from '@s/commonBL/dao/company/interface/dao';
 import { ArrayUtil } from '@c/util/arrayUtil';
+import { ExternalCompanyLogic } from '@s/commonBL/externalCompany/interface/logic';
+import { ExternalCompanyParameter } from '@s/commonBL/externalCompany/definition/externalCompanyParameter';
 
 @injectable()
 export class SharedPostSaveLogicImpl implements SharedPostSaveLogic {
   private companyMasterDao: CompanyMasterDao;
   private dateHandler: DateHandler;
+  private externalCompanyLogic: ExternalCompanyLogic;
 
   constructor(
     @inject(types.CompanyMasterDao) companyMasterDao: CompanyMasterDao,
     @inject(types.DateHandler) dateHandler: DateHandler,
+    @inject(types.ExternalCompanyLogic)
+    externalCompanyLogic: ExternalCompanyLogic,
   ) {
     this.companyMasterDao = companyMasterDao;
     this.dateHandler = dateHandler;
+    this.externalCompanyLogic = externalCompanyLogic;
   }
 
   public async createModels(
@@ -30,11 +36,26 @@ export class SharedPostSaveLogicImpl implements SharedPostSaveLogic {
     transaction: Transaction,
     createSharedPost: (company: companyMaster) => Promise<sharedPost>,
   ): Promise<SharedPostSaveResult> {
+    // 将来的に英語表記を使用するため、英語名も取得・保存する
+    const externalCompanyParameter: ExternalCompanyParameter = {
+      companyNumber: parameter.companyNumber,
+      limit: 1,
+    };
+    const companyResult = await this.externalCompanyLogic.getExternalCompany(
+      externalCompanyParameter,
+    );
+    const companyResultItems = companyResult.companies;
+    let companyEnglishName = '';
+    if (ArrayUtil.isNotEmpty(companyResultItems)) {
+      companyEnglishName = companyResultItems[0].englishName;
+    }
+
     // 会社マスタ作成
     const company = await this.companyMasterDao.upsertCompany(
       {
         companyNumber: parameter.companyNumber,
-        companyName: parameter.companyName,
+        companyJapaneseName: parameter.companyName,
+        companyEnglishName,
         homepageUrl: parameter.companyHomepageUrl,
       },
       transaction,
