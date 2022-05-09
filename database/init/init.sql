@@ -18,7 +18,8 @@ CREATE TABLE public.company_master (
   -- 予約語と被らないようにするために、companyをプレフィックスとしてつけている
   company_number VARCHAR(13) PRIMARY KEY,
   -- とりあえず100文字あれば入るだろうという想定
-  company_name VARCHAR(100),
+  company_japanese_name VARCHAR(100),
+  company_english_name VARCHAR(100),
   -- Edgeが2000文字までの対応のため、最大2100文字としている
   homepage_url VARCHAR(2100),
   created_at TIMESTAMP WITH TIME ZONE,

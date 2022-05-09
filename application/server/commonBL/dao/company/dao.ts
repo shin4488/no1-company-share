@@ -29,7 +29,8 @@ export class CompanyMasterDaoImpl implements CompanyMasterDao {
     const [upsertedCompanyMaster] = await CompanyMaster.upsert(
       {
         companyNumber: company.companyNumber,
-        companyName: company.companyName,
+        companyJapaneseName: company.companyJapaneseName,
+        companyEnglishName: company.companyEnglishName,
         homepageUrl: company.homepageUrl,
       },
       { transaction },

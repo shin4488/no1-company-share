@@ -9,7 +9,8 @@ import SharedPost from './sharedPost';
 
 export interface CompanyMasterModelAttribute {
   companyNumber: string;
-  companyName: string;
+  companyJapaneseName: string;
+  companyEnglishName: string;
   homepageUrl: string;
 }
 
@@ -38,7 +39,11 @@ export default class CompanyMaster extends Model<
           type: DataTypes.STRING(13),
           primaryKey: true,
         },
-        companyName: {
+        companyJapaneseName: {
+          type: new DataTypes.STRING(100),
+          allowNull: true,
+        },
+        companyEnglishName: {
           type: new DataTypes.STRING(100),
           allowNull: true,
         },
