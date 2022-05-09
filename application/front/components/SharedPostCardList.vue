@@ -35,7 +35,7 @@
 
     <ConfirmDialog ref="confirmDialog" />
     <SharedPostDialog ref="sharedPostDialog" :no1-divisions="no1Divisions" />
-    <AddIconFixedButton @click="onClickedAddPostButton" />
+    <AddIconFixedButton v-show="isLogined" @click="onClickedAddPostButton" />
   </div>
 </template>
 
@@ -66,6 +66,13 @@ export default Vue.extend({
           value: '',
         },
       ],
+    },
+  },
+  computed: {
+    isLogined(): boolean {
+      return StringUtil.isNotEmpty(
+        this.$accessor.firebaseAuthorization.userIdComputed,
+      );
     },
   },
   methods: {

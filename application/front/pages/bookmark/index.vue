@@ -21,12 +21,18 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { PageHeadData } from '@f/definition/pages/common/headData';
 
 export default Vue.extend({
   name: 'BookmarkPage',
   data: () => {
     return {
       message: 'aaaaaa',
+    };
+  },
+  head(): PageHeadData {
+    return {
+      title: 'お気に入り',
     };
   },
   methods: {

@@ -6,6 +6,7 @@ import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { BaseController } from '@s/common/controller/baseController';
 import { StringUtil } from '@c/util/stringUtil';
+import { wrapAction } from '@s/common/middleware/controllerCatcher';
 
 /**
  * 投稿処理に関するコントローラクラス
@@ -35,6 +36,6 @@ const companyRouter = Router();
 companyRouter.get(
   CompanyController.companyGetEndpoint,
   companySimpleValidators,
-  CompanyController.getCompanies,
+  wrapAction(CompanyController.getCompanies),
 );
 export { companyRouter };

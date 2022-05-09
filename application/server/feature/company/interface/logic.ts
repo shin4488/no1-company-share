@@ -1,13 +1,8 @@
-import { CompanyGetParameter } from '../definition/companyGetParameter';
 import { CompanyListGetResponse } from '../definition/companyGetResponse';
-import { GbizCompanyResponseItem } from '../definition/externalApiSpec/gbizCompanyResponse';
+import { CompanyResponseCreationParameterItem } from '../definition/companyResponseCreationParameter';
 
 export interface CompanyLogic {
-  sendCompanyRequest(
-    parameter: CompanyGetParameter,
-  ): Promise<GbizCompanyResponseItem[] | undefined>;
-
   createCompanyResponseByFetchingCompanyMaster(
-    castedCompanyDataList: GbizCompanyResponseItem[],
+    parameters: CompanyResponseCreationParameterItem[],
   ): Promise<CompanyListGetResponse[]>;
 }

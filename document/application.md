@@ -454,6 +454,12 @@ https://qiita.com/rubytomato@github/items/07fe07e64482f8f03ef3
 プロパティ名の接尾辞にsmやmdなど、Viewport Breakpointsのコードが付くものがあります。ただしxsについてはデフォルト扱いなのか接尾辞に付きません。
 ```
 
+## nuxtでのasyncData再実行（リロード）
+https://stackoverflow.com/questions/53821555/how-to-refresh-the-data-obtained-by-async-data-in-nuxtjs
+
+```ts
+await this.$nuxt.refresh();
+```
 
 # Typescript
 ## 絶対パスでimport

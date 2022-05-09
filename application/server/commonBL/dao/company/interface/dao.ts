@@ -9,5 +9,5 @@ export interface CompanyMasterDao {
   upsertCompany(
     company: CompanyMasterModelAttribute,
     transaction: Transaction,
-  ): Promise<void>;
+  ): Promise<CompanyMaster>;
 }

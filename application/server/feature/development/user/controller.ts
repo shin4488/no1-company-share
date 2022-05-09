@@ -8,6 +8,7 @@ import CompanyMaster from '@s/common/sequelize/models/companyMaster';
 import UserMaster from '@s/common/sequelize/models/userMaster';
 import { BaseController } from '@s/common/controller/baseController';
 import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthorization';
+import { wrapAction } from '@s/common/middleware/controllerCatcher';
 
 class UserController extends BaseController {
   public static userEndpoint: string = '/development/users';
@@ -50,6 +51,6 @@ const userDevelopmentRouter = Router();
 userDevelopmentRouter.post(
   UserController.userEndpoint,
   authorizationFirebaseUser(),
-  UserController.getUsers,
+  wrapAction(UserController.getUsers),
 );
 export { userDevelopmentRouter };

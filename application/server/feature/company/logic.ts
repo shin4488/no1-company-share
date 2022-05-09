@@ -1,14 +1,7 @@
-import axios from 'axios';
 import { inject, injectable } from 'inversify';
-import { CompanyGetParameter } from './definition/companyGetParameter';
-import { GbizCompanyRequest } from './definition/externalApiSpec/gbizCompanyRequest';
-import {
-  GbizCompanyResponse,
-  GbizCompanyResponseItem,
-} from './definition/externalApiSpec/gbizCompanyResponse';
 import { CompanyLogic } from './interface/logic';
 import { CompanyListGetResponse } from './definition/companyGetResponse';
-import { StringUtil } from '@c/util/stringUtil';
+import { CompanyResponseCreationParameterItem } from './definition/companyResponseCreationParameter';
 import { types } from '@s/common/dependencyInjection/types';
 import { CompanyMasterDao } from '@s/commonBL/dao/company/interface/dao';
 
@@ -20,44 +13,11 @@ export class CompanyLogicImpl implements CompanyLogic {
     this.companyDao = companyDao;
   }
 
-  public async sendCompanyRequest(
-    parameter: CompanyGetParameter,
-  ): Promise<GbizCompanyResponseItem[] | undefined> {
-    const gbizReuqestQuery: GbizCompanyRequest = {
-      name: parameter.companyName,
-      // 「JIS X 0401都道府県コード」の「18」は「福井県」
-      prefecture: '18',
-      page: 1,
-      limit: 30,
-    };
-    const gbizRequestHeader: Record<string, string> = {
-      'X-hojinInfo-api-token': StringUtil.ifEmpty(process.env.GBIZ_API_KEY),
-    };
-
-    let companyDataList: GbizCompanyResponseItem[] | undefined = [];
-    try {
-      const companyResult = await axios.get<GbizCompanyResponse>(
-        'https://info.gbiz.go.jp/hojin/v1/hojin',
-        {
-          headers: gbizRequestHeader,
-          params: gbizReuqestQuery,
-        },
-      );
-      const companyResultData = companyResult.data;
-      companyDataList = companyResultData['hojin-infos'];
-    } catch {
-      // APIコールアウト時のエラーはこのサーバ上ではエラーとして扱わないためcatchする
-    }
-
-    return companyDataList;
-  }
-
   public async createCompanyResponseByFetchingCompanyMaster(
-    castedCompanyDataList: GbizCompanyResponseItem[],
+    parameters: CompanyResponseCreationParameterItem[],
   ): Promise<CompanyListGetResponse[]> {
-    const companyNumberList = castedCompanyDataList.map(
-      (x) => x.corporate_number,
-    );
+    const companyNumberList = parameters.map((x) => x.companyNumber);
+    // 法人番号は重複しない想定であるため、SetにせずListのまま検索
     const existingCompanies = await this.companyDao.getCompaniesByNumber(
       companyNumberList,
     );
@@ -65,10 +25,11 @@ export class CompanyLogicImpl implements CompanyLogic {
       (x) => x.companyNumber,
     );
 
-    return castedCompanyDataList.map<CompanyListGetResponse>((x) => ({
-      number: x.corporate_number,
-      name: x.name,
-      isRegistered: existingCompanyNumbers.includes(x.corporate_number),
+    return parameters.map<CompanyListGetResponse>((x) => ({
+      number: x.companyNumber,
+      // TODO:将来的に会社名はユーザの使用言語によって英語・日本語を切り替える
+      name: x.japaneseName,
+      isRegistered: existingCompanyNumbers.includes(x.companyNumber),
     }));
   }
 }

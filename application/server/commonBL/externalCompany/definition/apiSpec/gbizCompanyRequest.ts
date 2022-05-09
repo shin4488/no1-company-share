@@ -1,4 +1,5 @@
 export interface GbizCompanyRequest {
+  corporate_number: string;
   name: string;
   /**
    * JIS X 0401都道府県コード

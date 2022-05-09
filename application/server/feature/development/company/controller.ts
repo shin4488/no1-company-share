@@ -4,6 +4,7 @@ import { types } from '@s/common/dependencyInjection/types';
 import { LogHandler } from '@s/common/logger/interface/LogHandler';
 import CompanyMaster from '@s/common/sequelize/models/companyMaster';
 import { BaseController } from '@s/common/controller/baseController';
+import { wrapAction } from '@s/common/middleware/controllerCatcher';
 
 class CompanyController extends BaseController {
   public static companyEndpoint: string = '/development/companies';
@@ -22,7 +23,8 @@ class CompanyController extends BaseController {
       console.log('会社作成（create）');
       const user1 = await CompanyMaster.create({
         companyNumber: `alice${records.length}`,
-        companyName: 'husigi',
+        companyJapaneseName: 'husigi ja',
+        companyEnglishName: 'husigi en',
         homepageUrl: '23fghh',
       });
       console.log(user1);
@@ -51,6 +53,6 @@ class CompanyController extends BaseController {
 const companyDevelopmentRouter = Router();
 companyDevelopmentRouter.post(
   CompanyController.companyEndpoint,
-  CompanyController.createCompanies,
+  wrapAction(CompanyController.createCompanies),
 );
 export { companyDevelopmentRouter };

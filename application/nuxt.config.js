@@ -3,6 +3,7 @@ import ja from 'vuetify/es5/locale/ja';
 // eslint-disable-next-line nuxt/no-cjs-in-config
 const path = require('path');
 
+const siteDescription = '福井のNo.1企業を共有しよう！';
 const axiosBaseUrl = '/api/v1';
 const port = process.env.NUXT_PORT;
 
@@ -21,16 +22,34 @@ export default {
   serverMiddleware: ['~~/server/'],
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - F1C',
-    title: 'F1C',
+    titleTemplate: `F1C - %s | ${siteDescription}`,
+    title: 'No1企業共有アプリ',
     htmlAttrs: {
       lang: 'ja',
+      prefix: 'og: http://ogp.me/ns#',
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '' },
       { name: 'format-detection', content: 'telephone=no' },
+      { name: 'twitter:card', content: 'summary' },
+      {
+        hid: 'og:title',
+        property: 'og:title',
+        content: 'F1C',
+      },
+      {
+        hid: 'og:description',
+        property: 'og:description',
+        content: siteDescription,
+      },
+      {
+        hid: 'og:image',
+        property: 'og:image',
+        content:
+          'http://illustrain.com/img/work/2016/illustrain04-kaisya01.png',
+      },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },

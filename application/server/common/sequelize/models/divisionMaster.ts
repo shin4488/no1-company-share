@@ -1,5 +1,6 @@
 import { Model, Sequelize, DataTypes } from 'sequelize';
 import { CommonModelAttribute } from './commonModelAttribute';
+import SharedPostDetail from './sharedPostDetail';
 
 export interface DivisionMasterModelAttribute {
   id: number;
@@ -46,5 +47,12 @@ export default class DivisionMaster extends Model<
         timestamps: true,
       },
     );
+  }
+
+  static associate() {
+    this.hasMany(SharedPostDetail, {
+      sourceKey: 'id',
+      foreignKey: 'no1Division',
+    });
   }
 }

@@ -9,6 +9,7 @@ import { BaseController } from '@s/common/controller/baseController';
 import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthorization';
 import { StringUtil } from '@c/util/stringUtil';
 import { throwIfHasSimpleValidationResult } from '@s/common/middleware/simpleValidationResult';
+import { wrapAction } from '@s/common/middleware/controllerCatcher';
 
 /**
  * 投稿処理に関するコントローラクラス
@@ -43,6 +44,6 @@ userRouter.post(
   authorizationFirebaseUser(),
   userSaveSimpleValidators,
   throwIfHasSimpleValidationResult,
-  UserController.save,
+  wrapAction(UserController.save),
 );
 export { userRouter };

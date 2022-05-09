@@ -25,14 +25,16 @@ export class CompanyMasterDaoImpl implements CompanyMasterDao {
   public async upsertCompany(
     company: CompanyMasterModelAttribute,
     transaction: Transaction,
-  ): Promise<void> {
-    await CompanyMaster.upsert(
+  ): Promise<CompanyMaster> {
+    const [upsertedCompanyMaster] = await CompanyMaster.upsert(
       {
         companyNumber: company.companyNumber,
-        companyName: company.companyName,
+        companyJapaneseName: company.companyJapaneseName,
+        companyEnglishName: company.companyEnglishName,
         homepageUrl: company.homepageUrl,
       },
       { transaction },
     );
+    return upsertedCompanyMaster;
   }
 }

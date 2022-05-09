@@ -31,6 +31,14 @@ import { DivisionSelectItemLogicImpl } from '@s/commonBL/division/divisionSelect
 import { DivisionSelectItemLogic } from '@s/commonBL/division/interface/divisionSelectItemLogic';
 import { DivisionService } from '@s/feature/division/interface/service';
 import { DivisionServiceImpl } from '@s/feature/division/service';
+import { SharedPostSaveLogic } from '@s/feature/sharedPost/interface/saveLogic';
+import { SharedPostSaveLogicImpl } from '@s/feature/sharedPost/saveLogic';
+import { SharedPostComplexValidator } from '@s/feature/sharedPost/interface/complexValidator';
+import { SharedPostComplexValidatorImple } from '@s/feature/sharedPost/complexValidator';
+import { BadParameterErrorHandlerImpl } from '@s/common/error/handler/badParameterErrorHandler';
+import { BadParameterErrorHandler } from '@s/common/error/handler/interface/badParameterErrorHandler';
+import { ExternalCompanyLogicImpl } from '@s/commonBL/externalCompany/logic';
+import { ExternalCompanyLogic } from '@s/commonBL/externalCompany/interface/logic';
 
 const appContainer = new Container();
 
@@ -59,13 +67,25 @@ appContainer
   .to(OpenGraphServiceImpl);
 appContainer.bind<OpenGraphLogic>(types.OpenGraphLogic).to(OpenGraphLogicImpl);
 appContainer
+  .bind<ExternalCompanyLogic>(types.ExternalCompanyLogic)
+  .to(ExternalCompanyLogicImpl);
+appContainer
   .bind<DivisionSelectItemLogic>(types.DivisionSelectItemLogic)
   .to(DivisionSelectItemLogicImpl);
 appContainer.bind<DateHandler>(types.DateHandler).to(DateHandlerImpl);
+appContainer
+  .bind<BadParameterErrorHandler>(types.BadParameterErrorHandler)
+  .to(BadParameterErrorHandlerImpl);
 
 appContainer
   .bind<SharedPostService>(types.SharedPostService)
   .to(SharedPostServiceImpl);
+appContainer
+  .bind<SharedPostComplexValidator>(types.SharedPostComplexValidator)
+  .to(SharedPostComplexValidatorImple);
+appContainer
+  .bind<SharedPostSaveLogic>(types.SharedPostSaveLogic)
+  .to(SharedPostSaveLogicImpl);
 appContainer.bind<CompanyService>(types.CompanyService).to(CompanyServiceImpl);
 appContainer.bind<CompanyLogic>(types.CompanyLogic).to(CompanyLogicImpl);
 appContainer.bind<UserService>(types.UserService).to(UserServiceImpl);

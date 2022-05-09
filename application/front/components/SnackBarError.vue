@@ -1,20 +1,5 @@
 <template>
-  <v-snackbar v-model="isShown" top max-width="60%" color="error">
-    <div class="pre-wrap" v-text="message" />
-
-    <template #action="{ attrs }">
-      <v-btn
-        small
-        plain
-        shaped
-        multi-line
-        v-bind="attrs"
-        @click="onClickedCloseButton"
-      >
-        <v-icon> mdi-close </v-icon>
-      </v-btn>
-    </template>
-  </v-snackbar>
+  <SnackBarBase v-model="isShown" :message="message" color="error" />
 </template>
 
 <script lang="ts">

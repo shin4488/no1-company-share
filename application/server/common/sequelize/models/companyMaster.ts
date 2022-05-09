@@ -1,9 +1,16 @@
-import { Model, Sequelize, DataTypes } from 'sequelize';
+import {
+  Model,
+  Sequelize,
+  DataTypes,
+  HasManyCreateAssociationMixin,
+} from 'sequelize';
 import { CommonModelAttribute } from './commonModelAttribute';
+import SharedPost from './sharedPost';
 
 export interface CompanyMasterModelAttribute {
   companyNumber: string;
-  companyName: string;
+  companyJapaneseName: string;
+  companyEnglishName: string;
   homepageUrl: string;
 }
 
@@ -20,6 +27,11 @@ export default class CompanyMaster extends Model<
   declare createdAt: Date;
   declare updatedAt: Date;
 
+  declare createSharedPost: HasManyCreateAssociationMixin<
+    SharedPost,
+    'companyNumber'
+  >;
+
   static initialize(sequelize: Sequelize) {
     this.init(
       {
@@ -27,7 +39,11 @@ export default class CompanyMaster extends Model<
           type: DataTypes.STRING(13),
           primaryKey: true,
         },
-        companyName: {
+        companyJapaneseName: {
+          type: new DataTypes.STRING(100),
+          allowNull: true,
+        },
+        companyEnglishName: {
           type: new DataTypes.STRING(100),
           allowNull: true,
         },
@@ -45,5 +61,12 @@ export default class CompanyMaster extends Model<
         timestamps: true,
       },
     );
+  }
+
+  static associate() {
+    this.hasMany(SharedPost, {
+      sourceKey: 'companyNumber',
+      foreignKey: 'companyNumber',
+    });
   }
 }
