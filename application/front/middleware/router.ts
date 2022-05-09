@@ -3,8 +3,9 @@ import { StringUtil } from '@c/util/stringUtil';
 
 const middlware: Middleware = ({ redirect, route, $accessor }: Context) => {
   // ルートディレクトリはホーム画面に遷移
-  const isRootUri = route.path === '/';
-  if (isRootUri) {
+  const homeRedirectPaths = ['/', '/login', '/logout'];
+  const shouldRouteToHome = homeRedirectPaths.includes(route.path);
+  if (shouldRouteToHome) {
     redirect('/home');
     return;
   }

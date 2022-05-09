@@ -103,8 +103,8 @@ export default Vue.extend({
   },
   computed: {
     homePath: (): string => '/home',
-    loginPath: (): string => '#login',
-    logoutPath: (): string => '#logout',
+    loginPath: (): string => '/login',
+    logoutPath: (): string => '/logout',
     /**
      * ログアウト状態でのサイドバーメニュー
      */
@@ -158,7 +158,7 @@ export default Vue.extend({
   },
   watch: {
     // ログイン状態が変わればサイドバー表示内容も変更
-    firebaseUserId() {
+    async firebaseUserId() {
       this.firebaseUserIconImage =
         this.$fireModule.auth().currentUser?.photoURL || '';
       this.sideBarItems = this.decideSidebarItems();
@@ -166,6 +166,8 @@ export default Vue.extend({
       // ミドルウェアでリダイレクトしたいが、
       // ミドルウェア内ではfirebaseユーザIDが（ログイン状態でも）nullになってしまうためここでルーティング
       this.routeToHomeIfNotLoggedin();
+      // ログイン状態が変わったら、お気に入り状態の再取得のためにデータを取得しなおす
+      await this.$nuxt.refresh();
     },
   },
   mounted() {
