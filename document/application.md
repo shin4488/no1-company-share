@@ -461,6 +461,101 @@ https://stackoverflow.com/questions/53821555/how-to-refresh-the-data-obtained-by
 await this.$nuxt.refresh();
 ```
 
+<!-- TODO:未解決のため、不要であれば消す -->
+## class-transformerのdecoratorの使用
+以下のエラーが出てしまう
+
+```
+Decorating class property failed. Please ensure that proposal-class-properties is enabled and runs after the decorators transform.
+```
+
+https://yukiyuriweb.com/2018/06/02/react-and-mobx-with-webpack4-and-babel7/
+
+```
+yarn add @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators
+```
+
+.babelrc（pluginsを追加）
+
+```json
+{
+  "env": {
+    "test": {
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "targets": {
+              "node": "current"
+            }
+          }
+        ]
+      ],
+      "plugins": [
+        [
+          "@babel/plugin-proposal-decorators",
+          {
+            "legacy": true
+          }
+        ],
+        [
+          "@babel/plugin-proposal-class-properties",
+          {
+            "loose": true
+          }
+        ]
+      ]
+    }
+  }
+}
+```
+
+https://www.aizulab.com/blog/referenceerror-regeneratorruntime-is-not-defined/
+
+```
+regeneratorRuntime is not defined
+```
+
+```ts
+export default {
+  build: {
+    extend(config) {
+      config.resolve.alias['@f'] = path.resolve(__dirname, 'front');
+      config.resolve.alias['@c'] = path.resolve(__dirname, 'common');
+    },
+    // storeをtypescriptで$accessインテリセンス可能とするため
+    transpile: [/typed-vuex/],
+    babel: {
+      presets: [
+        [
+          '@babel/preset-env',
+          {
+            targets: {
+              node: 'current',
+            },
+          },
+        ],
+      ],
+      plugins: [
+        [
+          '@babel/plugin-proposal-decorators',
+          {
+            legacy: true,
+          },
+        ],
+        [
+          '@babel/plugin-proposal-class-properties',
+          {
+            loose: false,
+          },
+        ],
+      ],
+    },
+  },
+}
+```
+
+
 # Typescript
 ## 絶対パスでimport
 
