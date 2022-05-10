@@ -5,6 +5,7 @@ const types = {
   CompanyMasterDao: Symbol.for('CompanyMasterDao'),
   UserMasterDao: Symbol.for('UserMasterDao'),
   DivisionMasterDao: Symbol.for('DivisionMasterDao'),
+  SharedPostDao: Symbol.for('SharedPostDao'),
 
   ApiResponseHandler: Symbol.for('ApiResponseHandler'),
   OpenGraphService: Symbol.for('OpenGraphService'),
@@ -13,6 +14,7 @@ const types = {
   DivisionSelectItemLogic: Symbol.for('DivisionSelectItemLogic'),
   DateHandler: Symbol.for('DateHandler'),
   BadParameterErrorHandler: Symbol.for('BadParameterErrorHandler'),
+  SharedPostLogic: Symbol.for('SharedPostLogic'),
 
   SharedPostService: Symbol.for('SharedPostService'),
   SharedPostSaveLogic: Symbol.for('SharedPostSaveLogic'),
