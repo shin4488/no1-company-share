@@ -22,7 +22,8 @@ export default class CompanyMaster extends Model<
   CompanyMasterModelAttribute
 > {
   declare companyNumber: string;
-  declare companyName: string;
+  declare companyJapaneseName: string;
+  declare companyEnglishName: string;
   declare homepageUrl: string;
   declare createdAt: Date;
   declare updatedAt: Date;
