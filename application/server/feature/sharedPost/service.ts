@@ -48,6 +48,8 @@ export class SharedPostServiceImpl implements SharedPostService {
       limit: parameter.limit,
       postId: parameter.postId,
       userId: parameter.userId,
+      isMyPostOnly: parameter.isMyPostOnly,
+      baseDateTime: parameter.baseDateTime,
     };
     const responsePosts = await this.sharedPostLogic.getSharedPosts(
       parameterDto,

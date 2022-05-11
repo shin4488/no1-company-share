@@ -1,6 +1,10 @@
 <template>
   <div>
     <v-row>
+      <v-col v-show="hasNoItem"
+        >まだ投稿がありません。最初の投稿をしてみよう！</v-col
+      >
+
       <!-- xsだけは指定できないため、cols指定となる -->
       <v-col
         v-for="(item, index) in value"
@@ -73,6 +77,9 @@ export default Vue.extend({
       return StringUtil.isNotEmpty(
         this.$accessor.firebaseAuthorization.userIdComputed,
       );
+    },
+    hasNoItem(): boolean {
+      return ArrayUtil.isEmpty(this.value);
     },
   },
   methods: {

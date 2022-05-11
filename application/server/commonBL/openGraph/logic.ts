@@ -41,6 +41,7 @@ export class OpenGraphLogicImpl implements OpenGraphLogic {
 
     const headElements = Array.from(headElement);
     const openGraph: OpenGraphGetResult = this.extractTargetOpenGraph(
+      pageUri,
       headElements,
       ogTypes,
     );
@@ -54,6 +55,7 @@ export class OpenGraphLogicImpl implements OpenGraphLogic {
    * @returns
    */
   private extractTargetOpenGraph(
+    pageUri: string,
     headElements: Element[],
     ogTypes: OpenGraphType[],
   ): OpenGraphGetResult {
@@ -80,7 +82,9 @@ export class OpenGraphLogicImpl implements OpenGraphLogic {
       const contentString = StringUtil.ifEmpty(content);
       switch (property) {
         case 'og:image':
-          openGraphResult.image = contentString;
+          openGraphResult.image = contentString.startsWith('/')
+            ? `${pageUri}${contentString}`
+            : contentString;
           break;
 
         default:

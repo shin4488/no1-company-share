@@ -48,10 +48,10 @@ export default class SharedPost extends Model<
   declare createdAt: Date;
   declare updatedAt: Date;
 
-  // declare sharedPostDetail?: NonAttribute<SharedPostDetail[]>;
-  declare bookmark?: NonAttribute<Bookmark[]>;
-  declare userMaster?: NonAttribute<UserMaster>;
-  declare companyMaster?: NonAttribute<CompanyMaster>;
+  declare SharedPostDetails?: NonAttribute<SharedPostDetail[]>;
+  declare Bookmarks?: NonAttribute<Bookmark[]>;
+  declare UserMaster?: NonAttribute<UserMaster>;
+  declare CompanyMaster?: NonAttribute<CompanyMaster>;
 
   declare createSharedPostDetail: HasManyCreateAssociationMixin<
     SharedPostDetail,
@@ -108,23 +108,19 @@ export default class SharedPost extends Model<
     this.belongsTo(CompanyMaster, {
       targetKey: 'companyNumber',
       foreignKey: 'companyNumber',
-      as: 'companyMaster',
     });
     this.belongsTo(UserMaster, {
       targetKey: 'id',
       foreignKey: 'userId',
-      as: 'userMaster',
     });
 
     this.hasMany(SharedPostDetail, {
       sourceKey: 'id',
       foreignKey: 'sharedPostId',
-      // as: 'sharedPostDetail',
     });
     this.hasMany(Bookmark, {
       sourceKey: 'id',
       foreignKey: 'sharedPostId',
-      as: 'bookmark',
     });
   }
 }

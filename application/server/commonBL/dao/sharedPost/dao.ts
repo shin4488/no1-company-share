@@ -12,6 +12,13 @@ export class SharedPostDaoImple implements SharedPostDao {
   public async getSharedPostWithDetails(
     parameterDto: SharedPostParameterDto,
   ): Promise<SharedPost[]> {
+    // TODO:動的にWHERE句組み立て
+    // const whereClause = {
+    //   where: {
+
+    //   }
+    // };
+
     const resultDto = await SharedPost.findAll({
       attributes: ['id', 'companyNumber', 'userId', 'remarks', 'updatedAt'],
       include: [
@@ -19,11 +26,10 @@ export class SharedPostDaoImple implements SharedPostDao {
           model: SharedPostDetail,
           attributes: ['id', 'no1Content', 'no1Division'],
           required: true,
-          // as: 'sharedPostDetail',
         },
         {
           model: Bookmark,
-          as: 'bookmark',
+          attributes: ['sharedPostId', 'userId'],
         },
         {
           model: CompanyMaster,
@@ -32,17 +38,17 @@ export class SharedPostDaoImple implements SharedPostDao {
             'companyEnglishName',
             'homepageUrl',
           ],
-          as: 'companyMaster',
         },
         {
           model: UserMaster,
           attributes: ['iconImageUrl', 'displayedName'],
-          as: 'userMaster',
         },
       ],
-      // TODO:raw指定すると子レコードが配列で取得できない
-      // raw: true,
-      // nest: true,
+      order: [
+        ['updatedAt', 'DESC'],
+        ['SharedPostDetails', 'id', 'ASC'],
+      ],
+      limit: parameterDto.limit,
     });
 
     console.log(parameterDto);
