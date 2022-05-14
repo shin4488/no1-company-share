@@ -11,6 +11,7 @@ import {
 } from './definition/sharedPostPostParameter';
 import { SharedPostPostResponse } from './definition/sharedPostPostResponse';
 import {
+  sharedPostGetSimpleValidators,
   sharedPostPostSimpleValidators,
   sharedPostPutSimpleValidators,
 } from './simpleValidator';
@@ -50,10 +51,10 @@ class SharedPostController extends BaseController {
     const query = request.query;
     const requestParameter = request.params;
     const parameter: SharedPostGetParameter = {
-      limit: StringUtil.isEmpty(query.limit) ? 10000 : Number(query.limit),
-      baseDateTime: StringUtil.isEmpty(query.limit)
+      limit: StringUtil.isEmpty(query.limit) ? 100 : Number(query.limit),
+      baseDateTime: StringUtil.isEmpty(query.baseDateTime)
         ? null
-        : new Date(query.limit as string),
+        : new Date(query.baseDateTime as string),
       isMyPostOnly: query.isMyPostOnly === 'true',
       postId: StringUtil.ifEmpty(requestParameter.postId),
       userId: StringUtil.ifEmpty(response.locals.firebaseUserId),
@@ -155,6 +156,8 @@ const sharedPostRouter = Router();
 sharedPostRouter.get(
   SharedPostController.sharedPostsGetEndpoint,
   authorizationFirebaseUser(false),
+  sharedPostGetSimpleValidators,
+  throwIfHasSimpleValidationResult,
   wrapAction(SharedPostController.getAlive),
 );
 sharedPostRouter.post(

@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { SharedPostGetReponse } from './definition/sharedPostGetReponse';
+import { SharedPostGetResponse } from './definition/sharedPostGetResponse';
 import { SharedPostService } from './interface/sharedPostService';
 import { SharedPostPostParameter } from './definition/sharedPostPostParameter';
 import {
@@ -43,18 +43,19 @@ export class SharedPostServiceImpl implements SharedPostService {
 
   public async getAlive(
     parameter: SharedPostGetParameter,
-  ): Promise<SharedPostGetReponse> {
+  ): Promise<SharedPostGetResponse> {
     const parameterDto: SharedPostParameterDto = {
       limit: parameter.limit,
       postId: parameter.postId,
       userId: parameter.userId,
       isMyPostOnly: parameter.isMyPostOnly,
+      isMyBookmarkOnly: false,
       baseDateTime: parameter.baseDateTime,
     };
     const responsePosts = await this.sharedPostLogic.getSharedPosts(
       parameterDto,
     );
-    const response: SharedPostGetReponse = {
+    const response: SharedPostGetResponse = {
       posts: responsePosts,
     };
 
