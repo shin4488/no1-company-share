@@ -37,6 +37,7 @@ export class SharedPostLogicImpl implements SharedPostLogic {
       (post) => {
         const sharedPostDetails = post.SharedPostDetails;
         const bookmarks = post.Bookmarks;
+        const bookmarkUsers = bookmarks?.map((x) => x.userId);
         const userMaster = post.UserMaster;
         const companyMaster = post.CompanyMaster;
         const sharedPostResult: SharedPostLogicResultItem = {
@@ -48,8 +49,8 @@ export class SharedPostLogicImpl implements SharedPostLogic {
           postingUserId: post.userId,
           postingUserName: StringUtil.ifEmpty(userMaster?.displayedName),
           postingUserIcomImageUrl: StringUtil.ifEmpty(userMaster?.iconImageUrl),
-          // TODO:ログインユーザのBookmarkの存在チェック
-          isBookmarkedByLoginUser: false,
+          isBookmarkedByLoginUser:
+            bookmarkUsers?.includes(parameter.userId) || false,
           numberOfBookmarks: ArrayUtil.isEmpty(bookmarks)
             ? 0
             : (bookmarks as Bookmark[]).length,
