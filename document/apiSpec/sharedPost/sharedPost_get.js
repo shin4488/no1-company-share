@@ -30,7 +30,7 @@ const responseBody = {
                 "isBookmarkedByLoginUser": false,
                 "numberOfBookmarks": 10,
                 "remarks": "テスト備考1",
-                "baseDateTime": '2022-04-27 10:30:59.999',
+                "updatedAt": '2022-04-27 10:30:59.999',
                 "postDetails": [
                     {
                         "id": 1,

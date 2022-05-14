@@ -1,4 +1,5 @@
-import { SharedPostGetReponse } from '../definition/sharedPostGetReponse';
+import { SharedPostGetParameter } from '../definition/sharedPostGetParameter';
+import { SharedPostGetResponse } from '../definition/sharedPostGetResponse';
 import { SharedPostPostParameter } from '../definition/sharedPostPostParameter';
 import { SharedPostPostResponse } from '../definition/sharedPostPostResponse';
 import { SharedPostPutParameter } from '../definition/sharedPostPutParameter';
@@ -8,7 +9,7 @@ export interface SharedPostService {
   /**
    * 投稿取得
    */
-  getSharedPosts(): Promise<SharedPostGetReponse>;
+  getAlive(parameter: SharedPostGetParameter): Promise<SharedPostGetResponse>;
   /**
    * 投稿新規作成
    * @param parameter

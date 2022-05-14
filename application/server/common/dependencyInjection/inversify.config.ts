@@ -39,6 +39,10 @@ import { BadParameterErrorHandlerImpl } from '@s/common/error/handler/badParamet
 import { BadParameterErrorHandler } from '@s/common/error/handler/interface/badParameterErrorHandler';
 import { ExternalCompanyLogicImpl } from '@s/commonBL/externalCompany/logic';
 import { ExternalCompanyLogic } from '@s/commonBL/externalCompany/interface/logic';
+import { SharedPostDaoImple } from '@s/commonBL/dao/sharedPost/dao';
+import { SharedPostDao } from '@s/commonBL/dao/sharedPost/interface/dao';
+import { SharedPostLogic } from '@s/commonBL/sharedPost/interface/logic';
+import { SharedPostLogicImpl } from '@s/commonBL/sharedPost/logic';
 
 const appContainer = new Container();
 
@@ -58,6 +62,7 @@ appContainer.bind<UserMasterDao>(types.UserMasterDao).to(UserMasterDaoImpl);
 appContainer
   .bind<DivisionMasterDao>(types.DivisionMasterDao)
   .to(DivisionMasterDaoImpl);
+appContainer.bind<SharedPostDao>(types.SharedPostDao).to(SharedPostDaoImple);
 
 appContainer
   .bind<ApiResponseHandler>(types.ApiResponseHandler)
@@ -76,6 +81,9 @@ appContainer.bind<DateHandler>(types.DateHandler).to(DateHandlerImpl);
 appContainer
   .bind<BadParameterErrorHandler>(types.BadParameterErrorHandler)
   .to(BadParameterErrorHandlerImpl);
+appContainer
+  .bind<SharedPostLogic>(types.SharedPostLogic)
+  .to(SharedPostLogicImpl);
 
 appContainer
   .bind<SharedPostService>(types.SharedPostService)

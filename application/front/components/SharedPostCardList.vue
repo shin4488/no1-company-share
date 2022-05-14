@@ -1,6 +1,8 @@
 <template>
   <div>
     <v-row>
+      <v-col v-show="hasNoItem">{{ messageIfNoData }}</v-col>
+
       <!-- xsだけは指定できないため、cols指定となる -->
       <v-col
         v-for="(item, index) in value"
@@ -67,12 +69,20 @@ export default Vue.extend({
         },
       ],
     },
+    messageIfNoData: {
+      type: String,
+      default: '',
+      required: false,
+    },
   },
   computed: {
     isLogined(): boolean {
       return StringUtil.isNotEmpty(
         this.$accessor.firebaseAuthorization.userIdComputed,
       );
+    },
+    hasNoItem(): boolean {
+      return ArrayUtil.isEmpty(this.value);
     },
   },
   methods: {

@@ -5,7 +5,9 @@ import {
   ForeignKey,
   HasManyCreateAssociationMixin,
   HasManyGetAssociationsMixin,
+  NonAttribute,
 } from 'sequelize';
+import Bookmark from './bookmark';
 import { CommonModelAttribute } from './commonModelAttribute';
 import CompanyMaster from './companyMaster';
 import SharedPostDetail from './sharedPostDetail';
@@ -46,11 +48,17 @@ export default class SharedPost extends Model<
   declare createdAt: Date;
   declare updatedAt: Date;
 
+  declare SharedPostDetails?: NonAttribute<SharedPostDetail[]>;
+  declare Bookmarks?: NonAttribute<Bookmark[]>;
+  declare UserMaster?: NonAttribute<UserMaster>;
+  declare CompanyMaster?: NonAttribute<CompanyMaster>;
+
   declare createSharedPostDetail: HasManyCreateAssociationMixin<
     SharedPostDetail,
     'sharedPostId'
   >;
 
+  // TODO:associationでalias設定時はこのメソッドが動作しなくなる
   declare getSharedPostDetails: HasManyGetAssociationsMixin<SharedPostDetail>;
 
   static initialize(sequelize: Sequelize) {
@@ -101,9 +109,16 @@ export default class SharedPost extends Model<
       targetKey: 'companyNumber',
       foreignKey: 'companyNumber',
     });
-    this.belongsTo(UserMaster, { targetKey: 'id', foreignKey: 'userId' });
+    this.belongsTo(UserMaster, {
+      targetKey: 'id',
+      foreignKey: 'userId',
+    });
 
     this.hasMany(SharedPostDetail, {
+      sourceKey: 'id',
+      foreignKey: 'sharedPostId',
+    });
+    this.hasMany(Bookmark, {
       sourceKey: 'id',
       foreignKey: 'sharedPostId',
     });

@@ -11,6 +11,7 @@ import {
 } from './definition/sharedPostPostParameter';
 import { SharedPostPostResponse } from './definition/sharedPostPostResponse';
 import {
+  sharedPostGetSimpleValidators,
   sharedPostPostSimpleValidators,
   sharedPostPutSimpleValidators,
 } from './simpleValidator';
@@ -23,6 +24,7 @@ import {
   SharedPostPutParameter,
   SharedPostPutParameterItem,
 } from './definition/sharedPostPutParameter';
+import { SharedPostGetParameter } from './definition/sharedPostGetParameter';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { BaseController } from '@s/common/controller/baseController';
@@ -37,7 +39,7 @@ import { wrapAction } from '@s/common/middleware/controllerCatcher';
  */
 class SharedPostController extends BaseController {
   public static sharedPostsGetEndpoint: string = '/shared-posts/:postId?';
-  public static async getSharedPosts(
+  public static async getAlive(
     request: express.Request<
       SharedPostGetRequestParameter,
       null,
@@ -46,12 +48,22 @@ class SharedPostController extends BaseController {
     >,
     response: express.Response,
   ) {
-    const requestQuery = request.query;
-    console.log(requestQuery);
+    const query = request.query;
+    const requestParameter = request.params;
+    const parameter: SharedPostGetParameter = {
+      limit: StringUtil.isEmpty(query.limit) ? 100 : Number(query.limit),
+      baseDateTime: StringUtil.isEmpty(query.baseDateTime)
+        ? null
+        : new Date(query.baseDateTime as string),
+      isMyPostOnly: query.isMyPostOnly === 'true',
+      postId: StringUtil.ifEmpty(requestParameter.postId),
+      userId: StringUtil.ifEmpty(response.locals.firebaseUserId),
+    };
+
     const service = appContainer.get<SharedPostService>(
       types.SharedPostService,
     );
-    const responseDataBody = await service.getSharedPosts();
+    const responseDataBody = await service.getAlive(parameter);
     super.success(response, responseDataBody);
   }
 
@@ -144,7 +156,9 @@ const sharedPostRouter = Router();
 sharedPostRouter.get(
   SharedPostController.sharedPostsGetEndpoint,
   authorizationFirebaseUser(false),
-  wrapAction(SharedPostController.getSharedPosts),
+  sharedPostGetSimpleValidators,
+  throwIfHasSimpleValidationResult,
+  wrapAction(SharedPostController.getAlive),
 );
 sharedPostRouter.post(
   SharedPostController.sharedPostsPostEndpoint,

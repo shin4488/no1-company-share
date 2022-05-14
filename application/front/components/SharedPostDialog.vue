@@ -93,6 +93,7 @@
               v-model="companyHomepageUrl"
               :label="companyHomePageUrlInputLabelComputed"
               clearable
+              @focus="$event.target.select()"
               @blur="onBluredCompanyHomePageUrl"
             ></v-text-field>
           </v-col>
