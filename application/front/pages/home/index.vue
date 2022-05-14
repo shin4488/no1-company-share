@@ -1,6 +1,10 @@
 <template>
   <div>
-    <SharedPostCardList v-model="sharedPosts" :no1-divisions="no1Divisions" />
+    <SharedPostCardList
+      v-model="sharedPosts"
+      message-if-no-data="まだ投稿がありません。最初の投稿をしてみよう！"
+      :no1-divisions="no1Divisions"
+    />
     <LoadMoreButton
       v-if="isLoadMoreButtonShown"
       text="さらに表示"

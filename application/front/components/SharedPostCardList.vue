@@ -1,9 +1,7 @@
 <template>
   <div>
     <v-row>
-      <v-col v-show="hasNoItem"
-        >まだ投稿がありません。最初の投稿をしてみよう！</v-col
-      >
+      <v-col v-show="hasNoItem">{{ messageIfNoData }}</v-col>
 
       <!-- xsだけは指定できないため、cols指定となる -->
       <v-col
@@ -70,6 +68,11 @@ export default Vue.extend({
           value: '',
         },
       ],
+    },
+    messageIfNoData: {
+      type: String,
+      default: '',
+      required: false,
     },
   },
   computed: {
