@@ -91,7 +91,7 @@ export class SharedPostSaveLogicImpl implements SharedPostSaveLogic {
 
     return {
       id: createdPost.id,
-      updatedAt: createdPost.updatedAt.toString(),
+      updatedAt: createdPost.updatedAt.toISOString(),
     };
   }
 
