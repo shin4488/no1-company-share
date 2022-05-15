@@ -175,8 +175,9 @@ export default Vue.extend({
         return;
       }
 
+      await AjaxHelper.delete(this.$axios, `/shared-posts/${postId}`);
+      this.$accessor.snackBarInfo.open('投稿を削除しました。');
       const clonedPosts = this.$cloner.deepClone(this.value);
-      // TODO:投稿削除処理呼び出し
       clonedPosts.splice(deletedPostIndex, 1);
       this.$emit('input', clonedPosts);
     },
