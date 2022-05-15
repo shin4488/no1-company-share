@@ -10,7 +10,7 @@ import UserMaster from '@s/common/sequelize/models/userMaster';
 import Bookmark from '@s/common/sequelize/models/bookmark';
 
 @injectable()
-export class SharedPostDaoImple implements SharedPostDao {
+export class SharedPostDaoImpl implements SharedPostDao {
   public async getSharedPostWithDetails(
     parameterDto: SharedPostParameterDto,
   ): Promise<SharedPost[]> {

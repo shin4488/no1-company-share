@@ -11,7 +11,7 @@ import SharedPost from '@s/common/sequelize/models/sharedPost';
 import CompanyMaster from '@s/common/sequelize/models/companyMaster';
 
 @injectable()
-export class SharedPostComplexValidatorImple
+export class SharedPostComplexValidatorImpl
   implements SharedPostComplexValidator
 {
   public async validateForInsert(
