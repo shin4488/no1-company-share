@@ -15,6 +15,8 @@ import UserMaster from './userMaster';
 
 export interface SharedPostModelAttribute {
   id: string;
+  companyNumber: string;
+  userId: string;
   isDeleted: boolean;
   isReported: boolean;
   reportDetail: string;
@@ -68,14 +70,14 @@ export default class SharedPost extends Model<
           type: DataTypes.STRING(58),
           primaryKey: true,
         },
-        // companyNumber: {
-        //   type: new DataTypes.STRING(13),
-        //   allowNull: false,
-        // },
-        // userId: {
-        //   type: new DataTypes.STRING(28),
-        //   allowNull: false,
-        // },
+        companyNumber: {
+          type: new DataTypes.STRING(13),
+          allowNull: false,
+        },
+        userId: {
+          type: new DataTypes.STRING(28),
+          allowNull: false,
+        },
         isDeleted: {
           type: new DataTypes.BOOLEAN(),
           allowNull: false,

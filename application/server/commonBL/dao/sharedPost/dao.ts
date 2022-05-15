@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { Op, WhereOptions } from 'sequelize';
+import { Op, Transaction, WhereOptions } from 'sequelize';
 import { SharedPostParameterDto } from './definition/sharedPostParameterDto';
 import { SharedPostDao } from './interface/dao';
 import { StringUtil } from '@c/util/stringUtil';
@@ -87,5 +87,41 @@ export class SharedPostDaoImpl implements SharedPostDao {
     });
 
     return resultDto;
+  }
+
+  public async getNonReportedAliveByCompanyNumbers(
+    companyNumbers: string[],
+  ): Promise<SharedPost[]> {
+    const posts = await SharedPost.findAll({
+      attributes: ['companyNumber'],
+      where: {
+        companyNumber: {
+          [Op.in]: companyNumbers,
+        },
+        isDeleted: false,
+        isReported: false,
+      },
+    });
+
+    return posts;
+  }
+
+  public async updateForLogicalDelete(
+    sharedPostIds: string[],
+    transaction: Transaction,
+  ): Promise<void> {
+    await SharedPost.update(
+      {
+        isDeleted: true,
+      },
+      {
+        where: {
+          id: {
+            [Op.in]: sharedPostIds,
+          },
+        },
+        transaction,
+      },
+    );
   }
 }

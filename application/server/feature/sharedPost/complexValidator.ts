@@ -1,7 +1,8 @@
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { SharedPostPostParameter } from './definition/sharedPostPostParameter';
 import { SharedPostPutParameter } from './definition/sharedPostPutParameter';
 import { SharedPostComplexValidator } from './interface/complexValidator';
+import { SharedPostDeleteParameter } from './definition/sharedPostDeleteParameter';
 import DivisionMaster from '@s/common/sequelize/models/divisionMaster';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
@@ -9,11 +10,19 @@ import { BadParameterErrorHandler } from '@s/common/error/handler/interface/badP
 import { StringUtil } from '@c/util/stringUtil';
 import SharedPost from '@s/common/sequelize/models/sharedPost';
 import CompanyMaster from '@s/common/sequelize/models/companyMaster';
+import { SharedPostDao } from '@s/commonBL/dao/sharedPost/interface/dao';
+import { ArrayUtil } from '@c/util/arrayUtil';
 
 @injectable()
 export class SharedPostComplexValidatorImpl
   implements SharedPostComplexValidator
 {
+  private sharedPostDao: SharedPostDao;
+
+  constructor(@inject(types.SharedPostDao) sharedPostDao: SharedPostDao) {
+    this.sharedPostDao = sharedPostDao;
+  }
+
   public async validateForInsert(
     parameter: SharedPostPostParameter,
   ): Promise<void> {
@@ -23,6 +32,16 @@ export class SharedPostComplexValidatorImpl
 
     const posts = parameter.posts;
     for (const post of posts) {
+      // 同企業の別投稿が存在しないことのチェック
+      const companyNumbers = [post.companyNumber];
+      const companyErrorMessage =
+        await this.validateExistingNonReportedAliveSameCompanyPost(
+          companyNumbers,
+        );
+      if (StringUtil.isNotEmpty(companyErrorMessage)) {
+        errorHandler.addMessage(companyErrorMessage);
+      }
+
       const postDetails = post.postDetails;
       for (const detail of postDetails) {
         // 区分値マスタの存在チェック
@@ -86,6 +105,52 @@ export class SharedPostComplexValidatorImpl
     }
 
     errorHandler.throwIfHasError();
+  }
+
+  public async validateForDelete(
+    parameter: SharedPostDeleteParameter,
+  ): Promise<void> {
+    const errorHandler = appContainer.get<BadParameterErrorHandler>(
+      types.BadParameterErrorHandler,
+    );
+
+    const posts = parameter.posts;
+    const userId = parameter.userId;
+    for (const post of posts) {
+      const sharedPostId = post.id;
+
+      // 削除しようとしている投稿の存在
+      const notExistingPostErrorMessage = await this.validateExistingSharedPost(
+        sharedPostId,
+      );
+      if (StringUtil.isNotEmpty(notExistingPostErrorMessage)) {
+        errorHandler.addMessage(notExistingPostErrorMessage);
+      }
+
+      // 投稿したユーザと削除しようとしているユーザの一致
+      const userErrorMessage = await this.validateUserEquality(
+        sharedPostId,
+        userId,
+      );
+      if (StringUtil.isNotEmpty(userErrorMessage)) {
+        errorHandler.addMessage(userErrorMessage);
+      }
+    }
+
+    errorHandler.throwIfHasError();
+  }
+
+  private async validateExistingNonReportedAliveSameCompanyPost(
+    companyNumbers: string[],
+  ): Promise<string> {
+    const sameCompanySharedPosts =
+      await this.sharedPostDao.getNonReportedAliveByCompanyNumbers(
+        companyNumbers,
+      );
+
+    return ArrayUtil.isNotEmpty(sameCompanySharedPosts)
+      ? '既に同じ企業に関する投稿がすでに存在します。'
+      : '';
   }
 
   private async validateExistingNo1Division(

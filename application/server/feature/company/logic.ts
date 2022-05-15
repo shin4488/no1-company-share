@@ -3,14 +3,14 @@ import { CompanyLogic } from './interface/logic';
 import { CompanyListGetResponse } from './definition/companyGetResponse';
 import { CompanyResponseCreationParameterItem } from './definition/companyResponseCreationParameter';
 import { types } from '@s/common/dependencyInjection/types';
-import { CompanyMasterDao } from '@s/commonBL/dao/company/interface/dao';
+import { SharedPostDao } from '@s/commonBL/dao/sharedPost/interface/dao';
 
 @injectable()
 export class CompanyLogicImpl implements CompanyLogic {
-  private companyDao: CompanyMasterDao;
+  private sharedPostDao: SharedPostDao;
 
-  constructor(@inject(types.CompanyMasterDao) companyDao: CompanyMasterDao) {
-    this.companyDao = companyDao;
+  constructor(@inject(types.SharedPostDao) sharedPostDao: SharedPostDao) {
+    this.sharedPostDao = sharedPostDao;
   }
 
   public async createCompanyResponseByFetchingCompanyMaster(
@@ -18,9 +18,10 @@ export class CompanyLogicImpl implements CompanyLogic {
   ): Promise<CompanyListGetResponse[]> {
     const companyNumberList = parameters.map((x) => x.companyNumber);
     // 法人番号は重複しない想定であるため、SetにせずListのまま検索
-    const existingCompanies = await this.companyDao.getCompaniesByNumber(
-      companyNumberList,
-    );
+    const existingCompanies =
+      await this.sharedPostDao.getNonReportedAliveByCompanyNumbers(
+        companyNumberList,
+      );
     const existingCompanyNumbers = existingCompanies.map(
       (x) => x.companyNumber,
     );

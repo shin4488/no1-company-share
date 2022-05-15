@@ -90,11 +90,19 @@ export const sharedPostPostSimpleValidators = [
   ...sharedPostSaveBaseSimpleValidators,
 ];
 
-export const sharedPostPutSimpleValidators = [
+const sharedPostUpdateBaseSimpleValidators = [
   body('posts.*.id')
     .notEmpty()
     .withMessage(`投稿ID:${Message.notEmpty}`)
     .isString()
     .withMessage(`投稿ID:${Message.isString}`),
+];
+
+export const sharedPostPutSimpleValidators = [
+  ...sharedPostUpdateBaseSimpleValidators,
   ...sharedPostSaveBaseSimpleValidators,
+];
+
+export const sharedPostLogicalDeleteSimpleValidators = [
+  ...sharedPostUpdateBaseSimpleValidators,
 ];

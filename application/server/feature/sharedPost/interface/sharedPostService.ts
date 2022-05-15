@@ -4,6 +4,7 @@ import { SharedPostPostParameter } from '../definition/sharedPostPostParameter';
 import { SharedPostPostResponse } from '../definition/sharedPostPostResponse';
 import { SharedPostPutParameter } from '../definition/sharedPostPutParameter';
 import { SharedPostPutResponse } from '../definition/sharedPostPutResponse';
+import { SharedPostDeleteParameter } from '../definition/sharedPostDeleteParameter';
 
 export interface SharedPostService {
   /**
@@ -20,4 +21,9 @@ export interface SharedPostService {
    * @param parameter
    */
   update(parameter: SharedPostPutParameter): Promise<SharedPostPutResponse>;
+  /**
+   * 投稿削除
+   * @param parameter
+   */
+  logicalDelete(parameter: SharedPostDeleteParameter): Promise<void>;
 }
