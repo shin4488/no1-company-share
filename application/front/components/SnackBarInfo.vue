@@ -5,6 +5,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { SnackBarInfoData } from '@f/definition/components/snackBarInfo/data';
+import { StringUtil } from '@c/util/stringUtil';
 
 export default Vue.extend({
   name: 'SnackBarInfo',
@@ -17,7 +18,12 @@ export default Vue.extend({
   created() {
     this.$store.subscribe((mutation, state) => {
       if (mutation.type === 'snackBarInfo/open') {
-        this.message = state.snackBarInfo.message;
+        const message = state.snackBarInfo.message;
+        if (StringUtil.isEmpty(message)) {
+          return;
+        }
+
+        this.message = message;
         this.isShown = true;
       }
     });

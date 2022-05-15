@@ -9,12 +9,12 @@
         </v-row>
         <v-row dense>
           <v-col>
-            <v-textarea
-              v-model="reportDetail"
-              label="通報理由"
-              rows="3"
-              auto-grow
-            ></v-textarea>
+            <v-textarea v-model="reportDetail" rows="3" auto-grow>
+              <template #label>
+                <span class="required"><strong>* </strong></span
+                >通報理由</template
+              >
+            </v-textarea>
           </v-col>
         </v-row>
       </v-card-text>
@@ -35,14 +35,17 @@
 <script lang="ts">
 import Vue from 'vue';
 import { ReportDialogData } from '@f/definition/components/reportDialog/data';
-import { ReportDialogResult } from '@f/definition/components/reportDialog/result';
+import { ReportDialogParameter } from '@f/definition/components/reportDialog/parameter';
 import { StringUtil } from '@c/util/stringUtil';
+import { ReportPostRequest } from '@f/definition/components/reportDialog/apiSpec/reportPostRequest';
+import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
 
 export default Vue.extend({
   name: 'ConfirmDialog',
   data(): ReportDialogData {
     return {
       isDialogShow: false,
+      postId: '',
       reportDetail: '',
     };
   },
@@ -52,26 +55,45 @@ export default Vue.extend({
     },
   },
   methods: {
-    open(): Promise<ReportDialogResult | void> {
+    open(parameter: ReportDialogParameter): Promise<boolean> {
       this.isDialogShow = true;
+      this.postId = parameter.postId;
       this.reportDetail = '';
 
       return new Promise((resolve) => {
-        this.$on('confirm', (result: ReportDialogResult) => {
+        this.$on('success', () => {
           this.isDialogShow = false;
-          resolve(result);
+          resolve(true);
         });
         this.$on('cancel', () => {
           this.isDialogShow = false;
-          resolve();
+          resolve(false);
         });
       });
     },
-    onClickedConfirmButton(): void {
-      const result: ReportDialogResult = {
-        reportDetail: this.reportDetail,
+    async onClickedConfirmButton(): Promise<void> {
+      const reportRequest: ReportPostRequest = {
+        posts: [
+          {
+            id: this.postId,
+            reportDetail: this.reportDetail,
+          },
+        ],
       };
-      this.$emit('confirm', result);
+      // APIレスポンスエラー検知のためにいったんエラーメッセージを空にしている
+      this.$accessor.snackBarError.open('');
+      await this.$accessor.spinnerOverlay.open(async () => {
+        await AjaxHelper.post(
+          this.$axios,
+          '/reported-shared-posts/',
+          reportRequest,
+        );
+      });
+      // TODO:エラー判定の改善（エラースナックバーにメッセージがある=エラーであるとしている）
+      if (StringUtil.isEmpty(this.$accessor.snackBarError.message)) {
+        this.$accessor.snackBarInfo.open('投稿を通報しました。');
+        this.$emit('success');
+      }
     },
     onClickedCancelButton(): void {
       this.$emit('cancel');
@@ -79,3 +101,8 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="sass" scoped>
+.required
+  color: red
+</style>

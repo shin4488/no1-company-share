@@ -3,6 +3,7 @@ import { SharedPostPostParameter } from './definition/sharedPostPostParameter';
 import { SharedPostPutParameter } from './definition/sharedPostPutParameter';
 import { SharedPostComplexValidator } from './interface/complexValidator';
 import { SharedPostDeleteParameter } from './definition/sharedPostDeleteParameter';
+import { ReportPostParameter } from './definition/reportPostParameter';
 import DivisionMaster from '@s/common/sequelize/models/divisionMaster';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
@@ -134,6 +135,29 @@ export class SharedPostComplexValidatorImpl
       );
       if (StringUtil.isNotEmpty(userErrorMessage)) {
         errorHandler.addMessage(userErrorMessage);
+      }
+    }
+
+    errorHandler.throwIfHasError();
+  }
+
+  public async validateForReport(
+    parameter: ReportPostParameter,
+  ): Promise<void> {
+    const errorHandler = appContainer.get<BadParameterErrorHandler>(
+      types.BadParameterErrorHandler,
+    );
+
+    const posts = parameter.posts;
+    for (const post of posts) {
+      const sharedPostId = post.id;
+
+      // 削除しようとしている投稿の存在
+      const notExistingPostErrorMessage = await this.validateExistingSharedPost(
+        sharedPostId,
+      );
+      if (StringUtil.isNotEmpty(notExistingPostErrorMessage)) {
+        errorHandler.addMessage(notExistingPostErrorMessage);
       }
     }
 

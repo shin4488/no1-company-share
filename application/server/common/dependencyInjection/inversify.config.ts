@@ -19,7 +19,7 @@ import { OpenGraphService } from '@s/feature/openGraph/interface/service';
 import { OpenGraphServiceImpl } from '@s/feature/openGraph/service';
 import { OpenGraphLogic } from '@s/commonBL/openGraph/interface/logic';
 import { OpenGraphLogicImpl } from '@s/commonBL/openGraph/logic';
-import { SharedPostService } from '@s/feature/sharedPost/interface/sharedPostService';
+import { SharedPostService } from '@s/feature/sharedPost/interface/service';
 import { SharedPostServiceImpl } from '@s/feature/sharedPost/service';
 import { CompanyService } from '@s/feature/company/interface/service';
 import { CompanyServiceImpl } from '@s/feature/company/service';

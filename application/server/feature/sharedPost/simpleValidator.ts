@@ -8,6 +8,7 @@ const companyNameLength = 100;
 const companyHomePageUrlLength = 2100;
 const remarksLength = 500;
 const no1ContentLength = 100;
+const reportDetailLength = 300;
 
 const sharedPostSaveBaseSimpleValidators = [
   body('posts.*.companyNumber')
@@ -105,4 +106,17 @@ export const sharedPostPutSimpleValidators = [
 
 export const sharedPostLogicalDeleteSimpleValidators = [
   ...sharedPostUpdateBaseSimpleValidators,
+];
+
+export const reportPostSimpleValidator = [
+  ...sharedPostUpdateBaseSimpleValidators,
+  body('posts.*.reportDetail')
+    .notEmpty()
+    .withMessage(`通報理由:${Message.notEmpty}`)
+    .isString()
+    .withMessage(`通報理由:${Message.isString}`)
+    .isLength({
+      max: reportDetailLength,
+    })
+    .withMessage(`通報理由:${Message.maxLength(reportDetailLength)}`),
 ];

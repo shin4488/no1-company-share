@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import { SharedPostService } from './interface/sharedPostService';
+import { SharedPostService } from './interface/service';
 import {
   SharedPostGetRequestQuery,
   SharedPostGetRequestParameter,
@@ -11,6 +11,7 @@ import {
 } from './definition/sharedPostPostParameter';
 import { SharedPostPostResponse } from './definition/sharedPostPostResponse';
 import {
+  reportPostSimpleValidator,
   sharedPostGetSimpleValidators,
   sharedPostLogicalDeleteSimpleValidators,
   sharedPostPostSimpleValidators,
@@ -34,6 +35,11 @@ import {
   SharedPostDeleteRequest,
   SharedPostDeleteRequestParameter,
 } from './definition/sharedPostDeleteRequest';
+import { ReportPostRequest } from './definition/reportPostRequest';
+import {
+  ReportPostParameter,
+  ReportPostParameterItem,
+} from './definition/reportPostParameter';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { BaseController } from '@s/common/controller/baseController';
@@ -198,6 +204,34 @@ class SharedPostController extends BaseController {
     await service.logicalDelete(parameter);
     super.success(response);
   }
+
+  public static reportEndpoint: string = '/reported-shared-posts/';
+  public static async report(
+    request: express.Request<
+      Record<string, any> | undefined,
+      null,
+      ReportPostRequest,
+      Record<string, any> | undefined
+    >,
+    response: express.Response,
+  ) {
+    const parameter: ReportPostParameter = {
+      posts: [],
+    };
+    const requestBody = request.body;
+    const bodyPosts = requestBody.posts;
+    parameter.posts =
+      bodyPosts?.map<ReportPostParameterItem>((x) => ({
+        id: StringUtil.ifEmpty(x.id),
+        reportDetail: StringUtil.ifEmpty(x.reportDetail),
+      })) || [];
+
+    const service = appContainer.get<SharedPostService>(
+      types.SharedPostService,
+    );
+    await service.report(parameter);
+    super.success(response);
+  }
 }
 
 const sharedPostRouter = Router();
@@ -228,5 +262,12 @@ sharedPostRouter.delete(
   sharedPostLogicalDeleteSimpleValidators,
   throwIfHasSimpleValidationResult,
   wrapAction(SharedPostController.logicalDelete),
+);
+sharedPostRouter.post(
+  SharedPostController.reportEndpoint,
+  authorizationFirebaseUser(),
+  reportPostSimpleValidator,
+  throwIfHasSimpleValidationResult,
+  wrapAction(SharedPostController.report),
 );
 export { sharedPostRouter };

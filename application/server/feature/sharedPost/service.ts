@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { SharedPostGetResponse } from './definition/sharedPostGetResponse';
-import { SharedPostService } from './interface/sharedPostService';
+import { SharedPostService } from './interface/service';
 import { SharedPostPostParameter } from './definition/sharedPostPostParameter';
 import {
   SharedPostPostResponse,
@@ -15,6 +15,7 @@ import {
 } from './definition/sharedPostPutResponse';
 import { SharedPostGetParameter } from './definition/sharedPostGetParameter';
 import { SharedPostDeleteParameter } from './definition/sharedPostDeleteParameter';
+import { ReportPostParameter } from './definition/reportPostParameter';
 import { types } from '@s/common/dependencyInjection/types';
 import { SequelizeHandler } from '@s/common/sequelize/logic/interface/SequelizeHandler';
 import CompanyMaster from '@s/common/sequelize/models/companyMaster';
@@ -184,6 +185,31 @@ export class SharedPostServiceImpl implements SharedPostService {
         logicalDeletedPostIds,
         transaction,
       );
+      transaction.commit();
+    });
+  }
+
+  public async report(parameter: ReportPostParameter): Promise<void> {
+    await this.complexValidator.validateForReport(parameter);
+
+    await this.sequelizeHandler.transact(async (transaction) => {
+      const parameterPosts = parameter.posts;
+      for (const post of parameterPosts) {
+        // 既に同じ投稿が通報されている場合は、既存の通報詳細を上書き
+        await SharedPost.update(
+          {
+            reportDetail: post.reportDetail,
+            isReported: true,
+          },
+          {
+            where: {
+              id: post.id,
+            },
+            transaction,
+          },
+        );
+      }
+
       transaction.commit();
     });
   }

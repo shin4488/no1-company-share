@@ -36,6 +36,7 @@
     </v-row>
 
     <ConfirmDialog ref="confirmDialog" />
+    <ReportDialog ref="reportDialog" />
     <SharedPostDialog ref="sharedPostDialog" :no1-divisions="no1Divisions" />
     <AddIconFixedButton v-show="isLogined" @click="onClickedAddPostButton" />
   </div>
@@ -44,6 +45,7 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 import SharedPostDialog from '@f/components/SharedPostDialog.vue';
+import ReportDialog from '@f/components/ReportDialog.vue';
 import ConfirmDialog from '@f/components/ConfirmDialog.vue';
 import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
 import { SelectItem } from '@f/definition/common/selectItem';
@@ -130,7 +132,7 @@ export default Vue.extend({
     /**
      * 通報処理
      */
-    onConfirmedReport({ postId }: { postId: string }): void {
+    async onConfirmedReport({ postId }: { postId: string }): Promise<void> {
       if (this.isNotLogined()) {
         this.$accessor.snackBarError.open(
           '投稿を通報するにはログインしてください。',
@@ -143,8 +145,16 @@ export default Vue.extend({
         return;
       }
 
-      // TODO:通報ダイアログ起動
-      // TODO:通報処理呼び出し
+      const reportDialog = this.$refs.reportDialog as InstanceType<
+        typeof ReportDialog
+      >;
+      const isSuccessful = await reportDialog.open({
+        postId,
+      });
+      if (!isSuccessful) {
+        return;
+      }
+
       const clonedPosts = this.$cloner.deepClone(this.value);
       clonedPosts.splice(reportedPostIndex, 1);
       this.$emit('input', clonedPosts);
