@@ -34,15 +34,21 @@ import { DivisionServiceImpl } from '@s/feature/division/service';
 import { SharedPostSaveLogic } from '@s/feature/sharedPost/interface/saveLogic';
 import { SharedPostSaveLogicImpl } from '@s/feature/sharedPost/saveLogic';
 import { SharedPostComplexValidator } from '@s/feature/sharedPost/interface/complexValidator';
-import { SharedPostComplexValidatorImple } from '@s/feature/sharedPost/complexValidator';
+import { SharedPostComplexValidatorImpl } from '@s/feature/sharedPost/complexValidator';
 import { BadParameterErrorHandlerImpl } from '@s/common/error/handler/badParameterErrorHandler';
 import { BadParameterErrorHandler } from '@s/common/error/handler/interface/badParameterErrorHandler';
 import { ExternalCompanyLogicImpl } from '@s/commonBL/externalCompany/logic';
 import { ExternalCompanyLogic } from '@s/commonBL/externalCompany/interface/logic';
-import { SharedPostDaoImple } from '@s/commonBL/dao/sharedPost/dao';
+import { SharedPostDaoImpl } from '@s/commonBL/dao/sharedPost/dao';
 import { SharedPostDao } from '@s/commonBL/dao/sharedPost/interface/dao';
 import { SharedPostLogic } from '@s/commonBL/sharedPost/interface/logic';
 import { SharedPostLogicImpl } from '@s/commonBL/sharedPost/logic';
+import { BookmarkService } from '@s/feature/bookmark/interface/service';
+import { BookmarkServiceImpl } from '@s/feature/bookmark/service';
+import { BookmarkComplexValidator } from '@s/feature/bookmark/interface/complexValidator';
+import { BookmarkComplexValidatorImpl } from '@s/feature/bookmark/complexValidator';
+import { BookmarkDao } from '@s/commonBL/dao/bookmark/interface/dao';
+import { BookmarkDaoImpl } from '@s/commonBL/dao/bookmark/dao';
 
 const appContainer = new Container();
 
@@ -62,7 +68,8 @@ appContainer.bind<UserMasterDao>(types.UserMasterDao).to(UserMasterDaoImpl);
 appContainer
   .bind<DivisionMasterDao>(types.DivisionMasterDao)
   .to(DivisionMasterDaoImpl);
-appContainer.bind<SharedPostDao>(types.SharedPostDao).to(SharedPostDaoImple);
+appContainer.bind<SharedPostDao>(types.SharedPostDao).to(SharedPostDaoImpl);
+appContainer.bind<BookmarkDao>(types.BookmarkDao).to(BookmarkDaoImpl);
 
 appContainer
   .bind<ApiResponseHandler>(types.ApiResponseHandler)
@@ -90,7 +97,7 @@ appContainer
   .to(SharedPostServiceImpl);
 appContainer
   .bind<SharedPostComplexValidator>(types.SharedPostComplexValidator)
-  .to(SharedPostComplexValidatorImple);
+  .to(SharedPostComplexValidatorImpl);
 appContainer
   .bind<SharedPostSaveLogic>(types.SharedPostSaveLogic)
   .to(SharedPostSaveLogicImpl);
@@ -100,5 +107,11 @@ appContainer.bind<UserService>(types.UserService).to(UserServiceImpl);
 appContainer
   .bind<DivisionService>(types.DivisionService)
   .to(DivisionServiceImpl);
+appContainer
+  .bind<BookmarkService>(types.BookmarkService)
+  .to(BookmarkServiceImpl);
+appContainer
+  .bind<BookmarkComplexValidator>(types.BookmarkComplexValidator)
+  .to(BookmarkComplexValidatorImpl);
 
 export { appContainer };

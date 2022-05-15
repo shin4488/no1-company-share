@@ -61,4 +61,24 @@ export class AjaxHelper {
     const responseBodyData = responseBody.data;
     return responseBodyData;
   }
+
+  static async delete<TResponse = {}, TRequest = {}>(
+    axios: AxiosInstance,
+    uri: string,
+    request?: TRequest,
+  ): Promise<TResponse | null> {
+    const response: AxiosResponse<ApiResponse<TResponse>> = await axios
+      .delete(uri, {
+        data: request,
+      })
+      .catch((error) => error);
+
+    const responseBody = response.data;
+    if (responseBody === undefined) {
+      return null;
+    }
+
+    const responseBodyData = responseBody.data;
+    return responseBodyData;
+  }
 }

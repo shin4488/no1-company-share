@@ -45,6 +45,7 @@
 import Vue, { PropType } from 'vue';
 import SharedPostDialog from '@f/components/SharedPostDialog.vue';
 import ConfirmDialog from '@f/components/ConfirmDialog.vue';
+import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
 import { SelectItem } from '@f/definition/common/selectItem';
 import { SharedPost } from '@f/definition/common/sharedPost';
 import { SharedPostDialogParameter } from '@f/definition/components/sharedPostDialog/parameter';
@@ -102,7 +103,8 @@ export default Vue.extend({
         return;
       }
 
-      // TODO:お気に入り追加処理呼び出し
+      // お気に入り登録はサーバ処理結果を画面に反映する必要がないため、サーバ処理結果を待たない
+      AjaxHelper.post(this.$axios, `/bookmarked-posts/${postId}`);
       const clonedPosts = this.$cloner.deepClone(this.value);
       clonedPosts[bookmarkedPostIndex].numberOfBookmarks++;
       clonedPosts[bookmarkedPostIndex].isBookmarkedByLoginUser = true;
@@ -118,7 +120,8 @@ export default Vue.extend({
         return;
       }
 
-      // TODO:お気に入り削除処理呼び出し
+      // お気に入り削除はサーバ処理結果を画面に反映する必要がないため、サーバ処理結果を待たない
+      AjaxHelper.delete(this.$axios, `/bookmarked-posts/${postId}`);
       const clonedPosts = this.$cloner.deepClone(this.value);
       clonedPosts[bookmarkedPostIndex].numberOfBookmarks--;
       clonedPosts[bookmarkedPostIndex].isBookmarkedByLoginUser = false;

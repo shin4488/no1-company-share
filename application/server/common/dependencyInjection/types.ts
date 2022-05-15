@@ -6,6 +6,7 @@ const types = {
   UserMasterDao: Symbol.for('UserMasterDao'),
   DivisionMasterDao: Symbol.for('DivisionMasterDao'),
   SharedPostDao: Symbol.for('SharedPostDao'),
+  BookmarkDao: Symbol.for('BookmarkDao'),
 
   ApiResponseHandler: Symbol.for('ApiResponseHandler'),
   OpenGraphService: Symbol.for('OpenGraphService'),
@@ -23,6 +24,8 @@ const types = {
   CompanyLogic: Symbol.for('CompanyLogic'),
   UserService: Symbol.for('UserService'),
   DivisionService: Symbol.for('DivisionService'),
+  BookmarkService: Symbol.for('BookmarkService'),
+  BookmarkComplexValidator: Symbol.for('BookmarkComplexValidator'),
 };
 
 export { types };
