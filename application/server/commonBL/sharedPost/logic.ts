@@ -73,6 +73,7 @@ export class SharedPostLogicImpl implements SharedPostLogic {
     );
 
     // 会社ホームページURLからOG画像取得
+    // TODO:1企業ごと毎回Http通信でogデータ取得しているため、パフォーマンス低下につながっている（改善が必要）
     const responsePostsWithCompanyUrl = await Promise.all(
       responsePosts.map(async (post) => {
         const ogResult = await this.openGraphLogic.getOpenGraph(
