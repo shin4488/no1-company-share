@@ -268,7 +268,10 @@ export default Vue.extend({
         ],
       };
       const result = await this.openSharedPostDialog(parameter);
-      if (result === undefined) {
+      // 新規に作成した投稿はお気に入り未追加であるため、お気に入りページでは新規投稿は画面に表示しない
+      const currentPagePath = this.$nuxt.$route.path;
+      const isBookmarkPage = currentPagePath === '/bookmark';
+      if (result === undefined || isBookmarkPage) {
         return;
       }
 
