@@ -14,9 +14,7 @@ export class SharedPostDaoImpl implements SharedPostDao {
   public async getSharedPostWithDetails(
     parameterDto: SharedPostParameterDto,
   ): Promise<SharedPost[]> {
-    // TODO:動的にWHERE句組み立て
     const sharedPostWhereClause: WhereOptions<SharedPost> = {};
-    const bookmarkWhereClause: WhereOptions<Bookmark> = {};
 
     // 投稿ID指定
     const postId = parameterDto.postId;
@@ -30,20 +28,12 @@ export class SharedPostDaoImpl implements SharedPostDao {
       sharedPostWhereClause.updatedAt = { [Op.lt]: baseDateTimeParameter };
     }
 
-    // お気に入りのみ
-    const isMyBookmarkOnly = parameterDto.isMyBookmarkOnly;
-    const userId = parameterDto.userId;
-    if (isMyBookmarkOnly) {
-      bookmarkWhereClause.userId = { [Op.eq]: userId };
-    }
-
     // ログインユーザの投稿のみ
+    const userId = parameterDto.userId;
     if (parameterDto.isMyPostOnly) {
-      sharedPostWhereClause.userId = { [Op.eq]: userId };
+      sharedPostWhereClause.userId = { [Op.eq]: parameterDto.userId };
     }
 
-    console.log(sharedPostWhereClause);
-    console.log(bookmarkWhereClause);
     const resultDto = await SharedPost.findAll({
       attributes: ['id', 'companyNumber', 'userId', 'remarks', 'updatedAt'],
       include: [
@@ -56,9 +46,9 @@ export class SharedPostDaoImpl implements SharedPostDao {
           model: Bookmark,
           attributes: ['sharedPostId', 'userId'],
           // お気に入りのみの時は、お気に入りテーブルにレコードが存在するもののみを取得
-          required: isMyBookmarkOnly,
+          required: parameterDto.isMyBookmarkOnly,
           where: {
-            ...bookmarkWhereClause,
+            userId: { [Op.eq]: userId },
           },
         },
         {
