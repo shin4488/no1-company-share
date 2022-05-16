@@ -8,6 +8,7 @@ import {
 import { BookmarkService } from './interface/service';
 import {
   bookmarkDeleteSimpleValidators,
+  bookmarkGetSimpleValidators,
   bookmarkPostSimpleValidators,
 } from './simpleValidator';
 import { BookmarkDeleteRequest } from './definition/bookmarkDeleteRequest';
@@ -24,7 +25,7 @@ import { wrapAction } from '@s/common/middleware/controllerCatcher';
 import { throwIfHasSimpleValidationResult } from '@s/common/middleware/simpleValidationResult';
 
 /**
- * 投稿処理に関するコントローラクラス
+ * お気に入りの投稿処理に関するコントローラクラス
  */
 class SharedPostController extends BaseController {
   public static bookmarkGetEndpoint: string = '/bookmarked-posts/:postId?';
@@ -126,9 +127,9 @@ class SharedPostController extends BaseController {
 const bookmarkRouter = Router();
 bookmarkRouter.get(
   SharedPostController.bookmarkGetEndpoint,
-  authorizationFirebaseUser(false),
-  // bookmarkGetSimpleValidators,
-  // throwIfHasSimpleValidationResult,
+  authorizationFirebaseUser(),
+  bookmarkGetSimpleValidators,
+  throwIfHasSimpleValidationResult,
   wrapAction(SharedPostController.getBookamrks),
 );
 bookmarkRouter.post(
