@@ -4,6 +4,7 @@ import { SelectItem } from '@f/definition/common/selectItem';
 import { StringUtil } from '@c/util/stringUtil';
 import { ArrayUtil } from '@c/util/arrayUtil';
 import { ApiSelectItem } from '@f/definition/common/apiSpec/selectItem';
+import { BookmarkGetReponse } from '@f/definition/pages/bookmark/apiSpec/bookmarkGetResponse';
 
 export class SharedPostHandler {
   static handleDivisionResponse(
@@ -19,7 +20,9 @@ export class SharedPostHandler {
     }));
   }
 
-  static handleResponse(response: SharedPostGetReponse | null): {
+  static handleResponse(
+    response: SharedPostGetReponse | BookmarkGetReponse | null,
+  ): {
     sharedPosts: SharedPost[];
   } {
     if (response === null) {

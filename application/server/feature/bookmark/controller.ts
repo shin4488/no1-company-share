@@ -12,6 +12,9 @@ import {
 } from './simpleValidator';
 import { BookmarkDeleteRequest } from './definition/bookmarkDeleteRequest';
 import { BookmarkDeleteParameterItem } from './definition/bookmarkDeleteParameter';
+import { BookmarkGetResponse } from './definition/bookmarkGetResponse';
+import { BookmarkGetRequest } from './definition/bookmarkGetRequest';
+import { BookmarkGetParameter } from './definition/bookmarkGetParameter';
 import { BaseController } from '@s/common/controller/baseController';
 import { StringUtil } from '@c/util/stringUtil';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
@@ -24,6 +27,31 @@ import { throwIfHasSimpleValidationResult } from '@s/common/middleware/simpleVal
  * 投稿処理に関するコントローラクラス
  */
 class SharedPostController extends BaseController {
+  public static bookmarkGetEndpoint: string = '/bookmarked-posts/:postId?';
+  public static async getBookamrks(
+    request: express.Request<
+      BookmarkRequestParameter,
+      BookmarkGetResponse,
+      null,
+      BookmarkGetRequest
+    >,
+    response: express.Response,
+  ) {
+    const query = request.query;
+    const requestParameter = request.params;
+    const parameter: BookmarkGetParameter = {
+      limit: StringUtil.isEmpty(query.limit) ? 100 : Number(query.limit),
+      baseDateTime: StringUtil.isEmpty(query.baseDateTime)
+        ? null
+        : new Date(query.baseDateTime as string),
+      postId: StringUtil.ifEmpty(requestParameter.postId),
+      userId: StringUtil.ifEmpty(response.locals.firebaseUserId),
+    };
+    const service = appContainer.get<BookmarkService>(types.BookmarkService);
+    const responseBody = await service.getBookmarks(parameter);
+    super.success(response, responseBody);
+  }
+
   public static bookmarkPostEndpoint: string = '/bookmarked-posts/:postId?';
   public static async postNewBookmarks(
     request: express.Request<
@@ -96,6 +124,13 @@ class SharedPostController extends BaseController {
 }
 
 const bookmarkRouter = Router();
+bookmarkRouter.get(
+  SharedPostController.bookmarkGetEndpoint,
+  authorizationFirebaseUser(false),
+  // bookmarkGetSimpleValidators,
+  // throwIfHasSimpleValidationResult,
+  wrapAction(SharedPostController.getBookamrks),
+);
 bookmarkRouter.post(
   SharedPostController.bookmarkPostEndpoint,
   authorizationFirebaseUser(),

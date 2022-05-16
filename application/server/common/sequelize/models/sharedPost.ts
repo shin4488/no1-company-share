@@ -52,6 +52,7 @@ export default class SharedPost extends Model<
 
   declare SharedPostDetails?: NonAttribute<SharedPostDetail[]>;
   declare Bookmarks?: NonAttribute<Bookmark[]>;
+  declare BookmarksTotalCount?: NonAttribute<Bookmark[]>;
   declare UserMaster?: NonAttribute<UserMaster>;
   declare CompanyMaster?: NonAttribute<CompanyMaster>;
 
@@ -123,6 +124,11 @@ export default class SharedPost extends Model<
     this.hasMany(Bookmark, {
       sourceKey: 'id',
       foreignKey: 'sharedPostId',
+    });
+    this.hasMany(Bookmark, {
+      sourceKey: 'id',
+      foreignKey: 'sharedPostId',
+      as: 'BookmarksTotalCount',
     });
   }
 }

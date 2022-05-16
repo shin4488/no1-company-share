@@ -1,33 +1,78 @@
 <template>
-  <v-row justify="center" align="center">
-    <v-col cols="12" sm="8" md="6">
-      <v-card>
-        <v-card-title class="headline"> APIテスト </v-card-title>
-        <v-card-text>
-          <v-btn color="primary" @click="onClickUserButton">Users</v-btn>
-          <v-btn color="primary" @click="onClickCompanyButton">Companies</v-btn>
-          <v-btn color="primary" @click="onClickErrorButton">Errors</v-btn>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="primary" @click="onClickSnackBarErrorButton"
-            >SnackBarError</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-col>
-  </v-row>
+  <div>
+    <SharedPostCardList
+      v-model="sharedPosts"
+      message-if-no-data="まだお気に入りした投稿がありません。お気に入りを追加してみよう！"
+      :no1-divisions="no1Divisions"
+    />
+    <LoadMoreButton
+      v-if="isLoadMoreButtonShown"
+      text="さらに表示"
+      @click="onClickedLoadMoreButton"
+    />
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { Context } from '@nuxt/types';
 import { PageHeadData } from '@f/definition/pages/common/headData';
+import { SharedPost } from '@f/definition/common/sharedPost';
+import { SelectItem } from '@f/definition/common/selectItem';
+import { No1DivisionSelectItemGetResponse } from '@f/definition/common/apiSpec/no1DivisionSelectItemGetResponse';
+import { SharedPostHandler } from '@f/common/ajax/sharedPostHandler';
+import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
+import { postFetchedLimit } from '@f/common/constant/sharedPost';
+import { BookmarkPageData } from '@f/definition/pages/bookmark/data';
+import { BookmarkGetReponse } from '@f/definition/pages/bookmark/apiSpec/bookmarkGetResponse';
+import { BookmarkGetRequestQuery } from '@f/definition/pages/bookmark/apiSpec/bookmarkGetRequest';
 
 export default Vue.extend({
   name: 'BookmarkPage',
-  data: () => {
+  async asyncData({ $axios, $accessor }: Context) {
+    let sharedPosts: SharedPost[] = [];
+    let no1Divisions: SelectItem[] = [];
+
+    // コンポーネントマウント前はストアアクセス不可のためスピナーは表示されない
+    await $accessor.spinnerOverlay.open(async () => {
+      const no1DivisionsReponse =
+        await AjaxHelper.get<No1DivisionSelectItemGetResponse>(
+          $axios,
+          '/divisions/no1/',
+        );
+      no1Divisions = SharedPostHandler.handleDivisionResponse(
+        no1DivisionsReponse?.no1DivisionSelectItems,
+      );
+
+      const response = await AjaxHelper.get<
+        BookmarkGetReponse,
+        BookmarkGetRequestQuery
+      >($axios, '/localhost/bookmarked-posts/', {
+        limit: postFetchedLimit,
+        // 初回読み込み時は1ページ目であるため、取得基準時刻は無し
+        baseDateTime: null,
+      });
+      const results = SharedPostHandler.handleResponse(response);
+      sharedPosts = results.sharedPosts;
+    });
+
+    // 1度に全データ取得しきれない場合は、さらに表示ボタンを表示
+    const isLoadMoreButtonShown = sharedPosts.length === postFetchedLimit;
+    const oldBaseDateTime = SharedPostHandler.getOldBaseDateTime(sharedPosts);
+
     return {
-      message: 'aaaaaa',
+      sharedPosts,
+      no1Divisions,
+      isLoadMoreButtonShown,
+      oldBaseDateTime,
+    };
+  },
+  data(): BookmarkPageData {
+    return {
+      sharedPosts: [],
+      no1Divisions: [],
+      isLoadMoreButtonShown: false,
+      oldBaseDateTime: '',
     };
   },
   head(): PageHeadData {
@@ -36,25 +81,25 @@ export default Vue.extend({
     };
   },
   methods: {
-    async onClickUserButton() {
-      const a = await this.$axios.post('/development/users');
-      console.log(a);
-    },
-    async onClickCompanyButton() {
-      const a = await this.$axios.post('/development/companies');
-      console.log(a);
-    },
-    async onClickErrorButton() {
-      const a = await this.$axios
-        .get('/development/errors/1')
-        .catch((error) => error);
-      console.log(a);
-    },
-    onClickSnackBarErrorButton() {
-      const message =
-        'エラーです！！！ああああああああああ' +
-        'いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい';
-      this.$accessor.snackBarError.open(message);
+    /**
+     * さらに表示処理ボタン押下処理
+     */
+    async onClickedLoadMoreButton(): Promise<void> {
+      await this.$accessor.spinnerOverlay.open(async () => {
+        const response = await AjaxHelper.get<
+          BookmarkGetReponse,
+          BookmarkGetRequestQuery
+        >(this.$axios, '/bookmarked-posts/', {
+          limit: postFetchedLimit,
+          baseDateTime: this.oldBaseDateTime,
+        });
+
+        const { sharedPosts } = SharedPostHandler.handleResponse(response);
+        this.sharedPosts.push(...sharedPosts);
+        this.isLoadMoreButtonShown = sharedPosts.length === postFetchedLimit;
+        this.oldBaseDateTime =
+          SharedPostHandler.getOldBaseDateTime(sharedPosts);
+      });
     },
   },
 });

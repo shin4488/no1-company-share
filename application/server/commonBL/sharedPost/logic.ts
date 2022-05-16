@@ -38,6 +38,7 @@ export class SharedPostLogicImpl implements SharedPostLogic {
         const sharedPostDetails = post.SharedPostDetails;
         const bookmarks = post.Bookmarks;
         const bookmarkUsers = bookmarks?.map((x) => x.userId);
+        const bookmarksTotalCount = post.BookmarksTotalCount;
         const userMaster = post.UserMaster;
         const companyMaster = post.CompanyMaster;
         const sharedPostResult: SharedPostLogicResultItem = {
@@ -51,9 +52,9 @@ export class SharedPostLogicImpl implements SharedPostLogic {
           postingUserIcomImageUrl: StringUtil.ifEmpty(userMaster?.iconImageUrl),
           isBookmarkedByLoginUser:
             bookmarkUsers?.includes(parameter.userId) || false,
-          numberOfBookmarks: ArrayUtil.isEmpty(bookmarks)
+          numberOfBookmarks: ArrayUtil.isEmpty(bookmarksTotalCount)
             ? 0
-            : (bookmarks as Bookmark[]).length,
+            : (bookmarksTotalCount as Bookmark[]).length,
           remarks: post.remarks,
           updatedAt: post.updatedAt.toISOString(),
           postDetails: ArrayUtil.isEmpty(sharedPostDetails)

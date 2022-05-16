@@ -62,6 +62,11 @@ export class SharedPostDaoImpl implements SharedPostDao {
           },
         },
         {
+          model: Bookmark,
+          attributes: ['sharedPostId'],
+          as: 'BookmarksTotalCount',
+        },
+        {
           model: CompanyMaster,
           attributes: [
             'companyJapaneseName',

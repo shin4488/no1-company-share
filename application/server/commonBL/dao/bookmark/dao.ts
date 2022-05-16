@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { BookmarkDestroyParameter } from './definition/bookmarkDestroyParameter';
 import { BookmarkDao } from './interface/dao';
 import Bookmark from '@s/common/sequelize/models/bookmark';
@@ -8,6 +8,7 @@ import Bookmark from '@s/common/sequelize/models/bookmark';
 export class BookmarkDaoImpl implements BookmarkDao {
   public async destroyBookmarks(
     parameter: BookmarkDestroyParameter,
+    transaction: Transaction,
   ): Promise<void> {
     await Bookmark.destroy({
       where: {
@@ -16,6 +17,7 @@ export class BookmarkDaoImpl implements BookmarkDao {
           [Op.in]: parameter.sharedPostIds,
         },
       },
+      transaction,
     });
   }
 }
