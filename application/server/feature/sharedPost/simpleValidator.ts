@@ -39,7 +39,6 @@ const sharedPostSaveBaseSimpleValidators = [
     .withMessage(
       `会社ホームページURL:${Message.maxLength(companyHomePageUrlLength)}`,
     )
-    // TODO:URL無効時のエラーメッセージ
     .isURL()
     .withMessage(`会社ホームページURL:${Message.invalidUrl}`),
   body('posts.*.remarks')
