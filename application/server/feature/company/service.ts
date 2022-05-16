@@ -28,7 +28,7 @@ export class CompanyServiceImpl implements CompanyService {
   ): Promise<CompanyGetResponse> {
     const externalCompanyParameter: ExternalCompanyParameter = {
       companyName: parameter.companyName,
-      limit: 30,
+      limit: 50,
     };
     const companyResult = await this.externalCompanyLogic.getExternalCompany(
       externalCompanyParameter,
