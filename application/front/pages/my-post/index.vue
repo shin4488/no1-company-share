@@ -21,6 +21,7 @@ import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
 import { SharedPostHandler } from '@f/common/ajax/sharedPostHandler';
 import { SharedPost } from '@f/definition/common/sharedPost';
 import { MyPostPageData } from '@f/definition/pages/myPost/data';
+import { SharedPostGetRequestQuery } from '@f/definition/pages/common/apiSpec/sharedPostGetRequest';
 import { SharedPostGetReponse } from '@f/definition/pages/common/apiSpec/sharedPostGetResponse';
 import { postFetchedLimit } from '@f/common/constant/sharedPost';
 import { No1DivisionSelectItemGetResponse } from '@s/feature/division/definition/no1DivisionSelectItemGetResponse';
@@ -43,16 +44,15 @@ export default Vue.extend({
         no1DivisionsReponse?.no1DivisionSelectItems,
       );
 
-      const response = await AjaxHelper.get<SharedPostGetReponse>(
-        $axios,
-        '/localhost/shared-posts/',
-        {
-          limit: postFetchedLimit,
-          // 初回読み込み時は1ページ目であるため、取得基準時刻は無し
-          baseDateTime: null,
-          isMyPostOnly: true,
-        },
-      );
+      const response = await AjaxHelper.get<
+        SharedPostGetReponse,
+        SharedPostGetRequestQuery
+      >($axios, '/localhost/shared-posts/', {
+        limit: postFetchedLimit,
+        // 初回読み込み時は1ページ目であるため、取得基準時刻は無し
+        baseDateTime: null,
+        isMyPostOnly: true,
+      });
       const results = SharedPostHandler.handleResponse(response);
       sharedPosts = results.sharedPosts;
     });
@@ -87,15 +87,14 @@ export default Vue.extend({
      */
     async onClickedLoadMoreButton(): Promise<void> {
       await this.$accessor.spinnerOverlay.open(async () => {
-        const response = await AjaxHelper.get<SharedPostGetReponse>(
-          this.$axios,
-          '/localhost/shared-posts/',
-          {
-            limit: postFetchedLimit,
-            baseDateTime: this.oldBaseDateTime,
-            isMyPostOnly: true,
-          },
-        );
+        const response = await AjaxHelper.get<
+          SharedPostGetReponse,
+          SharedPostGetRequestQuery
+        >(this.$axios, '/shared-posts/', {
+          limit: postFetchedLimit,
+          baseDateTime: this.oldBaseDateTime,
+          isMyPostOnly: true,
+        });
 
         const { sharedPosts } = SharedPostHandler.handleResponse(response);
         this.sharedPosts.push(...sharedPosts);
