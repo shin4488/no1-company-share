@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import { SharedPostService } from './interface/sharedPostService';
+import { SharedPostService } from './interface/service';
 import {
   SharedPostGetRequestQuery,
   SharedPostGetRequestParameter,
@@ -11,7 +11,9 @@ import {
 } from './definition/sharedPostPostParameter';
 import { SharedPostPostResponse } from './definition/sharedPostPostResponse';
 import {
+  reportPostSimpleValidator,
   sharedPostGetSimpleValidators,
+  sharedPostLogicalDeleteSimpleValidators,
   sharedPostPostSimpleValidators,
   sharedPostPutSimpleValidators,
 } from './simpleValidator';
@@ -25,6 +27,19 @@ import {
   SharedPostPutParameterItem,
 } from './definition/sharedPostPutParameter';
 import { SharedPostGetParameter } from './definition/sharedPostGetParameter';
+import {
+  SharedPostDeleteParameter,
+  SharedPostDeleteParameterItem,
+} from './definition/sharedPostDeleteParameter';
+import {
+  SharedPostDeleteRequest,
+  SharedPostDeleteRequestParameter,
+} from './definition/sharedPostDeleteRequest';
+import { ReportPostRequest } from './definition/reportPostRequest';
+import {
+  ReportPostParameter,
+  ReportPostParameterItem,
+} from './definition/reportPostParameter';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { BaseController } from '@s/common/controller/baseController';
@@ -150,6 +165,73 @@ class SharedPostController extends BaseController {
     const responseDataBody = await service.update(parameter);
     super.success(response, responseDataBody);
   }
+
+  public static sharedPostsLogicalDeleteEndpoint: string =
+    '/shared-posts/:postId?';
+
+  public static async logicalDelete(
+    request: express.Request<
+      SharedPostDeleteRequestParameter,
+      null,
+      SharedPostDeleteRequest,
+      Record<string, any> | undefined
+    >,
+    response: express.Response,
+  ) {
+    const parameter: SharedPostDeleteParameter = {
+      posts: [],
+      userId: StringUtil.ifEmpty(response.locals.firebaseUserId),
+    };
+    const requestParameter = request.params;
+    const requestParameterPostId = requestParameter.postId;
+    // URIにお気に入り対象の投稿IDがあれば、リクエストボディよりもURIの方を優先する
+    if (StringUtil.isNotEmpty(requestParameterPostId)) {
+      parameter.posts.push({
+        id: requestParameterPostId as string,
+      });
+    } else {
+      const requestBody = request.body;
+      const bodyPosts = requestBody.posts;
+      parameter.posts =
+        bodyPosts?.map<SharedPostDeleteParameterItem>((x) => ({
+          id: StringUtil.ifEmpty(x.id),
+        })) || [];
+    }
+
+    const service = appContainer.get<SharedPostService>(
+      types.SharedPostService,
+    );
+    await service.logicalDelete(parameter);
+    super.success(response);
+  }
+
+  public static reportEndpoint: string = '/reported-shared-posts/';
+  public static async report(
+    request: express.Request<
+      Record<string, any> | undefined,
+      null,
+      ReportPostRequest,
+      Record<string, any> | undefined
+    >,
+    response: express.Response,
+  ) {
+    const parameter: ReportPostParameter = {
+      posts: [],
+    };
+    const requestBody = request.body;
+    const bodyPosts = requestBody.posts;
+    parameter.posts =
+      bodyPosts?.map<ReportPostParameterItem>((x) => ({
+        id: StringUtil.ifEmpty(x.id),
+        reportDetail: StringUtil.ifEmpty(x.reportDetail),
+      })) || [];
+
+    const service = appContainer.get<SharedPostService>(
+      types.SharedPostService,
+    );
+    await service.report(parameter);
+    super.success(response);
+  }
 }
 
 const sharedPostRouter = Router();
@@ -173,5 +255,19 @@ sharedPostRouter.put(
   sharedPostPutSimpleValidators,
   throwIfHasSimpleValidationResult,
   wrapAction(SharedPostController.update),
+);
+sharedPostRouter.delete(
+  SharedPostController.sharedPostsLogicalDeleteEndpoint,
+  authorizationFirebaseUser(),
+  sharedPostLogicalDeleteSimpleValidators,
+  throwIfHasSimpleValidationResult,
+  wrapAction(SharedPostController.logicalDelete),
+);
+sharedPostRouter.post(
+  SharedPostController.reportEndpoint,
+  authorizationFirebaseUser(),
+  reportPostSimpleValidator,
+  throwIfHasSimpleValidationResult,
+  wrapAction(SharedPostController.report),
 );
 export { sharedPostRouter };

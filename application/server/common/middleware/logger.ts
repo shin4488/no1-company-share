@@ -21,7 +21,8 @@ export const logRequestResponse = (
   logger.log('info', 'query');
   logger.log('info', request.query);
   logger.log('info', 'body');
-  logger.log('info', request.body);
+  // ログ上でネストしたデータはobject表示になってしまうため、文字列としてログ出力
+  logger.log('info', JSON.stringify(request.body));
   logger.log('info', '---request end---');
 
   next();

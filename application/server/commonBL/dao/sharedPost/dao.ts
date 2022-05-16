@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { Op, WhereOptions } from 'sequelize';
+import { Op, Transaction, WhereOptions } from 'sequelize';
 import { SharedPostParameterDto } from './definition/sharedPostParameterDto';
 import { SharedPostDao } from './interface/dao';
 import { StringUtil } from '@c/util/stringUtil';
@@ -10,13 +10,11 @@ import UserMaster from '@s/common/sequelize/models/userMaster';
 import Bookmark from '@s/common/sequelize/models/bookmark';
 
 @injectable()
-export class SharedPostDaoImple implements SharedPostDao {
+export class SharedPostDaoImpl implements SharedPostDao {
   public async getSharedPostWithDetails(
     parameterDto: SharedPostParameterDto,
   ): Promise<SharedPost[]> {
-    // TODO:動的にWHERE句組み立て
     const sharedPostWhereClause: WhereOptions<SharedPost> = {};
-    const bookmarkWhereClause: WhereOptions<Bookmark> = {};
 
     // 投稿ID指定
     const postId = parameterDto.postId;
@@ -30,20 +28,12 @@ export class SharedPostDaoImple implements SharedPostDao {
       sharedPostWhereClause.updatedAt = { [Op.lt]: baseDateTimeParameter };
     }
 
-    // お気に入りのみ
-    const isMyBookmarkOnly = parameterDto.isMyBookmarkOnly;
-    const userId = parameterDto.userId;
-    if (isMyBookmarkOnly) {
-      bookmarkWhereClause.userId = { [Op.eq]: userId };
-    }
-
     // ログインユーザの投稿のみ
+    const userId = parameterDto.userId;
     if (parameterDto.isMyPostOnly) {
-      sharedPostWhereClause.userId = { [Op.eq]: userId };
+      sharedPostWhereClause.userId = { [Op.eq]: parameterDto.userId };
     }
 
-    console.log(sharedPostWhereClause);
-    console.log(bookmarkWhereClause);
     const resultDto = await SharedPost.findAll({
       attributes: ['id', 'companyNumber', 'userId', 'remarks', 'updatedAt'],
       include: [
@@ -56,10 +46,15 @@ export class SharedPostDaoImple implements SharedPostDao {
           model: Bookmark,
           attributes: ['sharedPostId', 'userId'],
           // お気に入りのみの時は、お気に入りテーブルにレコードが存在するもののみを取得
-          required: isMyBookmarkOnly,
+          required: parameterDto.isMyBookmarkOnly,
           where: {
-            ...bookmarkWhereClause,
+            userId: { [Op.eq]: userId },
           },
+        },
+        {
+          model: Bookmark,
+          attributes: ['sharedPostId'],
+          as: 'BookmarksTotalCount',
         },
         {
           model: CompanyMaster,
@@ -87,5 +82,41 @@ export class SharedPostDaoImple implements SharedPostDao {
     });
 
     return resultDto;
+  }
+
+  public async getNonReportedAliveByCompanyNumbers(
+    companyNumbers: string[],
+  ): Promise<SharedPost[]> {
+    const posts = await SharedPost.findAll({
+      attributes: ['companyNumber'],
+      where: {
+        companyNumber: {
+          [Op.in]: companyNumbers,
+        },
+        isDeleted: false,
+        isReported: false,
+      },
+    });
+
+    return posts;
+  }
+
+  public async updateForLogicalDelete(
+    sharedPostIds: string[],
+    transaction: Transaction,
+  ): Promise<void> {
+    await SharedPost.update(
+      {
+        isDeleted: true,
+      },
+      {
+        where: {
+          id: {
+            [Op.in]: sharedPostIds,
+          },
+        },
+        transaction,
+      },
+    );
   }
 }

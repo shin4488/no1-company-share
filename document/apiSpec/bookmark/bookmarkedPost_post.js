@@ -26,7 +26,7 @@ const errorResponseBody = {
     "messages": [
         // base.js記載の「Authorization」にログインユーザIDトークンが無効なとき
         {
-            "message": "お気に入り登録するにはログインしてください。"
+            "message": "ログインしてください。"
         },
         // お気に入り対象の投稿が存在しないとき
         {

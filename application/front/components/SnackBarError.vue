@@ -5,6 +5,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { SnackBarErrorData } from '@f/definition/components/snackBarError/data';
+import { StringUtil } from '@c/util/stringUtil';
 
 export default Vue.extend({
   name: 'SnackBarError',
@@ -17,7 +18,12 @@ export default Vue.extend({
   created() {
     this.$store.subscribe((mutation, state) => {
       if (mutation.type === 'snackBarError/open') {
-        this.message = state.snackBarError.message;
+        const message = state.snackBarError.message;
+        if (StringUtil.isEmpty(message)) {
+          return;
+        }
+
+        this.message = message;
         this.isShown = true;
       }
     });

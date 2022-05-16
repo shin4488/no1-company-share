@@ -36,6 +36,7 @@
     </v-row>
 
     <ConfirmDialog ref="confirmDialog" />
+    <ReportDialog ref="reportDialog" />
     <SharedPostDialog ref="sharedPostDialog" :no1-divisions="no1Divisions" />
     <AddIconFixedButton v-show="isLogined" @click="onClickedAddPostButton" />
   </div>
@@ -44,7 +45,9 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 import SharedPostDialog from '@f/components/SharedPostDialog.vue';
+import ReportDialog from '@f/components/ReportDialog.vue';
 import ConfirmDialog from '@f/components/ConfirmDialog.vue';
+import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
 import { SelectItem } from '@f/definition/common/selectItem';
 import { SharedPost } from '@f/definition/common/sharedPost';
 import { SharedPostDialogParameter } from '@f/definition/components/sharedPostDialog/parameter';
@@ -102,7 +105,8 @@ export default Vue.extend({
         return;
       }
 
-      // TODO:お気に入り追加処理呼び出し
+      // お気に入り登録はサーバ処理結果を画面に反映する必要がないため、サーバ処理結果を待たない
+      AjaxHelper.post(this.$axios, `/bookmarked-posts/${postId}`);
       const clonedPosts = this.$cloner.deepClone(this.value);
       clonedPosts[bookmarkedPostIndex].numberOfBookmarks++;
       clonedPosts[bookmarkedPostIndex].isBookmarkedByLoginUser = true;
@@ -118,7 +122,8 @@ export default Vue.extend({
         return;
       }
 
-      // TODO:お気に入り削除処理呼び出し
+      // お気に入り削除はサーバ処理結果を画面に反映する必要がないため、サーバ処理結果を待たない
+      AjaxHelper.delete(this.$axios, `/bookmarked-posts/${postId}`);
       const clonedPosts = this.$cloner.deepClone(this.value);
       clonedPosts[bookmarkedPostIndex].numberOfBookmarks--;
       clonedPosts[bookmarkedPostIndex].isBookmarkedByLoginUser = false;
@@ -127,7 +132,7 @@ export default Vue.extend({
     /**
      * 通報処理
      */
-    onConfirmedReport({ postId }: { postId: string }): void {
+    async onConfirmedReport({ postId }: { postId: string }): Promise<void> {
       if (this.isNotLogined()) {
         this.$accessor.snackBarError.open(
           '投稿を通報するにはログインしてください。',
@@ -140,8 +145,16 @@ export default Vue.extend({
         return;
       }
 
-      // TODO:通報ダイアログ起動
-      // TODO:通報処理呼び出し
+      const reportDialog = this.$refs.reportDialog as InstanceType<
+        typeof ReportDialog
+      >;
+      const isSuccessful = await reportDialog.open({
+        postId,
+      });
+      if (!isSuccessful) {
+        return;
+      }
+
       const clonedPosts = this.$cloner.deepClone(this.value);
       clonedPosts.splice(reportedPostIndex, 1);
       this.$emit('input', clonedPosts);
@@ -172,8 +185,9 @@ export default Vue.extend({
         return;
       }
 
+      await AjaxHelper.delete(this.$axios, `/shared-posts/${postId}`);
+      this.$accessor.snackBarInfo.open('投稿を削除しました。');
       const clonedPosts = this.$cloner.deepClone(this.value);
-      // TODO:投稿削除処理呼び出し
       clonedPosts.splice(deletedPostIndex, 1);
       this.$emit('input', clonedPosts);
     },
@@ -254,7 +268,10 @@ export default Vue.extend({
         ],
       };
       const result = await this.openSharedPostDialog(parameter);
-      if (result === undefined) {
+      // 新規に作成した投稿はお気に入り未追加であるため、お気に入りページでは新規投稿は画面に表示しない
+      const currentPagePath = this.$nuxt.$route.path;
+      const isBookmarkPage = currentPagePath === '/bookmark';
+      if (result === undefined || isBookmarkPage) {
         return;
       }
 

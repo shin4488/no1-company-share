@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { Op, Transaction } from 'sequelize';
+import { Transaction } from 'sequelize';
 import { CompanyMasterDao } from './interface/dao';
 import CompanyMaster, {
   CompanyMasterModelAttribute,
@@ -7,21 +7,6 @@ import CompanyMaster, {
 
 @injectable()
 export class CompanyMasterDaoImpl implements CompanyMasterDao {
-  public async getCompaniesByNumber(
-    numbers: string[],
-  ): Promise<CompanyMaster[]> {
-    const companies = await CompanyMaster.findAll({
-      attributes: ['companyNumber'],
-      where: {
-        companyNumber: {
-          [Op.in]: numbers,
-        },
-      },
-    });
-
-    return companies;
-  }
-
   public async upsertCompany(
     company: CompanyMasterModelAttribute,
     transaction: Transaction,

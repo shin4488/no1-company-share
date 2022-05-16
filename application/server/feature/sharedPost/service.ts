@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { SharedPostGetResponse } from './definition/sharedPostGetResponse';
-import { SharedPostService } from './interface/sharedPostService';
+import { SharedPostService } from './interface/service';
 import { SharedPostPostParameter } from './definition/sharedPostPostParameter';
 import {
   SharedPostPostResponse,
@@ -14,12 +14,15 @@ import {
   SharedPostPutResponseItem,
 } from './definition/sharedPostPutResponse';
 import { SharedPostGetParameter } from './definition/sharedPostGetParameter';
+import { SharedPostDeleteParameter } from './definition/sharedPostDeleteParameter';
+import { ReportPostParameter } from './definition/reportPostParameter';
 import { types } from '@s/common/dependencyInjection/types';
 import { SequelizeHandler } from '@s/common/sequelize/logic/interface/SequelizeHandler';
 import CompanyMaster from '@s/common/sequelize/models/companyMaster';
 import SharedPost from '@s/common/sequelize/models/sharedPost';
 import { SharedPostParameterDto } from '@s/commonBL/dao/sharedPost/definition/sharedPostParameterDto';
 import { SharedPostLogic } from '@s/commonBL/sharedPost/interface/logic';
+import { SharedPostDao } from '@s/commonBL/dao/sharedPost/interface/dao';
 
 @injectable()
 export class SharedPostServiceImpl implements SharedPostService {
@@ -27,6 +30,7 @@ export class SharedPostServiceImpl implements SharedPostService {
   private complexValidator: SharedPostComplexValidator;
   private saveLogic: SharedPostSaveLogic;
   private sharedPostLogic: SharedPostLogic;
+  private sharedPostDao: SharedPostDao;
 
   constructor(
     @inject(types.SequelizeHandler) sequelizeHandler: SequelizeHandler,
@@ -34,11 +38,13 @@ export class SharedPostServiceImpl implements SharedPostService {
     complexValidator: SharedPostComplexValidator,
     @inject(types.SharedPostSaveLogic) saveLogic: SharedPostSaveLogic,
     @inject(types.SharedPostLogic) sharedPostLogic: SharedPostLogic,
+    @inject(types.SharedPostDao) sharedPostDao: SharedPostDao,
   ) {
     this.sequelizeHandler = sequelizeHandler;
     this.complexValidator = complexValidator;
     this.saveLogic = saveLogic;
     this.sharedPostLogic = sharedPostLogic;
+    this.sharedPostDao = sharedPostDao;
   }
 
   public async getAlive(
@@ -131,9 +137,10 @@ export class SharedPostServiceImpl implements SharedPostService {
             post,
             transaction,
             async (company: CompanyMaster): Promise<SharedPost> => {
-              const [createdPost] = await SharedPost.upsert(
+              const postId = post.id;
+              await SharedPost.update(
                 {
-                  id: post.id,
+                  id: postId,
                   companyNumber: company.companyNumber,
                   userId: parameter.userId,
                   isDeleted: false,
@@ -141,10 +148,15 @@ export class SharedPostServiceImpl implements SharedPostService {
                   remarks: post.remarks,
                 },
                 {
+                  where: {
+                    id: postId,
+                  },
                   transaction,
                 },
               );
-              return createdPost;
+              const updatedSharedPost = await SharedPost.findByPk(postId);
+              // 更新処理成功後であるため、検索結果はnullになり得ない想定
+              return updatedSharedPost as SharedPost;
             },
           );
 
@@ -159,5 +171,46 @@ export class SharedPostServiceImpl implements SharedPostService {
     });
 
     return response;
+  }
+
+  public async logicalDelete(
+    parameter: SharedPostDeleteParameter,
+  ): Promise<void> {
+    await this.complexValidator.validateForDelete(parameter);
+
+    await this.sequelizeHandler.transact(async (transaction) => {
+      const parameterPosts = parameter.posts;
+      const logicalDeletedPostIds = parameterPosts.map((x) => x.id);
+      await this.sharedPostDao.updateForLogicalDelete(
+        logicalDeletedPostIds,
+        transaction,
+      );
+      transaction.commit();
+    });
+  }
+
+  public async report(parameter: ReportPostParameter): Promise<void> {
+    await this.complexValidator.validateForReport(parameter);
+
+    await this.sequelizeHandler.transact(async (transaction) => {
+      const parameterPosts = parameter.posts;
+      for (const post of parameterPosts) {
+        // 既に同じ投稿が通報されている場合は、既存の通報詳細を上書き
+        await SharedPost.update(
+          {
+            reportDetail: post.reportDetail,
+            isReported: true,
+          },
+          {
+            where: {
+              id: post.id,
+            },
+            transaction,
+          },
+        );
+      }
+
+      transaction.commit();
+    });
   }
 }

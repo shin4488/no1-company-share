@@ -8,6 +8,7 @@ const companyNameLength = 100;
 const companyHomePageUrlLength = 2100;
 const remarksLength = 500;
 const no1ContentLength = 100;
+const reportDetailLength = 300;
 
 const sharedPostSaveBaseSimpleValidators = [
   body('posts.*.companyNumber')
@@ -38,7 +39,6 @@ const sharedPostSaveBaseSimpleValidators = [
     .withMessage(
       `会社ホームページURL:${Message.maxLength(companyHomePageUrlLength)}`,
     )
-    // TODO:URL無効時のエラーメッセージ
     .isURL()
     .withMessage(`会社ホームページURL:${Message.invalidUrl}`),
   body('posts.*.remarks')
@@ -90,11 +90,32 @@ export const sharedPostPostSimpleValidators = [
   ...sharedPostSaveBaseSimpleValidators,
 ];
 
-export const sharedPostPutSimpleValidators = [
+const sharedPostUpdateBaseSimpleValidators = [
   body('posts.*.id')
     .notEmpty()
     .withMessage(`投稿ID:${Message.notEmpty}`)
     .isString()
     .withMessage(`投稿ID:${Message.isString}`),
+];
+
+export const sharedPostPutSimpleValidators = [
+  ...sharedPostUpdateBaseSimpleValidators,
   ...sharedPostSaveBaseSimpleValidators,
+];
+
+export const sharedPostLogicalDeleteSimpleValidators = [
+  ...sharedPostUpdateBaseSimpleValidators,
+];
+
+export const reportPostSimpleValidator = [
+  ...sharedPostUpdateBaseSimpleValidators,
+  body('posts.*.reportDetail')
+    .notEmpty()
+    .withMessage(`通報理由:${Message.notEmpty}`)
+    .isString()
+    .withMessage(`通報理由:${Message.isString}`)
+    .isLength({
+      max: reportDetailLength,
+    })
+    .withMessage(`通報理由:${Message.maxLength(reportDetailLength)}`),
 ];
