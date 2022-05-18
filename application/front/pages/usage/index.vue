@@ -131,10 +131,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import { PageHeadData } from '@f/definition/pages/common/headData';
+import { UsageData } from '@f/definition/pages/usage/data';
 
 export default Vue.extend({
   name: 'AppUsage',
-  data() {
+  data(): UsageData {
     return {
       columnSpan: '12',
     };
@@ -146,8 +147,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style lang="sass" scoped>
-.pre-wrap
-  white-space: pre-wrap
-</style>
