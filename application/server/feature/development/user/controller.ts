@@ -24,23 +24,19 @@ class UserController extends BaseController {
 
     logger.log('debug', 'firebase user id', response.locals.firebaseUserId);
 
-    console.log('ユーザ取得');
     const users = await sequelize.query<UserMaster>(
       'SELECT * FROM public.user_master',
       { type: QueryTypes.SELECT },
     );
-    console.log(users);
     const userWhere = await UserMaster.findAll({
       where: { id: { [Op.like]: 'eUFhpDok0k' } },
     });
     console.log(userWhere);
 
-    console.log('会社取得（query）');
     const companies = await sequelize.query<CompanyMaster>(
       'SELECT * FROM public.company_master',
       { type: QueryTypes.SELECT },
     );
-    console.log(companies);
     logger.log('debug', 'debug log');
 
     super.success(response, { users, companies });

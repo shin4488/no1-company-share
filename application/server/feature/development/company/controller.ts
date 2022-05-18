@@ -39,12 +39,9 @@ class CompanyController extends BaseController {
       }
       console.log(company);
 
-      console.log('会社取得（findAll）');
       const records2 = await CompanyMaster.findAll<CompanyMaster>();
-      console.log(records2);
       super.success(response, { companies: records2 });
     } catch (e) {
-      console.log(e);
       logger.error(e);
     }
   }
