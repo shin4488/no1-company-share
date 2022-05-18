@@ -60,18 +60,25 @@
 
     <!-- ボトムナビゲーション->モバイルのみ -->
     <template v-if="shouldUseBottomBarComputed">
-      <v-bottom-navigation app fixed :value="0" color="primary">
-        <v-slide-group>
-          <v-btn
+      <v-bottom-navigation app fixed>
+        <v-slide-group :value="selectedSideBarItem">
+          <v-slide-item
             v-for="(item, index) in sideBarItems"
             :key="index"
-            :to="item.to"
-            nuxt
-            @click="onClickedListItem(item.to)"
+            v-slot="{ active }"
           >
-            <span>{{ item.title }}</span>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-btn>
+            <v-btn
+              :to="item.to"
+              :input-value="active"
+              :color="active ? 'primary' : ''"
+              text
+              nuxt
+              @click="onClickedListItem(item.to)"
+            >
+              <span>{{ item.title }}</span>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-btn>
+          </v-slide-item>
         </v-slide-group>
       </v-bottom-navigation>
     </template>
@@ -171,13 +178,19 @@ export default Vue.extend({
     shouldUseBottomBarComputed(): boolean {
       return this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm;
     },
+    selectedSideBarItem(): number {
+      const selectedSideBarIndex = this.sideBarItems.findIndex(
+        (x) => x.to === this.$nuxt.$route.path,
+      );
+      return selectedSideBarIndex === -1 ? 0 : selectedSideBarIndex;
+    },
   },
   watch: {
     // ログイン状態が変わればサイドバー表示内容も変更
     firebaseUserId() {
       this.firebaseUserIconImage =
         this.$fireModule.auth().currentUser?.photoURL || '';
-      this.sideBarItems = this.decideSidebarItems();
+      this.sideBarItems = this.$cloner.deepClone(this.decideSidebarItems());
     },
   },
   mounted() {
