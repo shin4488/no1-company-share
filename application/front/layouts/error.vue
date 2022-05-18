@@ -22,8 +22,8 @@ export default {
   },
   data() {
     return {
-      pageNotFound: '404 Not Found',
-      otherError: 'An error occurred',
+      pageNotFound: '404 指定したページが見つかりません。',
+      otherError: 'エラーが発生しました。',
     };
   },
   head() {
