@@ -105,16 +105,27 @@ export default Vue.extend({
     homePath: (): string => '/home',
     loginPath: (): string => '/login',
     logoutPath: (): string => '/logout',
+    usagePath: (): string => '/usage',
     /**
      * ログアウト状態でのサイドバーメニュー
      */
     logoutSideBarItems(): SidebarItem[] {
       return [
         {
+          icon: 'mdi-home-variant-outline',
+          title: 'ホーム',
+          to: this.homePath,
+        },
+        {
           icon: 'mdi-login',
           title: 'ログイン',
           // ログイン画面はfirebaseのポップアップとなるが、ログインボタン押下判定のために「#」を付与
           to: this.loginPath,
+        },
+        {
+          icon: 'mdi-book-open-variant',
+          title: '使い方',
+          to: this.usagePath,
         },
       ];
     },
@@ -144,6 +155,11 @@ export default Vue.extend({
           // ログアウトしつつホームに戻る
           to: this.logoutPath,
         },
+        {
+          icon: 'mdi-book-open-variant',
+          title: '使い方',
+          to: this.usagePath,
+        },
       ];
     },
     isLogined(): boolean {
@@ -158,16 +174,10 @@ export default Vue.extend({
   },
   watch: {
     // ログイン状態が変わればサイドバー表示内容も変更
-    async firebaseUserId() {
+    firebaseUserId() {
       this.firebaseUserIconImage =
         this.$fireModule.auth().currentUser?.photoURL || '';
       this.sideBarItems = this.decideSidebarItems();
-
-      // ミドルウェアでリダイレクトしたいが、
-      // ミドルウェア内ではfirebaseユーザIDが（ログイン状態でも）nullになってしまうためここでルーティング
-      this.routeToHomeIfNotLoggedin();
-      // ログイン状態が変わったら、お気に入り状態の再取得のためにデータを取得しなおす
-      await this.$nuxt.refresh();
     },
   },
   mounted() {
@@ -176,20 +186,12 @@ export default Vue.extend({
     // TODO:本当はsideBarItemsはdataではなくcomputedを使用したいが、computedでstoreにアクセスすると以下エラーとなるためmountedを使用
     // The client-side rendered virtual DOM tree is not matching server-rendered content.
     this.sideBarItems = this.decideSidebarItems();
-    this.routeToHomeIfNotLoggedin();
   },
   methods: {
     decideSidebarItems(): SidebarItem[] {
       return this.isLogined
         ? this.logginedSidebarItems
         : this.logoutSideBarItems;
-    },
-    routeToHomeIfNotLoggedin(): void {
-      // ユーザIDが存在しない場合を未認証状態とみなす
-      // ホーム画面のみ、未認証でも閲覧可能
-      if (!this.isLogined) {
-        this.routeToHome();
-      }
     },
     routeToHome(): void {
       this.$router.push(this.homePath);
