@@ -188,7 +188,7 @@ export class SharedPostComplexValidatorImpl
     });
 
     return targetDivision === null
-      ? 'No1.区分:区分値マスタに存在する値を入力してください。'
+      ? 'No.1区分:区分値マスタに存在する値を入力してください。'
       : '';
   }
 

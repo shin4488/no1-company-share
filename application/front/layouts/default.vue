@@ -60,18 +60,25 @@
 
     <!-- ボトムナビゲーション->モバイルのみ -->
     <template v-if="shouldUseBottomBarComputed">
-      <v-bottom-navigation app fixed :value="0" color="primary">
-        <v-slide-group>
-          <v-btn
+      <v-bottom-navigation app fixed>
+        <v-slide-group :value="selectedSideBarItem">
+          <v-slide-item
             v-for="(item, index) in sideBarItems"
             :key="index"
-            :to="item.to"
-            nuxt
-            @click="onClickedListItem(item.to)"
+            v-slot="{ active }"
           >
-            <span>{{ item.title }}</span>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-btn>
+            <v-btn
+              :to="item.to"
+              :input-value="active"
+              :color="active ? 'primary' : ''"
+              text
+              nuxt
+              @click="onClickedListItem(item.to)"
+            >
+              <span>{{ item.title }}</span>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-btn>
+          </v-slide-item>
         </v-slide-group>
       </v-bottom-navigation>
     </template>
@@ -105,16 +112,27 @@ export default Vue.extend({
     homePath: (): string => '/home',
     loginPath: (): string => '/login',
     logoutPath: (): string => '/logout',
+    usagePath: (): string => '/usage',
     /**
      * ログアウト状態でのサイドバーメニュー
      */
     logoutSideBarItems(): SidebarItem[] {
       return [
         {
+          icon: 'mdi-home-variant-outline',
+          title: 'ホーム',
+          to: this.homePath,
+        },
+        {
           icon: 'mdi-login',
           title: 'ログイン',
           // ログイン画面はfirebaseのポップアップとなるが、ログインボタン押下判定のために「#」を付与
           to: this.loginPath,
+        },
+        {
+          icon: 'mdi-book-open-variant',
+          title: '使い方',
+          to: this.usagePath,
         },
       ];
     },
@@ -144,6 +162,11 @@ export default Vue.extend({
           // ログアウトしつつホームに戻る
           to: this.logoutPath,
         },
+        {
+          icon: 'mdi-book-open-variant',
+          title: '使い方',
+          to: this.usagePath,
+        },
       ];
     },
     isLogined(): boolean {
@@ -155,19 +178,19 @@ export default Vue.extend({
     shouldUseBottomBarComputed(): boolean {
       return this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm;
     },
+    selectedSideBarItem(): number {
+      const selectedSideBarIndex = this.sideBarItems.findIndex(
+        (x) => x.to === this.$nuxt.$route.path,
+      );
+      return selectedSideBarIndex === -1 ? 0 : selectedSideBarIndex;
+    },
   },
   watch: {
     // ログイン状態が変わればサイドバー表示内容も変更
-    async firebaseUserId() {
+    firebaseUserId() {
       this.firebaseUserIconImage =
         this.$fireModule.auth().currentUser?.photoURL || '';
-      this.sideBarItems = this.decideSidebarItems();
-
-      // ミドルウェアでリダイレクトしたいが、
-      // ミドルウェア内ではfirebaseユーザIDが（ログイン状態でも）nullになってしまうためここでルーティング
-      this.routeToHomeIfNotLoggedin();
-      // ログイン状態が変わったら、お気に入り状態の再取得のためにデータを取得しなおす
-      await this.$nuxt.refresh();
+      this.sideBarItems = this.$cloner.deepClone(this.decideSidebarItems());
     },
   },
   mounted() {
@@ -176,20 +199,12 @@ export default Vue.extend({
     // TODO:本当はsideBarItemsはdataではなくcomputedを使用したいが、computedでstoreにアクセスすると以下エラーとなるためmountedを使用
     // The client-side rendered virtual DOM tree is not matching server-rendered content.
     this.sideBarItems = this.decideSidebarItems();
-    this.routeToHomeIfNotLoggedin();
   },
   methods: {
     decideSidebarItems(): SidebarItem[] {
       return this.isLogined
         ? this.logginedSidebarItems
         : this.logoutSideBarItems;
-    },
-    routeToHomeIfNotLoggedin(): void {
-      // ユーザIDが存在しない場合を未認証状態とみなす
-      // ホーム画面のみ、未認証でも閲覧可能
-      if (!this.isLogined) {
-        this.routeToHome();
-      }
     },
     routeToHome(): void {
       this.$router.push(this.homePath);

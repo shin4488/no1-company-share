@@ -16,7 +16,7 @@
     </v-card-title>
 
     <!-- 一位内容 -->
-    <v-card-text>
+    <v-card-text class="shared-post-text-max overflow-y-auto">
       <div
         v-for="(detailText, index) in postDetailsComputed"
         :key="index"
@@ -262,4 +262,12 @@ export default Vue.extend({
   cursor: auto
 .full-width
   width: 100%
+.shared-post-text-max
+  max-height: 250px
+
+::-webkit-scrollbar
+    width: 5px
+::-webkit-scrollbar-thumb
+    border-radius: 20px
+    background-color: lightgray
 </style>
