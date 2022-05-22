@@ -34,7 +34,8 @@ export const catchError = (
     const errorMessages = (error as AppError).errorMessages;
     responseHandler.addErrorMessages(...errorMessages);
   } else {
-    responseHandler.addErrorMessages(error.message);
+    // アプリ側で意図的に発生させた例外以外は、セキュリティのため詳細なエラーメッセージを返さない
+    responseHandler.addErrorMessages(`${statusCode} : Server Error`);
   }
 
   expressResponse.send(responseHandler.createResponse());
