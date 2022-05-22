@@ -2,7 +2,11 @@ FROM ubuntu:20.04
 
 # コンテナ間通信時は、コンテナ内部で使用されるポートを指定
 # postgreSQLはデフォルトで5432ポートを使用
-ENV DB_CONNECTION_URI postgres://company_share_admin:admin@database:5432/company_share
+ENV POSTGRES_DATABASE=company_share
+ENV POSTGRES_USER_NAME=company_share_admin
+ENV POSTGRES_PASSWORD=admin
+ENV POSTGRES_HOST_NAME=database
+ENV POSTGRES_PORT=5432
 # nuxtのサーバサイドプログラムもホットリロードを可能とする
 ENV CHOKIDAR_USEPOLLING true
 # firebase認証用
