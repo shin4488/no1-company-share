@@ -1,9 +1,22 @@
 import { Context, Middleware } from '@nuxt/types';
 import { StringUtil } from '@c/util/stringUtil';
 
-const middlware: Middleware = ({ redirect, route, $accessor }: Context) => {
+const middlware: Middleware = async ({
+  redirect,
+  route,
+  $accessor,
+}: Context) => {
+  const routePath = route.path;
+  const loginPath = '/login';
+  const logoutPath = '/logout';
+  if (routePath === loginPath) {
+    await $accessor.firebaseAuthorization.loginByGoogle();
+  } else if (routePath === logoutPath) {
+    await $accessor.firebaseAuthorization.logout();
+  }
+
   // ルートディレクトリ・ログイン状態変更時はホーム画面に遷移
-  const homeRedirectPaths = ['/', '/login', '/logout'];
+  const homeRedirectPaths = ['/', loginPath, logoutPath];
   const shouldRouteToHome = homeRedirectPaths.includes(route.path);
   if (shouldRouteToHome) {
     redirect('/home');
