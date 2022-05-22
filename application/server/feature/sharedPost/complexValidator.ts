@@ -173,7 +173,7 @@ export class SharedPostComplexValidatorImpl
       );
 
     return ArrayUtil.isNotEmpty(sameCompanySharedPosts)
-      ? '既に同じ企業に関する投稿がすでに存在します。'
+      ? '同じ企業に関する投稿がすでに存在します。'
       : '';
   }
 

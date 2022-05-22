@@ -24,12 +24,18 @@
       <v-card>
         <v-card-title>
           <v-icon>mdi-web</v-icon>
-          推奨環境（ブラウザ）
+          推奨環境（ブラウザ・OS）
         </v-card-title>
         <v-card-text>
-          <div>Google Chrome（動作確認済みバージョン：101.0.4951.54）</div>
-          <div>Edge Chromium（動作確認済みバージョン：101.0.1210.47）</div>
-          <div>Firefox</div>
+          <div>
+            Google Chrome（動作確認済みバージョン：101.0.4951.54,
+            動作確認済みOS：Windows・iOS）
+          </div>
+          <div>
+            Edge Chromium（動作確認済みバージョン：101.0.1210.47,
+            動作確認済みOS：Windows）
+          </div>
+          <div>Safari（動作確認済みバージョン：15.4, 動作確認済みOS：iOS）</div>
         </v-card-text>
       </v-card>
     </v-col>
