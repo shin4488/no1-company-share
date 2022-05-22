@@ -1,5 +1,8 @@
 import { Sequelize, Transaction } from 'sequelize';
 import { injectable, inject } from 'inversify';
+import { LogHandler } from '@s/common/logger/interface/LogHandler';
+import { types } from '@s/common/dependencyInjection/types';
+import { StringUtil } from '@c/util/stringUtil';
 import CompanyMaster from '../models/companyMaster';
 import UserMaster from '../models/userMaster';
 import DivisionMaster from '../models/divisionMaster';
@@ -7,8 +10,6 @@ import SharedPost from '../models/sharedPost';
 import SharedPostDetail from '../models/sharedPostDetail';
 import Bookmark from '../models/bookmark';
 import { SequelizeHandler } from './interface/SequelizeHandler';
-import { LogHandler } from '@s/common/logger/interface/LogHandler';
-import { types } from '@s/common/dependencyInjection/types';
 
 /**
  * Sequelize操作用クラス
@@ -27,8 +28,13 @@ export class SequelizeHandlerImpl implements SequelizeHandler {
 
     // SQL出力先をLog4jsに変更
     SequelizeHandlerImpl._sequelize = new Sequelize(
-      process.env.DB_CONNECTION_URI || '',
+      StringUtil.ifEmpty(process.env.POSTGRES_DATABASE),
+      StringUtil.ifEmpty(process.env.POSTGRES_USER_NAME),
+      StringUtil.ifEmpty(process.env.POSTGRES_PASSWORD),
       {
+        host: StringUtil.ifEmpty(process.env.POSTGRES_HOST_NAME),
+        port: Number(StringUtil.ifEmpty(process.env.POSTGRES_PORT)),
+        dialect: 'postgres',
         logging: (log) => this.logger.log('info', log),
       },
     );
