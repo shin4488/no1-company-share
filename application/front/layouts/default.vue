@@ -39,7 +39,6 @@
             router
             exact
             nuxt
-            @click="onClickedListItem(item.to)"
           >
             <v-list-item-action>
               <v-icon>{{ item.icon }}</v-icon>
@@ -73,12 +72,15 @@
               :color="active ? 'primary' : ''"
               text
               nuxt
-              @click="onClickedListItem(item.to)"
             >
               <span>{{ item.title }}</span>
               <v-icon>{{ item.icon }}</v-icon>
             </v-btn>
           </v-slide-item>
+
+          <v-list-item-avatar v-if="isLogined" dense>
+            <v-img class="elevation-6" :src="firebaseUserIconImage"></v-img>
+          </v-list-item-avatar>
         </v-slide-group>
       </v-bottom-navigation>
     </template>
@@ -147,7 +149,7 @@ export default Vue.extend({
           to: this.homePath,
         },
         {
-          icon: 'mdi-star',
+          icon: 'mdi-heart',
           title: 'お気に入り',
           to: '/bookmark',
         },
@@ -187,10 +189,16 @@ export default Vue.extend({
   },
   watch: {
     // ログイン状態が変わればサイドバー表示内容も変更
-    firebaseUserId() {
+    async firebaseUserId() {
       this.firebaseUserIconImage =
         this.$fireModule.auth().currentUser?.photoURL || '';
       this.sideBarItems = this.$cloner.deepClone(this.decideSidebarItems());
+
+      // homeはルーティング時にhomeのままであり、画面更新されないため、
+      // ログイン状態が変わったら、お気に入り状態の再取得のために明示的にデータを取得しなおす
+      if (this.$nuxt.$route.path === '/home') {
+        await this.$nuxt.refresh();
+      }
     },
   },
   mounted() {
@@ -211,19 +219,6 @@ export default Vue.extend({
     },
     onClickedNavigationBar(): void {
       this.isDrawerMini = !this.isDrawerMini;
-    },
-    async onClickedListItem(path: string): Promise<void> {
-      const isLoginPath = path === this.loginPath;
-      const isLogoutPath = path === this.logoutPath;
-      if (!(isLoginPath || isLogoutPath)) {
-        return;
-      }
-
-      if (isLoginPath) {
-        await this.$accessor.firebaseAuthorization.loginByGoogle();
-      } else {
-        await this.$accessor.firebaseAuthorization.logout();
-      }
     },
   },
 });
