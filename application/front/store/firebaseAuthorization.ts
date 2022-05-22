@@ -88,8 +88,15 @@ export const actions = actionTree(
     },
     async loginByGoogle() {
       const provider = new this.$fireModule.auth.GoogleAuthProvider();
-      // ポップアップを閉じたときのエラー回避のためcatchを記載
-      await this.$fire.auth.signInWithPopup(provider).catch((error) => error);
+      await this.$fire.auth
+        .signInWithPopup(provider)
+        .then((userResult) =>
+          this.dispatch('firebaseAuthorization/onAuthStateChangedAction', {
+            authUser: userResult.user,
+          }),
+        )
+        // ポップアップを閉じたときのエラー回避のためcatchを記載
+        .catch((error) => error);
     },
     async logout() {
       await this.$fire.auth.signOut();
