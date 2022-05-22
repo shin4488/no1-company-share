@@ -6,12 +6,16 @@
     <h1 v-else>
       {{ otherError }}
     </h1>
-    <NuxtLink to="/"> Home page </NuxtLink>
+    <NuxtLink to="/"> ホームへ戻る</NuxtLink>
   </v-app>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue';
+import { ErrorData } from '@f/definition/layouts/error/data';
+import { PageHeadData } from '@f/definition/pages/common/headData';
+
+export default Vue.extend({
   name: 'EmptyLayout',
   layout: 'empty',
   props: {
@@ -20,20 +24,20 @@ export default {
       default: null,
     },
   },
-  data() {
+  data(): ErrorData {
     return {
-      pageNotFound: '404 Not Found',
-      otherError: 'An error occurred',
-    }
+      pageNotFound: '404 指定したページが見つかりません。',
+      otherError: 'エラーが発生しました。',
+    };
   },
-  head() {
+  head(): PageHeadData {
     const title =
-      this.error.statusCode === 404 ? this.pageNotFound : this.otherError
+      this.error.statusCode === 404 ? this.pageNotFound : this.otherError;
     return {
       title,
-    }
+    };
   },
-}
+});
 </script>
 
 <style scoped>
