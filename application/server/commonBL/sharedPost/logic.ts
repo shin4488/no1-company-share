@@ -7,8 +7,6 @@ import {
 import { SharedPostLogic } from './interface/logic';
 import { SharedPostDao } from '@s/commonBL/dao/sharedPost/interface/dao';
 import { types } from '@s/common/dependencyInjection/types';
-import { OpenGraphType } from '@s/commonBL/openGraph/definition/openGraphType';
-import { OpenGraphLogic } from '@s/commonBL/openGraph/interface/logic';
 import { StringUtil } from '@c/util/stringUtil';
 import { ArrayUtil } from '@c/util/arrayUtil';
 import Bookmark from '@s/common/sequelize/models/bookmark';
@@ -16,14 +14,9 @@ import SharedPostDetail from '@s/common/sequelize/models/sharedPostDetail';
 
 @injectable()
 export class SharedPostLogicImpl implements SharedPostLogic {
-  private openGraphLogic: OpenGraphLogic;
   private sharedPostDao: SharedPostDao;
 
-  constructor(
-    @inject(types.OpenGraphLogic) openGraphLogic: OpenGraphLogic,
-    @inject(types.SharedPostDao) sharedPostDao: SharedPostDao,
-  ) {
-    this.openGraphLogic = openGraphLogic;
+  constructor(@inject(types.SharedPostDao) sharedPostDao: SharedPostDao) {
     this.sharedPostDao = sharedPostDao;
   }
 
@@ -46,7 +39,7 @@ export class SharedPostLogicImpl implements SharedPostLogic {
           companyNumber: post.companyNumber,
           companyName: StringUtil.ifEmpty(companyMaster?.companyJapaneseName),
           companyHomepageUrl: StringUtil.ifEmpty(companyMaster?.homepageUrl),
-          companyImageUrl: '',
+          companyImageUrl: StringUtil.ifEmpty(companyMaster?.imageUrl),
           postingUserId: post.userId,
           postingUserName: StringUtil.ifEmpty(userMaster?.displayedName),
           postingUserIcomImageUrl: StringUtil.ifEmpty(userMaster?.iconImageUrl),
@@ -72,19 +65,6 @@ export class SharedPostLogicImpl implements SharedPostLogic {
       },
     );
 
-    // 会社ホームページURLからOG画像取得
-    // TODO:1企業ごと毎回Http通信でogデータ取得しているため、パフォーマンス低下につながっている（改善が必要）
-    const responsePostsWithCompanyUrl = await Promise.all(
-      responsePosts.map(async (post) => {
-        const ogResult = await this.openGraphLogic.getOpenGraph(
-          post.companyHomepageUrl,
-          [OpenGraphType.IMAGE],
-        );
-        post.companyImageUrl = ogResult.image;
-        return post;
-      }),
-    );
-
-    return responsePostsWithCompanyUrl;
+    return responsePosts;
   }
 }

@@ -10,8 +10,8 @@ import SharedPost from './sharedPost';
 export interface CompanyMasterModelAttribute {
   companyNumber: string;
   companyJapaneseName: string;
-  companyEnglishName: string;
   homepageUrl: string;
+  imageUrl: string;
 }
 
 /**
@@ -23,8 +23,8 @@ export default class CompanyMaster extends Model<
 > {
   declare companyNumber: string;
   declare companyJapaneseName: string;
-  declare companyEnglishName: string;
   declare homepageUrl: string;
+  declare imageUrl: string;
   declare createdAt: Date;
   declare updatedAt: Date;
 
@@ -44,11 +44,11 @@ export default class CompanyMaster extends Model<
           type: new DataTypes.STRING(100),
           allowNull: true,
         },
-        companyEnglishName: {
-          type: new DataTypes.STRING(100),
+        homepageUrl: {
+          type: new DataTypes.STRING(2100),
           allowNull: true,
         },
-        homepageUrl: {
+        imageUrl: {
           type: new DataTypes.STRING(2100),
           allowNull: true,
         },
