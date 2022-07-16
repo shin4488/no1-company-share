@@ -11,25 +11,33 @@ export interface SharedPostService {
   /**
    * 投稿取得
    */
-  getAlive(parameter: SharedPostGetParameter): Promise<SharedPostGetResponse>;
+  getAliveSharedPosts(
+    parameter: SharedPostGetParameter,
+  ): Promise<SharedPostGetResponse>;
   /**
    * 投稿新規作成
    * @param parameter
    */
-  insert(parameter: SharedPostPostParameter): Promise<SharedPostPostResponse>;
+  insertSharedPosts(
+    parameter: SharedPostPostParameter,
+  ): Promise<SharedPostPostResponse>;
   /**
    * 投稿更新
    * @param parameter
    */
-  update(parameter: SharedPostPutParameter): Promise<SharedPostPutResponse>;
+  updateSharedPosts(
+    parameter: SharedPostPutParameter,
+  ): Promise<SharedPostPutResponse>;
   /**
    * 投稿削除
    * @param parameter
    */
-  logicalDelete(parameter: SharedPostDeleteParameter): Promise<void>;
+  deleteSharedPostsLogically(
+    parameter: SharedPostDeleteParameter,
+  ): Promise<void>;
   /**
    * 投稿通報
    * @param parameter
    */
-  report(parameter: ReportPostParameter): Promise<void>;
+  reportSharedPosts(parameter: ReportPostParameter): Promise<void>;
 }
