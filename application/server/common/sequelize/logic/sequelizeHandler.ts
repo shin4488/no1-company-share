@@ -1,8 +1,5 @@
 import { Sequelize, Transaction } from 'sequelize';
 import { injectable, inject } from 'inversify';
-import { LogHandler } from '@s/common/logger/interface/LogHandler';
-import { types } from '@s/common/dependencyInjection/types';
-import { StringUtil } from '@c/util/stringUtil';
 import CompanyMaster from '../models/companyMaster';
 import UserMaster from '../models/userMaster';
 import DivisionMaster from '../models/divisionMaster';
@@ -10,6 +7,9 @@ import SharedPost from '../models/sharedPost';
 import SharedPostDetail from '../models/sharedPostDetail';
 import Bookmark from '../models/bookmark';
 import { SequelizeHandler } from './interface/SequelizeHandler';
+import { StringUtil } from '@c/util/stringUtil';
+import { types } from '@s/common/dependencyInjection/types';
+import { LogHandler } from '@s/common/logger/interface/LogHandler';
 
 /**
  * Sequelize操作用クラス
