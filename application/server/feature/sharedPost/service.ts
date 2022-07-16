@@ -47,7 +47,7 @@ export class SharedPostServiceImpl implements SharedPostService {
     this.sharedPostDao = sharedPostDao;
   }
 
-  public async getAlive(
+  public async getAliveSharedPosts(
     parameter: SharedPostGetParameter,
   ): Promise<SharedPostGetResponse> {
     const parameterDto: SharedPostParameterDto = {
@@ -68,7 +68,7 @@ export class SharedPostServiceImpl implements SharedPostService {
     return response;
   }
 
-  public async insert(
+  public async insertSharedPosts(
     parameter: SharedPostPostParameter,
   ): Promise<SharedPostPostResponse> {
     await this.complexValidator.validateForInsert(parameter);
@@ -120,7 +120,7 @@ export class SharedPostServiceImpl implements SharedPostService {
     return response;
   }
 
-  public async update(
+  public async updateSharedPosts(
     parameter: SharedPostPutParameter,
   ): Promise<SharedPostPutResponse> {
     await this.complexValidator.validateForUpdate(parameter);
@@ -173,7 +173,7 @@ export class SharedPostServiceImpl implements SharedPostService {
     return response;
   }
 
-  public async logicalDelete(
+  public async deleteSharedPostsLogically(
     parameter: SharedPostDeleteParameter,
   ): Promise<void> {
     await this.complexValidator.validateForDelete(parameter);
@@ -189,7 +189,9 @@ export class SharedPostServiceImpl implements SharedPostService {
     });
   }
 
-  public async report(parameter: ReportPostParameter): Promise<void> {
+  public async reportSharedPosts(
+    parameter: ReportPostParameter,
+  ): Promise<void> {
     await this.complexValidator.validateForReport(parameter);
 
     await this.sequelizeHandler.transact(async (transaction) => {
