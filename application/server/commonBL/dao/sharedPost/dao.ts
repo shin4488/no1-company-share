@@ -58,11 +58,7 @@ export class SharedPostDaoImpl implements SharedPostDao {
         },
         {
           model: CompanyMaster,
-          attributes: [
-            'companyJapaneseName',
-            'companyEnglishName',
-            'homepageUrl',
-          ],
+          attributes: ['companyJapaneseName', 'homepageUrl', 'imageUrl'],
         },
         {
           model: UserMaster,

@@ -1,0 +1,14 @@
+{
+  "name": "functions",
+  "version": "1.0.0",
+  "scripts": {
+    "firebase": "firebase"
+  },
+  "dependencies": {
+    "firebase-tools": "^11.2.2"
+  },
+  "devDependencies": {},
+  "private": true,
+  "author": "shin4488",
+  "license": "MIT"
+}
