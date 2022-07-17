@@ -225,3 +225,6 @@ $ sudo npm install -g forever
 $ cd アプリのディレクトリ
 $ forever start -c "yarn start" ./
 ```
+
+ポートを握っているプロセスを見たい時
+https://qiita.com/ionis_h/items/21cd094136c45ad98b44
