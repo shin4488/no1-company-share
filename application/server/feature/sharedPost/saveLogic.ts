@@ -11,24 +11,23 @@ import companyMaster from '@s/common/sequelize/models/companyMaster';
 import sharedPost from '@s/common/sequelize/models/sharedPost';
 import { CompanyMasterDao } from '@s/commonBL/dao/company/interface/dao';
 import { ArrayUtil } from '@c/util/arrayUtil';
-import { ExternalCompanyLogic } from '@s/commonBL/externalCompany/interface/logic';
-import { ExternalCompanyParameter } from '@s/commonBL/externalCompany/definition/externalCompanyParameter';
+import { OpenGraphLogic } from '@s/commonBL/openGraph/interface/logic';
+import { OpenGraphType } from '@s/commonBL/openGraph/definition/openGraphType';
 
 @injectable()
 export class SharedPostSaveLogicImpl implements SharedPostSaveLogic {
   private companyMasterDao: CompanyMasterDao;
   private dateHandler: DateHandler;
-  private externalCompanyLogic: ExternalCompanyLogic;
+  private openGraphLogic: OpenGraphLogic;
 
   constructor(
     @inject(types.CompanyMasterDao) companyMasterDao: CompanyMasterDao,
     @inject(types.DateHandler) dateHandler: DateHandler,
-    @inject(types.ExternalCompanyLogic)
-    externalCompanyLogic: ExternalCompanyLogic,
+    @inject(types.OpenGraphLogic) openGraphLogic: OpenGraphLogic,
   ) {
     this.companyMasterDao = companyMasterDao;
     this.dateHandler = dateHandler;
-    this.externalCompanyLogic = externalCompanyLogic;
+    this.openGraphLogic = openGraphLogic;
   }
 
   public async createModels(
@@ -36,27 +35,21 @@ export class SharedPostSaveLogicImpl implements SharedPostSaveLogic {
     transaction: Transaction,
     createSharedPost: (company: companyMaster) => Promise<sharedPost>,
   ): Promise<SharedPostSaveResult> {
-    // 将来的に英語表記を使用するため、英語名も取得・保存する
-    const externalCompanyParameter: ExternalCompanyParameter = {
-      companyNumber: parameter.companyNumber,
-      limit: 1,
-    };
-    const companyResult = await this.externalCompanyLogic.getExternalCompany(
-      externalCompanyParameter,
+    // 会社画像は日次バッチでデータ保存するが、
+    // バッチ実行まではデータ保存されないため会社マスタ作成時に一度画像保存しておく
+    const companyHomepageUrl = parameter.companyHomepageUrl;
+    const ogResult = await this.openGraphLogic.getOpenGraph(
+      companyHomepageUrl,
+      [OpenGraphType.IMAGE],
     );
-    const companyResultItems = companyResult.companies;
-    let companyEnglishName = '';
-    if (ArrayUtil.isNotEmpty(companyResultItems)) {
-      companyEnglishName = companyResultItems[0].englishName;
-    }
 
     // 会社マスタ作成
     const company = await this.companyMasterDao.upsertCompany(
       {
         companyNumber: parameter.companyNumber,
         companyJapaneseName: parameter.companyName,
-        companyEnglishName,
-        homepageUrl: parameter.companyHomepageUrl,
+        homepageUrl: companyHomepageUrl,
+        imageUrl: ogResult.image,
       },
       transaction,
     );

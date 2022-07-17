@@ -15,7 +15,7 @@ export class CompanyMasterDaoImpl implements CompanyMasterDao {
       {
         companyNumber: company.companyNumber,
         companyJapaneseName: company.companyJapaneseName,
-        companyEnglishName: company.companyEnglishName,
+        imageUrl: company.imageUrl,
         homepageUrl: company.homepageUrl,
       },
       { transaction },

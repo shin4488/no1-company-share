@@ -24,7 +24,7 @@ class CompanyController extends BaseController {
       const user1 = await CompanyMaster.create({
         companyNumber: `alice${records.length}`,
         companyJapaneseName: 'husigi ja',
-        companyEnglishName: 'husigi en',
+        imageUrl: 'http://example.com',
         homepageUrl: '23fghh',
       });
       console.log(user1);
