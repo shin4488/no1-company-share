@@ -7,7 +7,7 @@ import axios from 'axios';
 const scheduledCompanyMasterUpdate = functions.pubsub
   .schedule('0 0 * * *')
   .timeZone('Asia/Tokyo')
-  .onRun(async (_context) => {
+  .onRun(async () => {
     const httpResponse = await axios.put(
       'https://f1c.jp.net/api/v1/companies/',
     );

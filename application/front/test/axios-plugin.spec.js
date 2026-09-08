@@ -1,63 +1,73 @@
 import plugin from '../plugins/axios/axios';
-
 function setup(token = 'test-id-token') {
-  const hooks = {};
+  let api;
   const open = jest.fn();
-  plugin({
-    $axios: {
-      onRequest: (hook) => {
-        hooks.request = hook;
-      },
-      onResponse: (hook) => {
-        hooks.response = hook;
-      },
-      onResponseError: (hook) => {
-        hooks.error = hook;
+  plugin(
+    {
+      $accessor: {
+        firebaseAuthorization: { idTokenComputed: token },
+        snackBarError: { open },
       },
     },
-    $accessor: {
-      firebaseAuthorization: { idTokenComputed: token },
-      snackBarError: { open },
-    },
-  });
-  return { hooks, open };
-}
-
-describe('API通信の表示・認証契約', () => {
-  test.each(['test-id-token', null])(
-    'IDトークン %s を既存ヘッダーにそのまま設定する',
-    (token) => {
-      const { hooks } = setup(token);
-      const config = { headers: { Accept: 'application/json' } };
-      expect(hooks.request(config)).toBe(config);
-      expect(config.headers).toEqual({
-        Accept: 'application/json',
-        Authorization: token,
-      });
+    (name, value) => {
+      if (name === 'axios') {
+        api = value;
+      }
     },
   );
-  test.each(['response', 'error'])(
-    '%s に含まれる複数メッセージを改行して表示する',
-    (kind) => {
-      const { hooks, open } = setup();
+  return { api, open };
+}
+describe('API通信の表示・認証契約', () => {
+  test.each(['test-id-token', null])(
+    '認証トークン %s と既存ヘッダーを維持する',
+    async (token) => {
+      const { api } = setup(token);
+      let config;
+      api.defaults.adapter = (request) => {
+        config = request;
+        return Promise.resolve({
+          data: { messages: [] },
+          status: 200,
+          config: request,
+          headers: {},
+        });
+      };
+      await api.get('/posts', { headers: { Accept: 'application/json' } });
+      expect(config.headers.get('Authorization')).toBe(token);
+      expect(config.headers.get('Accept')).toBe('application/json');
+    },
+  );
+  test.each([200, 400])(
+    'HTTP %s の複数メッセージを改行表示する',
+    async (status) => {
+      const { api, open } = setup();
       const response = {
+        status,
         data: {
           messages: [
             { message: '入力を確認してください' },
             { message: '会社名が必要です' },
           ],
         },
+        headers: {},
       };
-      hooks[kind](kind === 'response' ? response : { response });
+      const failure = Object.assign(new Error('HTTP failure'), { response });
+      api.defaults.adapter = () =>
+        status === 200 ? Promise.resolve(response) : Promise.reject(failure);
+      if (status === 200) {
+        await api.get('/posts');
+      } else {
+        await expect(api.get('/posts')).rejects.toBe(failure);
+      }
       expect(open).toHaveBeenCalledWith(
         '入力を確認してください\n会社名が必要です',
       );
     },
   );
-  test('空のメッセージとレスポンスのない通信失敗では通知を追加しない', () => {
-    const { hooks, open } = setup();
-    hooks.response({ data: { messages: [] } });
-    hooks.error({});
+  test('通信失敗では余計な通知を追加せず呼び出し元へ失敗を伝える', async () => {
+    const { api, open } = setup();
+    api.defaults.adapter = () => Promise.reject(new Error('offline'));
+    await expect(api.get('/posts')).rejects.toThrow('offline');
     expect(open).not.toHaveBeenCalled();
   });
 });

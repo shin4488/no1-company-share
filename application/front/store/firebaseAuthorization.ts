@@ -1,3 +1,4 @@
+import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 // 本当は↓で実装したい（可読性・メンテナンス性のため）
 // https://typescript.nuxtjs.org/ja/cookbook/store/#vuex-module-decorators
 
@@ -87,9 +88,8 @@ export const actions = actionTree(
       AjaxHelper.post(this.$axios, '/users/', requestBody);
     },
     async loginByGoogle() {
-      const provider = new this.$fireModule.auth.GoogleAuthProvider();
-      await this.$fire.auth
-        .signInWithPopup(provider)
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(this.$fire.auth, provider)
         .then((userResult) =>
           this.dispatch('firebaseAuthorization/onAuthStateChangedAction', {
             authUser: userResult.user,
@@ -99,7 +99,7 @@ export const actions = actionTree(
         .catch((error) => error);
     },
     async logout() {
-      await this.$fire.auth.signOut();
+      await signOut(this.$fire.auth);
     },
   },
 );

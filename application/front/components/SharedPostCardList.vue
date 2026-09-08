@@ -285,10 +285,10 @@ export default Vue.extend({
           this.$accessor.firebaseAuthorization.userIdComputed,
         ),
         postingUserName: StringUtil.ifEmpty(
-          this.$fireModule.auth().currentUser?.displayName,
+          this.$fire.auth.currentUser?.displayName,
         ),
         postingUserIcomImageUrl: StringUtil.ifEmpty(
-          this.$fireModule.auth().currentUser?.photoURL,
+          this.$fire.auth.currentUser?.photoURL,
         ),
         isBookmarkedByLoginUser: false,
         numberOfBookmarks: 0,

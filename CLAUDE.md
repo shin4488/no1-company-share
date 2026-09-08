@@ -5,6 +5,7 @@
 ## 開発・検証
 
 - ローカル構成は `docker-compose.yml`、起動・マウント条件は `application/Dockerfile`、アプリ設定は `application/nuxt.config.js` を確認する。`application/` で依存を用意した後、ルートの `docker compose up` が開発環境の入口。
+- アプリはNode 24で実行する。Firebase Web SDKとAxiosは `front/plugins/` から直接提供し、SSR認証は `server/firebaseSsr.ts` でリクエストごとに検証する。`front/static/firebase-auth-sw.js` のFirebase SDK版はWeb SDK更新時に合わせる。
 - アプリ変更は `application/` の `yarn lint`・`yarn test`・`yarn build` で必要な範囲を確認する。正確なscriptsと依存は `application/package.json` に従う。全体に書き込む `lintfix` は無関係な差分を作らないよう扱う。
 - FunctionsはNode 22で、`functions/functions/` の `npm ci`・`npm run lint`・`npm test`（ビルドを含む）を使う。依存はpackage-lock.jsonに統一する。外側の `functions/` のFirebase CLIは引き続きYarnで管理する。ローカル実行は同ディレクトリの `package.json` と外側の `functions/firebase.json` に従い、エミュレータと実サービスの接続先を区別する。
 - DB定義・初期化は `database/` を入口にする。`database/data/` は永続データなので、調査・検証のために削除しない。設定・サービスアカウント鍵・`.env` の値をコミット・ログ・文書へ転記しない。
