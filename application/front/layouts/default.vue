@@ -190,8 +190,7 @@ export default Vue.extend({
   watch: {
     // ログイン状態が変わればサイドバー表示内容も変更
     async firebaseUserId() {
-      this.firebaseUserIconImage =
-        this.$fireModule.auth().currentUser?.photoURL || '';
+      this.firebaseUserIconImage = this.$fire.auth.currentUser?.photoURL || '';
       this.sideBarItems = this.$cloner.deepClone(this.decideSidebarItems());
 
       // homeはルーティング時にhomeのままであり、画面更新されないため、
@@ -202,8 +201,7 @@ export default Vue.extend({
     },
   },
   mounted() {
-    this.firebaseUserIconImage =
-      this.$fireModule.auth().currentUser?.photoURL || '';
+    this.firebaseUserIconImage = this.$fire.auth.currentUser?.photoURL || '';
     // TODO:本当はsideBarItemsはdataではなくcomputedを使用したいが、computedでstoreにアクセスすると以下エラーとなるためmountedを使用
     // The client-side rendered virtual DOM tree is not matching server-rendered content.
     this.sideBarItems = this.decideSidebarItems();

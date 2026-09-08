@@ -4,7 +4,6 @@ import ja from 'vuetify/es5/locale/ja';
 const path = require('path');
 
 const siteDescription = '福井のNo.1企業を共有しよう！';
-const axiosBaseUrl = '/api/v1';
 const port = process.env.NUXT_PORT;
 
 export default {
@@ -19,7 +18,7 @@ export default {
     port,
   },
   srcDir: './front',
-  serverMiddleware: ['~~/server/'],
+  serverMiddleware: ['~~/server/firebaseSsr.ts', '~~/server/'],
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     titleTemplate: `F1C - %s | ${siteDescription}`,
@@ -62,7 +61,11 @@ export default {
   },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['~/plugins/axios/axios.ts', '~/plugins/clone/lodash.ts'],
+  plugins: [
+    '~/plugins/axios/axios.ts',
+    '~/plugins/clone/lodash.ts',
+    { src: '~/plugins/firebase/client.ts', mode: 'client' },
+  ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -78,34 +81,8 @@ export default {
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: [
-    // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios',
-    '@nuxtjs/pwa',
-    '@nuxtjs/firebase',
-  ],
+  modules: ['@nuxtjs/pwa'],
 
-  firebase: {
-    config: {
-      apiKey: 'AIzaSyCPvuvm4wNrjLlpixP2xyUgsaYnIj2cub0',
-      authDomain: 'no1-company-share.firebaseapp.com',
-      projectId: 'no1-company-share',
-      storageBucket: 'no1-company-share.appspot.com',
-      messagingSenderId: '650436262386',
-      appId: '1:650436262386:web:9a17e3aacca532fb82d36b',
-      measurementId: 'G-ZJVQSKLGQ0',
-    },
-    services: {
-      auth: {
-        ssr: true,
-        initialize: {
-          onAuthStateChangedAction:
-            'firebaseAuthorization/onAuthStateChangedAction',
-        },
-      },
-      analytics: true,
-    },
-  },
   pwa: {
     // disable the modules you don't need
     meta: false,
@@ -116,23 +93,6 @@ export default {
       // by default the workbox module will not install the service worker in dev environment to avoid conflicts with HMR
       // only set this true for testing and remember to always clear your browser cache in development
       dev: process.env.NODE_ENV === 'development',
-    },
-  },
-
-  // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {
-    // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    // baseUrlとproxyは同時に使用できないためprefixにしている
-    // https://axios.nuxtjs.org/options/#baseurl
-    prefix: axiosBaseUrl,
-    proxy: true,
-  },
-  // ssr時のservermiddleware呼び出しはnuxtサーバを指定しないといけない
-  // この指定がないとnginxサーバ向けのリクエストになる
-  proxy: {
-    [`${axiosBaseUrl}/localhost/`]: {
-      target: `http://localhost:${port}`,
-      pathRewrite: { '/localhost/': '/' },
     },
   },
 
@@ -181,6 +141,6 @@ export default {
       config.resolve.alias['@c'] = path.resolve(__dirname, 'common');
     },
     // storeをtypescriptで$accessインテリセンス可能とするため
-    transpile: [/typed-vuex/],
+    transpile: [/typed-vuex/, /firebase/],
   },
 };
