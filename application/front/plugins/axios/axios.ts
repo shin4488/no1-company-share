@@ -1,5 +1,5 @@
 import { Context, Plugin } from '@nuxt/types';
-import { AxiosResponse, AxiosError } from 'axios';
+import { AxiosResponse } from 'axios';
 import {
   AppResponse,
   AppMessageResponse,
@@ -25,25 +25,25 @@ const extractErrorMessageIfExists = (
 
 const plugin: Plugin = ({ $axios, $accessor }: Context) => {
   $axios.onRequest((config) => {
-    config.headers.Authorization =
-      $accessor.firebaseAuthorization.idTokenComputed;
+    const headers = config.headers as Record<string, string | null>;
+    headers.Authorization = $accessor.firebaseAuthorization.idTokenComputed;
     return config;
   });
   $axios.onResponse((response: AxiosResponse<AppResponse>) => {
     // 200で返ってきてもメッセージが含まれていればエラーメッセージとして表示
-    const responseBody = response.data;
+    const responseBody = response.data as AppResponse;
     const joinedMessage = extractErrorMessageIfExists(responseBody);
     if (joinedMessage !== null) {
       $accessor.snackBarError.open(joinedMessage);
     }
   });
-  $axios.onResponseError((error: AxiosError<AppResponse>) => {
+  $axios.onResponseError((error) => {
     const response = error.response;
     if (response === undefined) {
       return;
     }
 
-    const responseBody = response.data;
+    const responseBody = response.data as AppResponse;
     const joinedMessage = extractErrorMessageIfExists(responseBody);
     if (joinedMessage !== null) {
       $accessor.snackBarError.open(joinedMessage);

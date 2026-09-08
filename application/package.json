@@ -7,7 +7,7 @@
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
-    "lint:js": "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
+    "lint:js": "eslint --ext \".js,.ts,.vue\" --ignore-path ../.gitignore .",
     "lint:prettier": "prettier --check .",
     "lint": "yarn lint:js && yarn lint:prettier",
     "lintfix": "prettier --write --list-different . && yarn lint:js --fix",
@@ -64,5 +64,10 @@
   "_moduleAliases": {
     "@s": "./server",
     "@c": "./common"
+  },
+  "resolutions": {
+    "**/qs": "6.16.0",
+    "**/axios": "0.33.0",
+    "**/@grpc/grpc-js": "^1.9.16"
   }
 }

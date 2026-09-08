@@ -5,10 +5,14 @@
     "firebase": "firebase"
   },
   "dependencies": {
-    "firebase-tools": "^11.2.2"
+    "firebase-tools": "15.29.0"
   },
   "devDependencies": {},
   "private": true,
   "author": "shin4488",
-  "license": "MIT"
+  "license": "MIT",
+  "resolutions": {
+    "**/qs": "6.16.0",
+    "**/on-headers": "1.1.0"
+  }
 }
