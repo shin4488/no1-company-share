@@ -75,6 +75,11 @@
     "**/serialize-javascript": "7.1.1",
     "**/cacache/tar": "7.5.22",
     "**/external-editor/tmp": "0.2.7",
-    "**/@nuxtjs/youch/cookie": "0.7.2"
+    "**/@nuxtjs/youch/cookie": "0.7.2",
+    "**/defu": "6.1.7",
+    "**/@vue/component-compiler-utils/postcss": "8.5.28",
+    "**/uuid": "11.1.1",
+    "**/webpack/micromatch": "4.0.8",
+    "**/watchpack-chokidar2/chokidar": "3.6.0"
   }
 }
