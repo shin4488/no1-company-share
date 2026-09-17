@@ -21,13 +21,9 @@ For detailed explanation on how things work, check out the [documentation](https
 
 ## Dependency checks
 
-Use the Node.js version specified in `package.json` and install dependencies with
-`yarn install --frozen-lockfile`. After updating dependencies, run `yarn lint`,
-`yarn test`, and `yarn build`. To run only the dependency security and compatibility
-checks, use `yarn test:dependencies`.
+Use the Node.js version specified in `package.json` and install dependencies with `yarn install --frozen-lockfile`. After updating dependencies, run `yarn lint`, `yarn test`, and `yarn build`. To run only the dependency security and compatibility checks, use `yarn test:dependencies`.
 
-When using `resolutions`, verify compatibility with the packages that depend on
-them. Remove overrides once the parent packages support patched versions.
+When using `resolutions`, verify compatibility with the packages that depend on them. Remove overrides once the parent packages support patched versions.
 
 ## Special Directories
 
