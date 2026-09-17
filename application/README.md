@@ -19,6 +19,32 @@ $ yarn generate
 
 For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
 
+## Dependency security checks
+
+Use Node 24 and `yarn install --frozen-lockfile`. `yarn test` runs the dependency
+security checks followed by the application tests; `yarn test:dependencies` runs
+only the dependency checks. Run `yarn lint` and `yarn build` before changing the
+security resolutions in `package.json`.
+
+Nuxt 2 and its tools still request vulnerable dependency versions. The resolutions
+keep the existing framework while selecting these patched packages:
+
+| Dependency             | Used by                              | Compatibility checks                                                                                                     |
+| ---------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `serialize-javascript` | Vue SSR, Nuxt, Terser                | SSR state escaping, dates/regular expressions/functions, rejection of injected code, production build; requires Node 20+ |
+| `tar`                  | `cacache` used by Nuxt's Terser      | Archive creation/extraction and cache read/write; cacache 15 declares tar but does not import it in its runtime code     |
+| `tmp`                  | `external-editor` via Nuxt telemetry | Temporary file creation, contents, permissions and cleanup                                                               |
+| `cookie`               | `@nuxtjs/youch`                      | Cookie parsing and rejection of invalid cookie names                                                                     |
+
+These resolutions intentionally exceed the old parents' requested ranges, so Yarn
+prints compatibility warnings. Keep the tests when updating them; remove the
+resolutions when the parent packages support patched versions themselves.
+
+This does not resolve all advisories. Nuxt 2/Vue 2/Vuetify 2 and their older build
+dependencies still require a framework migration. Firebase dependencies also
+retain advisories requiring upstream changes. Do not replace those dependencies
+across incompatible major versions solely to silence audit results.
+
 ## Special Directories
 
 You can create the following extra directories, some of which have special behaviors. Only `pages` is required; you can delete them if you don't want to use their functionality.
