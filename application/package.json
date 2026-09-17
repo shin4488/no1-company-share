@@ -7,11 +7,12 @@
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
-    "lint:js": "eslint --ext \".js,.ts,.vue\" --ignore-path ../.gitignore .",
+    "lint:js": "eslint --ext \".js,.ts,.vue,.cjs\" --ignore-path ../.gitignore .",
     "lint:prettier": "prettier --check .",
     "lint": "yarn lint:js && yarn lint:prettier",
     "lintfix": "prettier --write --list-different . && yarn lint:js --fix",
-    "test": "jest"
+    "test": "yarn test:dependencies && jest",
+    "test:dependencies": "node --test test/*.test.cjs"
   },
   "dependencies": {
     "@nuxtjs/pwa": "^3.3.5",
@@ -70,6 +71,10 @@
     "node": "24.x"
   },
   "resolutions": {
-    "**/qs": "6.16.0"
+    "**/qs": "6.16.0",
+    "**/serialize-javascript": "7.1.1",
+    "**/cacache/tar": "7.5.22",
+    "**/external-editor/tmp": "0.2.7",
+    "**/@nuxtjs/youch/cookie": "0.7.2"
   }
 }
