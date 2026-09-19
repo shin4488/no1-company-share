@@ -19,22 +19,44 @@ const plugin: Plugin = ({ store, error }, inject) => {
   // SSRと同じストアでhydrationを完了してから、ブラウザ側の認証状態に同期する。
   // Service WorkerがIDトークンを付けられない初回訪問などでは、両者が異なり得る。
   window.onNuxtReady(() => {
+    let authVersion = 0;
     onAuthStateChanged(
       auth,
       async (authUser) => {
+        const version = ++authVersion;
         try {
-          const claims = authUser
-            ? (await authUser.getIdTokenResult(true)).claims
+          const result = authUser
+            ? await authUser.getIdTokenResult(true)
             : null;
+          // トークンの取得中にログアウトや別ユーザーへの切り替えが起き得る。
+          if (version !== authVersion) {
+            return;
+          }
           await store.dispatch(
             'firebaseAuthorization/onAuthStateChangedAction',
-            { authUser, claims },
+            {
+              // ストア内で再びトークン取得を待たず、取得済みの同じ状態を反映する。
+              authUser:
+                authUser && result
+                  ? {
+                      uid: authUser.uid,
+                      idToken: result.token,
+                      photoURL: authUser.photoURL,
+                      displayName: authUser.displayName,
+                    }
+                  : null,
+            },
           );
         } catch {
-          onAuthError();
+          if (version === authVersion) {
+            onAuthError();
+          }
         }
       },
-      onAuthError,
+      () => {
+        ++authVersion;
+        onAuthError();
+      },
     );
   });
 };

@@ -89,6 +89,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { isNavigationFailure } from 'vue-router';
 import { DefaultData, SidebarItem } from '@f/definition/layouts/default/data';
 import { StringUtil } from '@c/util/stringUtil';
 
@@ -196,9 +197,19 @@ export default Vue.extend({
     async firebaseUserId() {
       this.sideBarItems = this.$cloner.deepClone(this.decideSidebarItems());
 
-      // homeはルーティング時にhomeのままであり、画面更新されないため、
-      // ログイン状態が変わったら、お気に入り状態の再取得のために明示的にデータを取得しなおす
-      if (this.$nuxt.$route.path === '/home') {
+      const path = this.$nuxt.$route.path;
+      const isPrivatePage = ['/bookmark', '/my-post'].includes(path);
+      if (isPrivatePage && !this.isLogined) {
+        await this.$router.replace(this.homePath).catch((error: Error) => {
+          // /logoutのルート処理も同時にホームへ戻すため、遷移が取り消され得る。
+          if (!isNavigationFailure(error)) {
+            throw error;
+          }
+        });
+        return;
+      }
+      // 初期認証の同期やアカウント変更後に、前のユーザーの表示を残さない。
+      if (path === this.homePath || isPrivatePage) {
         await this.$nuxt.refresh();
       }
     },

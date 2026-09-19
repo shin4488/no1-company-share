@@ -21,7 +21,9 @@ jest.mock('@c/firebaseConfig', () => ({
 
 const user = (uid) => ({
   uid,
-  getIdTokenResult: jest.fn().mockResolvedValue({ claims: {} }),
+  getIdTokenResult: jest
+    .fn()
+    .mockResolvedValue({ token: 'test-token', claims: {} }),
 });
 let ready;
 beforeEach(() => {
@@ -93,7 +95,14 @@ test('描画後もログイン・ログアウトの通知を反映する', async
     await listeners[0].listener(authUser);
     expect(dispatch).toHaveBeenLastCalledWith(
       'firebaseAuthorization/onAuthStateChangedAction',
-      { authUser, claims: authUser ? {} : null },
+      {
+        authUser: authUser
+          ? expect.objectContaining({
+              uid: authUser.uid,
+              idToken: 'test-token',
+            })
+          : null,
+      },
     );
   }
 });
@@ -122,5 +131,33 @@ test.each(['token', 'store', 'listener'])(
       message:
         '認証状態を確認できませんでした。ページを再読み込みしてください。',
     });
+  },
+);
+
+test.each(['resolve', 'reject'])(
+  'ログアウト後に古いトークン取得が%sしても認証状態やエラー画面を巻き戻さない',
+  async (outcome) => {
+    let finish;
+    const staleUser = user('stale');
+    staleUser.getIdTokenResult.mockImplementation(
+      () =>
+        new Promise((resolve, reject) => {
+          finish = () =>
+            outcome === 'resolve'
+              ? resolve({ claims: {} })
+              : reject(new Error('stale failure'));
+        }),
+    );
+    const dispatch = jest.fn().mockResolvedValue(undefined);
+    const error = jest.fn();
+    await plugin({ store: { dispatch }, error }, jest.fn());
+    ready();
+    const pending = listeners[0].listener(staleUser);
+    await listeners[0].listener(null);
+    finish();
+    await pending;
+    expect(dispatch).toHaveBeenCalledTimes(1);
+    expect(dispatch.mock.calls[0][1].authUser).toBeNull();
+    expect(error).not.toHaveBeenCalled();
   },
 );

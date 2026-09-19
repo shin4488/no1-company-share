@@ -17,13 +17,13 @@ export const state = (): firebaseUserInfo => ({
 export type RootState = ReturnType<typeof state>;
 
 export const getters = getterTree(state, {
-  userIdComputed(state): string | null {
+  userIdComputed(state: RootState): string | null {
     return state.userId;
   },
-  idTokenComputed(state): string | null {
+  idTokenComputed(state: RootState): string | null {
     return state.idToken;
   },
-  userInfoComputed(state): firebaseUserInfo {
+  userInfoComputed(state: RootState): firebaseUserInfo {
     return {
       userId: state.userId,
       idToken: state.idToken,
@@ -35,7 +35,7 @@ export const getters = getterTree(state, {
 
 export const mutations = mutationTree(state, {
   setUserInfo(
-    state,
+    state: RootState,
     { userId, idToken, iconImageUrl, displayedName }: firebaseUserInfo,
   ) {
     state.userId = userId;
