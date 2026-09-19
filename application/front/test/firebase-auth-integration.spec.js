@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex, { Store } from 'vuex';
+import { signInWithPopup } from 'firebase/auth';
 import plugin from '../plugins/firebase/client';
 import * as authorization from '../store/firebaseAuthorization';
 
@@ -9,6 +10,8 @@ let ready;
 jest.mock('firebase/app', () => ({ getApps: () => ['app'] }));
 jest.mock('firebase/auth', () => ({
   getAuth: () => ({}),
+  GoogleAuthProvider: jest.fn(),
+  signInWithPopup: jest.fn(),
   onAuthStateChanged: (_auth, callback) => {
     listener = callback;
   },
@@ -85,4 +88,25 @@ test('遅い前ユーザーの同期が後から完了しても、新ユーザ�
   expect(store.state.firebaseAuthorization.userId).toBe('second');
   expect(store.state.firebaseAuthorization.idToken).toBe('second-token');
   expect(error).not.toHaveBeenCalled();
+});
+
+test('Googleログインの完了がログアウト後に届いても、実ストアをログイン状態に戻さない', async () => {
+  const { store } = await start();
+  store.$fire = { auth: {} };
+  const account = user('stale');
+  account.getIdToken.mockResolvedValue('stale-token');
+  let completeLogin;
+  signInWithPopup.mockImplementation(
+    () =>
+      new Promise((resolve) => {
+        completeLogin = resolve;
+      }),
+  );
+  const pending = store.dispatch('firebaseAuthorization/loginByGoogle');
+  await listener(account);
+  await listener(null);
+  completeLogin({ user: account });
+  await pending;
+  expect(store.state.firebaseAuthorization.userId).toBeNull();
+  expect(store.state.firebaseAuthorization.idToken).toBeNull();
 });

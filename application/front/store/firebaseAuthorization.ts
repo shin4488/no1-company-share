@@ -89,12 +89,8 @@ export const actions = actionTree(
     },
     async loginByGoogle() {
       const provider = new GoogleAuthProvider();
+      // ストアへの反映は認証リスナーに集約し、古いログイン結果による上書きを防ぐ。
       await signInWithPopup(this.$fire.auth, provider)
-        .then((userResult) =>
-          this.dispatch('firebaseAuthorization/onAuthStateChangedAction', {
-            authUser: userResult.user,
-          }),
-        )
         // ポップアップを閉じたときのエラー回避のためcatchを記載
         .catch((error) => error);
     },
