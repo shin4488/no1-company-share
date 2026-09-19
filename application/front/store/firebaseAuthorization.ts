@@ -17,13 +17,13 @@ export const state = (): firebaseUserInfo => ({
 export type RootState = ReturnType<typeof state>;
 
 export const getters = getterTree(state, {
-  userIdComputed(state): string | null {
+  userIdComputed(state: RootState): string | null {
     return state.userId;
   },
-  idTokenComputed(state): string | null {
+  idTokenComputed(state: RootState): string | null {
     return state.idToken;
   },
-  userInfoComputed(state): firebaseUserInfo {
+  userInfoComputed(state: RootState): firebaseUserInfo {
     return {
       userId: state.userId,
       idToken: state.idToken,
@@ -35,7 +35,7 @@ export const getters = getterTree(state, {
 
 export const mutations = mutationTree(state, {
   setUserInfo(
-    state,
+    state: RootState,
     { userId, idToken, iconImageUrl, displayedName }: firebaseUserInfo,
   ) {
     state.userId = userId;
@@ -89,12 +89,8 @@ export const actions = actionTree(
     },
     async loginByGoogle() {
       const provider = new GoogleAuthProvider();
+      // ストアへの反映は認証リスナーに集約し、古いログイン結果による上書きを防ぐ。
       await signInWithPopup(this.$fire.auth, provider)
-        .then((userResult) =>
-          this.dispatch('firebaseAuthorization/onAuthStateChangedAction', {
-            authUser: userResult.user,
-          }),
-        )
         // ポップアップを閉じたときのエラー回避のためcatchを記載
         .catch((error) => error);
     },
