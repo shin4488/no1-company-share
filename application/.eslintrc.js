@@ -23,4 +23,4 @@ module.exports = {
     // 「(obj?.foo)();」->「(obj?.foo)?.();」
     'no-unsafe-optional-chaining': 'error',
   },
-}
+};
