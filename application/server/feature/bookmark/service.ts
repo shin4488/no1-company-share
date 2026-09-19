@@ -67,8 +67,6 @@ export class BookmarkServiceImpl implements BookmarkService {
           { transaction },
         );
       }
-
-      transaction.commit();
     });
   }
 
@@ -85,8 +83,6 @@ export class BookmarkServiceImpl implements BookmarkService {
         sharedPostIds,
       };
       await this.bookmarkDao.destroyBookmarks(parameterToDestroy, transaction);
-
-      transaction.commit();
     });
   }
 }

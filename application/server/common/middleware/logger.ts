@@ -10,20 +10,8 @@ export const logRequestResponse = (
 ) => {
   const logger = appContainer.get<LogHandler>(types.LogHandler);
 
-  logger.log('info', '---request start---');
-  logger.log('info', request.method);
-  logger.log('info', request.hostname);
-  logger.log('info', request.url);
-  logger.log('info', 'headers');
-  logger.log('info', request.headers);
-  logger.log('info', 'params');
-  logger.log('info', request.params);
-  logger.log('info', 'query');
-  logger.log('info', request.query);
-  logger.log('info', 'body');
-  // ログ上でネストしたデータはobject表示になってしまうため、文字列としてログ出力
-  logger.log('info', JSON.stringify(request.body));
-  logger.log('info', '---request end---');
+  // 認証ヘッダー・Cookie・本文・クエリの値を記録しない。
+  logger.log('info', { method: request.method, path: request.path });
 
   next();
 };

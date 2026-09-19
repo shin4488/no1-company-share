@@ -6,17 +6,7 @@ import { ArrayUtil } from '@c/util/arrayUtil';
 
 @injectable()
 export class BadParameterErrorHandlerImpl implements BadParameterErrorHandler {
-  private messages: string[];
-
-  constructor();
-  constructor(...messages: string[]) {
-    this.messages = [];
-    if (messages === undefined) {
-      return;
-    }
-
-    this.messages.push(...messages);
-  }
+  private messages: string[] = [];
 
   public addMessage(...messages: string[]): BadParameterErrorHandler {
     this.messages.push(...messages);

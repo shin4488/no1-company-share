@@ -113,8 +113,6 @@ export class SharedPostServiceImpl implements SharedPostService {
           };
         }),
       );
-
-      transaction.commit();
     });
 
     return response;
@@ -154,7 +152,9 @@ export class SharedPostServiceImpl implements SharedPostService {
                   transaction,
                 },
               );
-              const updatedSharedPost = await SharedPost.findByPk(postId);
+              const updatedSharedPost = await SharedPost.findByPk(postId, {
+                transaction,
+              });
               // 更新処理成功後であるため、検索結果はnullになり得ない想定
               return updatedSharedPost as SharedPost;
             },
@@ -166,8 +166,6 @@ export class SharedPostServiceImpl implements SharedPostService {
           };
         }),
       );
-
-      transaction.commit();
     });
 
     return response;
@@ -185,7 +183,6 @@ export class SharedPostServiceImpl implements SharedPostService {
         logicalDeletedPostIds,
         transaction,
       );
-      transaction.commit();
     });
   }
 
@@ -211,8 +208,6 @@ export class SharedPostServiceImpl implements SharedPostService {
           },
         );
       }
-
-      transaction.commit();
     });
   }
 }

@@ -9,6 +9,28 @@ export class CalloutError extends Error {
 }
 
 export class AjaxHelper {
+  // Empty successful responses still need to be distinguished from failed writes.
+  static async submit<TRequest = unknown>(
+    axios: AxiosInstance,
+    method: 'post' | 'put' | 'delete',
+    uri: string,
+    request?: TRequest,
+  ): Promise<boolean> {
+    try {
+      const response = await axios.request<ApiResponse<unknown>>({
+        method,
+        url: uri,
+        data: request,
+      });
+      return (
+        Array.isArray(response.data?.messages) &&
+        response.data.messages.length === 0
+      );
+    } catch {
+      return false;
+    }
+  }
+
   static async get<TResponse = {}, TRequest = {}>(
     axios: AxiosInstance,
     uri: string,

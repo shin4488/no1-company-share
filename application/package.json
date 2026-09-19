@@ -12,7 +12,8 @@
     "lint": "yarn lint:js && yarn lint:prettier",
     "lintfix": "prettier --write --list-different . && yarn lint:js --fix",
     "test": "yarn test:dependencies && jest",
-    "test:dependencies": "node --test test/*.test.cjs"
+    "test:dependencies": "node --test test/*.test.cjs",
+    "test:integration": "node integration/api-writes.cjs"
   },
   "dependencies": {
     "@nuxtjs/pwa": "^3.3.5",
