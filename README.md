@@ -16,7 +16,7 @@ Nuxt.js による SSR フロントエンドと Express API、Firebase Functions�
 ## システム構成
 
 ```mermaid
-flowchart TD
+flowchart LR
     Client["ブラウザ (Nuxt SSR / Vue)"] --> Web["Nginx リバースプロキシ"]
     Web --> App["Nuxt / Express アプリケーション<br>(application/)"]
     App --> DB[("データベース<br>(MySQL / PostgreSQL)")]
