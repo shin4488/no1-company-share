@@ -2,13 +2,21 @@
   "name": "functions",
   "version": "1.0.0",
   "scripts": {
-    "firebase": "firebase"
+    "firebase": "firebase",
+    "test": "node --test tests/*.test.cjs"
   },
   "dependencies": {
-    "firebase-tools": "^11.2.2"
+    "firebase-tools": "15.29.0"
   },
   "devDependencies": {},
   "private": true,
   "author": "shin4488",
-  "license": "MIT"
+  "license": "MIT",
+  "resolutions": {
+    "**/qs": "6.16.0",
+    "**/on-headers": "1.1.0",
+    "**/uuid": "11.1.1",
+    "**/firebase-tools/csv-parse": "7.0.2",
+    "**/@google-cloud/pubsub/@opentelemetry/core": "2.11.0"
+  }
 }

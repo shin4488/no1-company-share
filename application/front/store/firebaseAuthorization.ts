@@ -1,3 +1,4 @@
+import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 // 本当は↓で実装したい（可読性・メンテナンス性のため）
 // https://typescript.nuxtjs.org/ja/cookbook/store/#vuex-module-decorators
 
@@ -16,13 +17,13 @@ export const state = (): firebaseUserInfo => ({
 export type RootState = ReturnType<typeof state>;
 
 export const getters = getterTree(state, {
-  userIdComputed(state): string | null {
+  userIdComputed(state: RootState): string | null {
     return state.userId;
   },
-  idTokenComputed(state): string | null {
+  idTokenComputed(state: RootState): string | null {
     return state.idToken;
   },
-  userInfoComputed(state): firebaseUserInfo {
+  userInfoComputed(state: RootState): firebaseUserInfo {
     return {
       userId: state.userId,
       idToken: state.idToken,
@@ -34,7 +35,7 @@ export const getters = getterTree(state, {
 
 export const mutations = mutationTree(state, {
   setUserInfo(
-    state,
+    state: RootState,
     { userId, idToken, iconImageUrl, displayedName }: firebaseUserInfo,
   ) {
     state.userId = userId;
@@ -87,19 +88,14 @@ export const actions = actionTree(
       AjaxHelper.post(this.$axios, '/users/', requestBody);
     },
     async loginByGoogle() {
-      const provider = new this.$fireModule.auth.GoogleAuthProvider();
-      await this.$fire.auth
-        .signInWithPopup(provider)
-        .then((userResult) =>
-          this.dispatch('firebaseAuthorization/onAuthStateChangedAction', {
-            authUser: userResult.user,
-          }),
-        )
+      const provider = new GoogleAuthProvider();
+      // ストアへの反映は認証リスナーに集約し、古いログイン結果による上書きを防ぐ。
+      await signInWithPopup(this.$fire.auth, provider)
         // ポップアップを閉じたときのエラー回避のためcatchを記載
         .catch((error) => error);
     },
     async logout() {
-      await this.$fire.auth.signOut();
+      await signOut(this.$fire.auth);
     },
   },
 );

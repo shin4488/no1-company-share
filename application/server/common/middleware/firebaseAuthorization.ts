@@ -1,5 +1,5 @@
 import express from 'express';
-import admin from 'firebase-admin';
+import { getAuth } from 'firebase-admin/auth';
 import { StringUtil } from '@c/util/stringUtil';
 import { NotAuthorizedError } from '@s/common/error/notAuthorizedError';
 
@@ -21,7 +21,7 @@ export const authorizationFirebaseUser = (shouldThrowError: boolean = true) => {
         : firebaseIdToken || '';
     // デコードできない時は例外が発生する
     try {
-      const firebaseDecodedToken = await admin.auth().verifyIdToken(token);
+      const firebaseDecodedToken = await getAuth().verifyIdToken(token);
       const firebaseUserId = firebaseDecodedToken?.uid;
       // GETリクエストであってもログイン中であればユーザIDを取得する
       // 自分の投稿かどうか、お気に入り済みかどうかを判定するため

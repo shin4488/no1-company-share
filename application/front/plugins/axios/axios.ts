@@ -1,54 +1,45 @@
-import { Context, Plugin } from '@nuxt/types';
-import { AxiosResponse, AxiosError } from 'axios';
+import { Plugin } from '@nuxt/types';
+import { create, AxiosResponse } from 'axios';
 import {
   AppResponse,
   AppMessageResponse,
 } from '@f/definition/plugins/ajaxResponse';
 import { ArrayUtil } from '@c/util/arrayUtil';
 
-/**
- * レスポンスからエラーメッセージの取得
- * メッセージがない場合はnullを返却
- */
-const extractErrorMessageIfExists = (
-  responseBody: AppResponse,
-): string | null => {
-  const messageObjects = responseBody.messages;
-  if (ArrayUtil.isEmpty(messageObjects)) {
-    return null;
-  }
-
-  const messages = messageObjects.map((x: AppMessageResponse) => x.message);
-  const joinedMessage = messages.join('\n');
-  return joinedMessage;
-};
-
-const plugin: Plugin = ({ $axios, $accessor }: Context) => {
-  $axios.onRequest((config) => {
-    config.headers.Authorization =
-      $accessor.firebaseAuthorization.idTokenComputed;
+const plugin: Plugin = ({ $accessor }, inject) => {
+  const api = create({
+    baseURL: process.server
+      ? `http://127.0.0.1:${process.env.NUXT_PORT || 3000}/api/v1`
+      : '/api/v1',
+  });
+  const notify = (body: AppResponse) => {
+    if (!ArrayUtil.isEmpty(body?.messages)) {
+      $accessor.snackBarError.open(
+        body.messages
+          .map((item: AppMessageResponse) => item.message)
+          .join('\n'),
+      );
+    }
+  };
+  api.interceptors.request.use((config) => {
+    config.headers.set(
+      'Authorization',
+      $accessor.firebaseAuthorization.idTokenComputed,
+    );
     return config;
   });
-  $axios.onResponse((response: AxiosResponse<AppResponse>) => {
-    // 200で返ってきてもメッセージが含まれていればエラーメッセージとして表示
-    const responseBody = response.data;
-    const joinedMessage = extractErrorMessageIfExists(responseBody);
-    if (joinedMessage !== null) {
-      $accessor.snackBarError.open(joinedMessage);
-    }
-  });
-  $axios.onResponseError((error: AxiosError<AppResponse>) => {
-    const response = error.response;
-    if (response === undefined) {
-      return;
-    }
-
-    const responseBody = response.data;
-    const joinedMessage = extractErrorMessageIfExists(responseBody);
-    if (joinedMessage !== null) {
-      $accessor.snackBarError.open(joinedMessage);
-    }
-  });
+  api.interceptors.response.use(
+    (response: AxiosResponse<AppResponse>) => {
+      notify(response.data);
+      return response;
+    },
+    (error) => {
+      if (error.response) {
+        notify(error.response.data);
+      }
+      return Promise.reject(error);
+    },
+  );
+  inject('axios', api);
 };
-
 export default plugin;

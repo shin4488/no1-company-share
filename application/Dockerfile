@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM node:24.20.0-bookworm@sha256:be23f54a88d34e8824c741b19b91064094f92c1c97b194144bfc8b50d67258e2
 
 # コンテナ間通信時は、コンテナ内部で使用されるポートを指定
 # postgreSQLはデフォルトで5432ポートを使用
@@ -15,13 +15,6 @@ ENV GOOGLE_CLOUD_PROJECT no1-company-share
 ENV NUXT_PORT 3100
 ENV TZ Asia/Tokyo
 
-RUN apt update
-RUN apt install sudo -y
-RUN apt install curl -y
-# nodeは最新のLTSをインストール（npmも一緒にインストールされる）
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-RUN apt install -y nodejs
-RUN npm install -g yarn
 
 WORKDIR /home/app/companyshare
 
