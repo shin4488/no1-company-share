@@ -4,13 +4,21 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getAnalytics } from 'firebase/analytics';
 import { firebaseConfig } from '@c/firebaseConfig';
 
-const plugin: Plugin = async ({ store }, inject) => {
+const plugin: Plugin = ({ store, error }, inject) => {
   const app = getApps()[0] || initializeApp(firebaseConfig);
   const auth = getAuth(app);
   inject('fire', { auth });
   getAnalytics(app);
-  // 最初の認証状態を反映してから画面を描画する。以降のログイン・ログアウトも監視する。
-  await new Promise<void>((resolve, reject) => {
+  const onAuthError = () => {
+    error({
+      statusCode: 503,
+      message:
+        '認証状態を確認できませんでした。ページを再読み込みしてください。',
+    });
+  };
+  // SSRと同じストアでhydrationを完了してから、ブラウザ側の認証状態に同期する。
+  // Service WorkerがIDトークンを付けられない初回訪問などでは、両者が異なり得る。
+  window.onNuxtReady(() => {
     onAuthStateChanged(
       auth,
       async (authUser) => {
@@ -22,12 +30,11 @@ const plugin: Plugin = async ({ store }, inject) => {
             'firebaseAuthorization/onAuthStateChangedAction',
             { authUser, claims },
           );
-          resolve();
-        } catch (error) {
-          reject(error);
+        } catch {
+          onAuthError();
         }
       },
-      reject,
+      onAuthError,
     );
   });
 };

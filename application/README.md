@@ -25,6 +25,12 @@ Use the Node.js version specified in `package.json` and install dependencies wit
 
 When using `resolutions`, verify compatibility with the packages that depend on them. Remove overrides once the parent packages support patched versions.
 
+## Firebase authentication and initial rendering
+
+The client keeps the server-provided authentication state until Nuxt finishes hydrating the page. It then subscribes to Firebase authentication changes through `window.onNuxtReady` and updates the store. Do not update this store before hydration: the first HTML request may lack a Service Worker ID token even when the browser has a signed-in user. Authentication-dependent elements must use the same store for their initial render.
+
+The authentication regression tests use production Vue and server-rendered HTML to cover mismatched server/browser sessions, subsequent login/logout, and synchronization failures.
+
 ## API access limits
 
 The bookmark, shared-post, user and development-user routes share a limit of 120 requests per minute per authenticated Firebase user. The limiter runs after token verification and before database access. Both `/api/v1` and its `/localhost` compatibility paths share the same counter. Excess requests receive HTTP 429 and a `Retry-After` header. The in-process counter resets on restart and is not shared between replicas.
