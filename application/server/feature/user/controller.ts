@@ -3,6 +3,7 @@ import { UserService } from './interface/service';
 import { UserSaveRequest } from './definition/userSaveRequest';
 import { UserSaveParameter } from './definition/userSaveParameter';
 import { userSaveSimpleValidators } from './simpleValidator';
+import { apiRateLimiter } from '@s/common/middleware/apiRateLimit';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { BaseController } from '@s/common/controller/baseController';
@@ -42,6 +43,7 @@ const userRouter = Router();
 userRouter.post(
   UserController.userSaveEndpoint,
   authorizationFirebaseUser(),
+  apiRateLimiter,
   userSaveSimpleValidators,
   throwIfHasSimpleValidationResult,
   wrapAction(UserController.save),

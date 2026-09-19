@@ -16,6 +16,7 @@ import { BookmarkDeleteParameterItem } from './definition/bookmarkDeleteParamete
 import { BookmarkGetResponse } from './definition/bookmarkGetResponse';
 import { BookmarkGetRequest } from './definition/bookmarkGetRequest';
 import { BookmarkGetParameter } from './definition/bookmarkGetParameter';
+import { apiRateLimiter } from '@s/common/middleware/apiRateLimit';
 import { BaseController } from '@s/common/controller/baseController';
 import { StringUtil } from '@c/util/stringUtil';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
@@ -128,6 +129,7 @@ const bookmarkRouter = Router();
 bookmarkRouter.get(
   SharedPostController.bookmarkGetEndpoint,
   authorizationFirebaseUser(),
+  apiRateLimiter,
   bookmarkGetSimpleValidators,
   throwIfHasSimpleValidationResult,
   wrapAction(SharedPostController.getBookamrks),
@@ -135,6 +137,7 @@ bookmarkRouter.get(
 bookmarkRouter.post(
   SharedPostController.bookmarkPostEndpoint,
   authorizationFirebaseUser(),
+  apiRateLimiter,
   bookmarkPostSimpleValidators,
   throwIfHasSimpleValidationResult,
   wrapAction(SharedPostController.postNewBookmarks),
@@ -142,6 +145,7 @@ bookmarkRouter.post(
 bookmarkRouter.delete(
   SharedPostController.bookmarkDeleteEndpoint,
   authorizationFirebaseUser(),
+  apiRateLimiter,
   bookmarkDeleteSimpleValidators,
   throwIfHasSimpleValidationResult,
   wrapAction(SharedPostController.deleteBookmarks),
