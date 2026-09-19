@@ -16,20 +16,20 @@ class CompanyController extends BaseController {
     logger.log('info', 'firebase user id', response.locals.firebaseUserId);
 
     try {
-      console.log('会社取得（findAll）');
+      logger.log('debug', '会社取得（findAll）');
       const records = await CompanyMaster.findAll();
-      console.log(records);
+      logger.log('debug', records);
 
-      console.log('会社作成（create）');
+      logger.log('debug', '会社作成（create）');
       const user1 = await CompanyMaster.create({
         companyNumber: `alice${records.length}`,
         companyJapaneseName: 'husigi ja',
         imageUrl: 'http://example.com',
         homepageUrl: '23fghh',
       });
-      console.log(user1);
+      logger.log('debug', user1);
 
-      console.log('会社取得（findOne）');
+      logger.log('debug', '会社取得（findOne）');
       const company = await CompanyMaster.findOne({
         where: { companyNumber: `alice${records.length}` },
       });
@@ -37,7 +37,7 @@ class CompanyController extends BaseController {
         company.homepageUrl = `20qwer.com${records.length}`;
         await company.save();
       }
-      console.log(company);
+      logger.log('debug', company);
 
       const records2 = await CompanyMaster.findAll<CompanyMaster>();
       super.success(response, { companies: records2 });

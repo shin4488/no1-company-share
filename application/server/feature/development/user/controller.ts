@@ -32,7 +32,7 @@ class UserController extends BaseController {
     const userWhere = await UserMaster.findAll({
       where: { id: { [Op.like]: 'eUFhpDok0k' } },
     });
-    console.log(userWhere);
+    logger.log('debug', userWhere);
 
     const companies = await sequelize.query<CompanyMaster>(
       'SELECT * FROM public.company_master',

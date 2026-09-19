@@ -239,12 +239,12 @@ let count = 0;
     ).rows[0].n,
     0,
   );
-  console.log(
-    `PASS: ${count} real API calls, persisted writes, ownership checks, validation and rollback`,
+  process.stdout.write(
+    `PASS: ${count} real API calls, persisted writes, ownership checks, validation and rollback\n`,
   );
 })()
   .catch((error) => {
-    console.error(error.message);
+    process.stderr.write(`${error.message}\n`);
     process.exitCode = 1;
   })
   .finally(async () => {
