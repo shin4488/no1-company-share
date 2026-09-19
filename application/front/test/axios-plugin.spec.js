@@ -37,7 +37,7 @@ describe('API通信の表示・認証契約', () => {
       expect(config.headers.get('Accept')).toBe('application/json');
     },
   );
-  test.each([200, 400])(
+  test.each([200, 400, 429])(
     'HTTP %s の複数メッセージを改行表示する',
     async (status) => {
       const { api, open } = setup();

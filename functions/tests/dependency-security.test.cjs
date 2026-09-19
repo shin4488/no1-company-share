@@ -132,3 +132,78 @@ test("CLI Gaxios UUID generation supports v4 and rejects short v5 output buffers
     RangeError
   );
 });
+
+test("PubSub publishes and reports RPC failures with the updated telemetry core", async (t) => {
+  const { PubSub } = fromCli("@google-cloud/pubsub");
+  const tracing = fromPubsub("./telemetry-tracing.js");
+  const enabled = tracing.isEnabled();
+  tracing.setGloballyEnabled(true);
+  const client = new PubSub({ projectId: "demo-test" });
+  t.after(async () => {
+    tracing.setGloballyEnabled(Boolean(enabled));
+    await client.close();
+  });
+  const topic = client.topic("test", { batching: { maxMessages: 1 } });
+  const requests = [];
+  // 最後のRPC境界のみ差し替え、公開APIからバッチ・トレース・コールバックを通す。
+  t.mock.method(topic, "request", (options, callback) => {
+    requests.push(options);
+    if (requests.length === 2) callback(new Error("RPC unavailable"));
+    else callback(null, { messageIds: ["message-1"] });
+  });
+  const messageId = await topic.publishMessage({
+    data: Buffer.from("日本語"),
+    attributes: { company: "example" },
+  });
+  assert.equal(messageId, "message-1");
+  assert.equal(requests[0].method, "publish");
+  assert.equal(requests[0].reqOpts.topic, "projects/demo-test/topics/test");
+  assert.equal(requests[0].reqOpts.messages[0].data.toString(), "日本語");
+  assert.equal(requests[0].reqOpts.messages[0].attributes.company, "example");
+  await assert.rejects(topic.publishMessage({ data: Buffer.from("retry") }), {
+    message: "RPC unavailable",
+  });
+});
+
+test("PubSub extracts valid trace context and rejects invalid incoming IDs", (t) => {
+  const tracing = fromPubsub("./telemetry-tracing.js");
+  const enabled = tracing.isEnabled();
+  tracing.setGloballyEnabled(true);
+  t.after(() => tracing.setGloballyEnabled(Boolean(enabled)));
+  // 受信スパンを作る直前のコンテキストを観測し、外部トレース送信はしない。
+  let captured;
+  t.mock.method(
+    tracing.PubsubSpans,
+    "createReceiveSpan",
+    (_message, _name, context) => {
+      captured = context;
+      return {};
+    }
+  );
+  tracing.extractSpan(
+    {
+      attributes: {
+        googclient_traceparent:
+          "00-1234567890abcdef1234567890abcdef-1234567890abcdef-01",
+        googclient_tracestate: "vendor=value",
+      },
+    },
+    "projects/demo-test/subscriptions/test"
+  );
+  const parent = telemetryApi.trace.getSpanContext(captured);
+  assert.equal(parent.traceId, "1234567890abcdef1234567890abcdef");
+  assert.equal(parent.spanId, "1234567890abcdef");
+  assert.equal(parent.traceFlags, 1);
+  assert.equal(parent.traceState.get("vendor"), "value");
+  assert.equal(parent.isRemote, true);
+  for (const invalid of [
+    "garbage",
+    "00-00000000000000000000000000000000-1234567890abcdef-01",
+  ]) {
+    tracing.extractSpan(
+      { attributes: { googclient_traceparent: invalid } },
+      "test"
+    );
+    assert.equal(telemetryApi.trace.getSpanContext(captured), undefined);
+  }
+});
