@@ -80,6 +80,14 @@ npm run lint
 
 ---
 
+## 書き込みAPIの結合テスト
+
+`application/` の `yarn test:integration` は実際のAPI・DI・PostgreSQLで保存、権限検証、ロールバックを確認します。Firebaseの本人確認だけをテスト用に置き換えます。
+
+`database/init/` のスキーマを用意した使い捨てDBの接続URLを `NO1_TEST_DATABASE_URL` に設定して実行してください。接続先は localhost または 127.0.0.1、DB名は `codex_no1_` で始まる名前に限定されます。テスト用データを書き込むため、本番や普段の開発DBを指定しないでください。
+
+---
+
 ## ディレクトリ構成
 
 ```text

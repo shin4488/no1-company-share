@@ -29,7 +29,6 @@ export class UserServiceImpl implements UserService {
 
     await this.sequelizeHandler.transact(async (transaction: Transaction) => {
       await this.userMasterDao.upsertUser(userMaster, transaction);
-      transaction.commit();
     });
   }
 }

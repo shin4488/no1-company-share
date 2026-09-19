@@ -80,17 +80,16 @@ export default Vue.extend({
           },
         ],
       };
-      // APIレスポンスエラー検知のためにいったんエラーメッセージを空にしている
-      this.$accessor.snackBarError.open('');
+      let succeeded = false;
       await this.$accessor.spinnerOverlay.open(async () => {
-        await AjaxHelper.post(
+        succeeded = await AjaxHelper.submit(
           this.$axios,
+          'post',
           '/reported-shared-posts/',
           reportRequest,
         );
       });
-      // TODO:エラー判定の改善（エラースナックバーにメッセージがある=エラーであるとしている）
-      if (StringUtil.isEmpty(this.$accessor.snackBarError.message)) {
+      if (succeeded) {
         this.$accessor.snackBarInfo.open('投稿を通報しました。');
         this.$emit('success');
       }

@@ -393,7 +393,7 @@ export default Vue.extend({
         request,
       );
       const responsePosts = response?.posts;
-      if (response === null && ArrayUtil.isEmpty(responsePosts)) {
+      if (response === null || ArrayUtil.isEmpty(responsePosts)) {
         throw new Error('api error');
       }
 
@@ -426,7 +426,7 @@ export default Vue.extend({
         request,
       );
       const responsePosts = response?.posts;
-      if (response === null && ArrayUtil.isEmpty(responsePosts)) {
+      if (response === null || ArrayUtil.isEmpty(responsePosts)) {
         throw new Error('api error');
       }
 
