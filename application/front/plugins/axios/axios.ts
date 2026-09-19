@@ -36,6 +36,15 @@ const plugin: Plugin = ({ $accessor }, inject) => {
     (error) => {
       if (error.response) {
         notify(error.response.data);
+        if (ArrayUtil.isEmpty(error.response.data?.messages)) {
+          $accessor.snackBarError.open(
+            `${error.response.status} : 通信に失敗しました。再試行してください。`,
+          );
+        }
+      } else {
+        $accessor.snackBarError.open(
+          '通信に失敗しました。接続を確認して再試行してください。',
+        );
       }
       return Promise.reject(error);
     },

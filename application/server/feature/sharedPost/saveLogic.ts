@@ -59,7 +59,9 @@ export class SharedPostSaveLogicImpl implements SharedPostSaveLogic {
 
     // 投稿明細作成
     // 投稿詳細は、送られたもののみを残すため、delete→insertで更新
-    const currentDetails = await createdPost.getSharedPostDetails();
+    const currentDetails = await createdPost.getSharedPostDetails({
+      transaction,
+    });
     if (ArrayUtil.isNotEmpty(currentDetails)) {
       await Promise.all(
         currentDetails.map(async (x) => await x.destroy({ transaction })),

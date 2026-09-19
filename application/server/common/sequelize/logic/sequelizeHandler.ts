@@ -65,12 +65,8 @@ export class SequelizeHandlerImpl implements SequelizeHandler {
   public async transact(
     process: (transaction: Transaction) => Promise<void> | void,
   ): Promise<void> {
-    const transaction = await this.sequelize.transaction();
-    try {
+    await this.sequelize.transaction(async (transaction) => {
       await process(transaction);
-    } catch (error) {
-      transaction.rollback();
-      throw error;
-    }
+    });
   }
 }

@@ -5,8 +5,8 @@
 
       <!-- xsだけは指定できないため、cols指定となる -->
       <v-col
-        v-for="(item, index) in value"
-        :key="index"
+        v-for="item in value"
+        :key="item.postId"
         xl="3"
         md="4"
         sm="6"
@@ -78,6 +78,9 @@ export default Vue.extend({
       required: false,
     },
   },
+  data() {
+    return { pendingBookmarkIds: [] as string[] };
+  },
   computed: {
     isLogined(): boolean {
       return StringUtil.isNotEmpty(
@@ -92,42 +95,61 @@ export default Vue.extend({
     /**
      * お気に入り追加処理
      */
-    onAddedBookmark({ postId }: { postId: string }): void {
+    async onAddedBookmark({ postId }: { postId: string }): Promise<void> {
+      await this.changeBookmark(postId, true);
+    },
+    async onRemovedBookmark({ postId }: { postId: string }): Promise<void> {
+      await this.changeBookmark(postId, false);
+    },
+    async changeBookmark(postId: string, bookmarked: boolean): Promise<void> {
       if (this.isNotLogined()) {
         this.$accessor.snackBarError.open(
-          'お気に入り追加するにはログインしてください。',
+          'お気に入りを変更するにはログインしてください。',
         );
         return;
       }
-
-      const bookmarkedPostIndex = this.getTargetPostIndex(postId);
-      if (bookmarkedPostIndex === -1) {
+      if (
+        this.pendingBookmarkIds.includes(postId) ||
+        this.getTargetPostIndex(postId) === -1
+      ) {
         return;
       }
-
-      // お気に入り登録はサーバ処理結果を画面に反映する必要がないため、サーバ処理結果を待たない
-      AjaxHelper.post(this.$axios, `/bookmarked-posts/${postId}`);
-      const clonedPosts = this.$cloner.deepClone(this.value);
-      clonedPosts[bookmarkedPostIndex].numberOfBookmarks++;
-      clonedPosts[bookmarkedPostIndex].isBookmarkedByLoginUser = true;
-      this.$emit('input', clonedPosts);
-    },
-    /**
-     * お気に入り削除処理
-     */
-    // ログインしていない状態でお気に入り削除は画面上では考えられないため、ログインチェックを行っていない
-    onRemovedBookmark({ postId }: { postId: string }): void {
-      const bookmarkedPostIndex = this.getTargetPostIndex(postId);
-      if (bookmarkedPostIndex === -1) {
-        return;
+      const userId = this.$accessor.firebaseAuthorization.userIdComputed;
+      this.pendingBookmarkIds.push(postId);
+      try {
+        const succeeded = await AjaxHelper.submit(
+          this.$axios,
+          bookmarked ? 'post' : 'delete',
+          `/bookmarked-posts/${postId}`,
+        );
+        if (
+          !succeeded ||
+          userId !== this.$accessor.firebaseAuthorization.userIdComputed
+        ) {
+          return;
+        }
+        const index = this.getTargetPostIndex(postId);
+        if (index === -1) {
+          return;
+        }
+        const posts = this.$cloner.deepClone(this.value);
+        const post = posts[index];
+        if (post.isBookmarkedByLoginUser !== bookmarked) {
+          post.numberOfBookmarks = Math.max(
+            0,
+            post.numberOfBookmarks + (bookmarked ? 1 : -1),
+          );
+          post.isBookmarkedByLoginUser = bookmarked;
+        }
+        if (!bookmarked && this.$nuxt.$route.path === '/bookmark') {
+          posts.splice(index, 1);
+        }
+        this.$emit('input', posts);
+      } finally {
+        this.pendingBookmarkIds = this.pendingBookmarkIds.filter(
+          (id) => id !== postId,
+        );
       }
-
-      // お気に入り削除はサーバ処理結果を画面に反映する必要がないため、サーバ処理結果を待たない
-      AjaxHelper.delete(this.$axios, `/bookmarked-posts/${postId}`);
-      const clonedPosts = this.$cloner.deepClone(this.value);
-      clonedPosts[bookmarkedPostIndex].numberOfBookmarks--;
-      clonedPosts[bookmarkedPostIndex].isBookmarkedByLoginUser = false;
-      this.$emit('input', clonedPosts);
     },
     /**
      * 通報処理
@@ -155,8 +177,12 @@ export default Vue.extend({
         return;
       }
 
+      const currentIndex = this.getTargetPostIndex(postId);
+      if (currentIndex === -1) {
+        return;
+      }
       const clonedPosts = this.$cloner.deepClone(this.value);
-      clonedPosts.splice(reportedPostIndex, 1);
+      clonedPosts.splice(currentIndex, 1);
       this.$emit('input', clonedPosts);
     },
     /**
@@ -185,10 +211,21 @@ export default Vue.extend({
         return;
       }
 
-      await AjaxHelper.delete(this.$axios, `/shared-posts/${postId}`);
+      const succeeded = await AjaxHelper.submit(
+        this.$axios,
+        'delete',
+        `/shared-posts/${postId}`,
+      );
+      if (!succeeded) {
+        return;
+      }
+      const currentIndex = this.getTargetPostIndex(postId);
+      if (currentIndex === -1) {
+        return;
+      }
       this.$accessor.snackBarInfo.open('投稿を削除しました。');
       const clonedPosts = this.$cloner.deepClone(this.value);
-      clonedPosts.splice(deletedPostIndex, 1);
+      clonedPosts.splice(currentIndex, 1);
       this.$emit('input', clonedPosts);
     },
     /**

@@ -64,10 +64,12 @@ describe('API通信の表示・認証契約', () => {
       );
     },
   );
-  test('通信失敗では余計な通知を追加せず呼び出し元へ失敗を伝える', async () => {
+  test('通信失敗を表示し呼び出し元へ失敗を伝える', async () => {
     const { api, open } = setup();
     api.defaults.adapter = () => Promise.reject(new Error('offline'));
     await expect(api.get('/posts')).rejects.toThrow('offline');
-    expect(open).not.toHaveBeenCalled();
+    expect(open).toHaveBeenCalledWith(
+      '通信に失敗しました。接続を確認して再試行してください。',
+    );
   });
 });
