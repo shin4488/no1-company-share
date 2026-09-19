@@ -16,6 +16,7 @@
     "**/qs": "6.16.0",
     "**/on-headers": "1.1.0",
     "**/uuid": "11.1.1",
-    "**/firebase-tools/csv-parse": "7.0.2"
+    "**/firebase-tools/csv-parse": "7.0.2",
+    "**/@google-cloud/pubsub/@opentelemetry/core": "2.11.0"
   }
 }

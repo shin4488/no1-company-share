@@ -7,6 +7,7 @@ const { createRequire } = require('node:module');
 const { test } = require('node:test');
 const Vue = require('vue');
 const { createRenderer } = require('vue-server-renderer');
+const { JSDOM } = require('jsdom');
 
 const fromNuxtWebpack = createRequire(require.resolve('@nuxt/webpack'));
 const fromTerser = createRequire(
@@ -26,10 +27,12 @@ test('SSR embeds state without allowing a posted value to close its script', asy
     { state },
   );
   assert.match(html, /企業一覧/);
-  assert.equal((html.match(/<script>/g) || []).length, 1);
-  assert.equal((html.match(/<\/script>/g) || []).length, 1);
+  const dom = new JSDOM(html);
+  const scripts = dom.window.document.querySelectorAll('script');
+  assert.equal(scripts.length, 1);
   const sandbox = { window: {} };
-  vm.runInNewContext(html.match(/<script>([\s\S]*?)<\/script>/)[1], sandbox);
+  vm.runInNewContext(scripts[0].textContent, sandbox);
+  dom.window.close();
   assert.equal(
     JSON.stringify(sandbox.window.__INITIAL_STATE__),
     JSON.stringify(state),

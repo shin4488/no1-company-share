@@ -8,6 +8,69 @@ const { test } = require("node:test");
 const fromCli = createRequire(require.resolve("firebase-tools"));
 const { parse } = fromCli("csv-parse");
 
+const fromPubsub = createRequire(fromCli.resolve("@google-cloud/pubsub"));
+const telemetryApi = fromPubsub("@opentelemetry/api");
+const { W3CBaggagePropagator } = fromPubsub("@opentelemetry/core");
+
+test("incoming baggage retains normal entries and bounds oversized input", () => {
+  const propagator = new W3CBaggagePropagator();
+  const extract = (baggage) => {
+    const context = propagator.extract(
+      telemetryApi.ROOT_CONTEXT,
+      { baggage },
+      telemetryApi.defaultTextMapGetter
+    );
+    return telemetryApi.propagation.getBaggage(context)?.getAllEntries() ?? [];
+  };
+  assert.deepEqual(extract("company=example,region=jp"), [
+    ["company", { value: "example" }],
+    ["region", { value: "jp" }],
+  ]);
+  for (const input of [
+    Array.from({ length: 1000 }, (_, i) => `k${i}=v`).join(","),
+    `company=${"x".repeat(100000)}`,
+  ]) {
+    const entries = extract(input);
+    assert.ok(entries.length <= 180);
+    assert.ok(
+      entries.every(
+        ([key, entry]) => key.length + entry.value.length + 1 <= 4096
+      )
+    );
+    assert.ok(
+      entries.reduce(
+        (sum, [key, entry]) => sum + key.length + entry.value.length + 2,
+        0
+      ) <= 8193
+    );
+  }
+});
+
+test("Firebase PubSub still propagates trace context without network access", (t) => {
+  const pubsub = fromCli("@google-cloud/pubsub");
+  const tracing = fromPubsub("./telemetry-tracing.js");
+  const enabled = tracing.isEnabled();
+  tracing.setGloballyEnabled(true);
+  t.after(() => tracing.setGloballyEnabled(enabled));
+  const spanContext = {
+    traceId: "1234567890abcdef1234567890abcdef",
+    spanId: "1234567890abcdef",
+    traceFlags: 1,
+  };
+  const message = { attributes: { company: "example" } };
+  tracing.injectSpan({ spanContext: () => spanContext }, message);
+  assert.equal(
+    message.attributes.googclient_traceparent,
+    "00-1234567890abcdef1234567890abcdef-1234567890abcdef-01"
+  );
+  assert.equal(message.attributes.company, "example");
+  assert.equal(
+    typeof new pubsub.PubSub({ projectId: "demo-test" }).topic("test")
+      .publishMessage,
+    "function"
+  );
+});
+
 test("Firebase auth CSV import preserves quoted fields and batching without contacting Firebase", async (t) => {
   const importer = require("firebase-tools/lib/accountImporter");
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "no1-csv-test-"));

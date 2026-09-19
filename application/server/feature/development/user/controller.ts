@@ -1,5 +1,6 @@
 import express, { Router } from 'express';
 import { Op, QueryTypes } from 'sequelize';
+import { apiRateLimiter } from '@s/common/middleware/apiRateLimit';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { SequelizeHandler } from '@s/common/sequelize/logic/interface/SequelizeHandler';
@@ -47,6 +48,7 @@ const userDevelopmentRouter = Router();
 userDevelopmentRouter.post(
   UserController.userEndpoint,
   authorizationFirebaseUser(),
+  apiRateLimiter,
   wrapAction(UserController.getUsers),
 );
 export { userDevelopmentRouter };

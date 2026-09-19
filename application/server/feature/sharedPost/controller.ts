@@ -40,6 +40,7 @@ import {
   ReportPostParameter,
   ReportPostParameterItem,
 } from './definition/reportPostParameter';
+import { apiRateLimiter } from '@s/common/middleware/apiRateLimit';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
 import { types } from '@s/common/dependencyInjection/types';
 import { BaseController } from '@s/common/controller/baseController';
@@ -238,6 +239,7 @@ const sharedPostRouter = Router();
 sharedPostRouter.get(
   SharedPostController.sharedPostsGetEndpoint,
   authorizationFirebaseUser(false),
+  apiRateLimiter,
   sharedPostGetSimpleValidators,
   throwIfHasSimpleValidationResult,
   wrapAction(SharedPostController.getAliveSharedPosts),
@@ -245,6 +247,7 @@ sharedPostRouter.get(
 sharedPostRouter.post(
   SharedPostController.sharedPostsPostEndpoint,
   authorizationFirebaseUser(),
+  apiRateLimiter,
   sharedPostPostSimpleValidators,
   throwIfHasSimpleValidationResult,
   wrapAction(SharedPostController.insertSharedPosts),
@@ -252,6 +255,7 @@ sharedPostRouter.post(
 sharedPostRouter.put(
   SharedPostController.sharedPostsPutEndpoint,
   authorizationFirebaseUser(),
+  apiRateLimiter,
   sharedPostPutSimpleValidators,
   throwIfHasSimpleValidationResult,
   wrapAction(SharedPostController.updateSharedPosts),
@@ -259,6 +263,7 @@ sharedPostRouter.put(
 sharedPostRouter.delete(
   SharedPostController.sharedPostsLogicalDeleteEndpoint,
   authorizationFirebaseUser(),
+  apiRateLimiter,
   sharedPostLogicalDeleteSimpleValidators,
   throwIfHasSimpleValidationResult,
   wrapAction(SharedPostController.deleteSharedPostsLogically),
@@ -266,6 +271,7 @@ sharedPostRouter.delete(
 sharedPostRouter.post(
   SharedPostController.sharedPostsReportEndpoint,
   authorizationFirebaseUser(),
+  apiRateLimiter,
   reportPostSimpleValidator,
   throwIfHasSimpleValidationResult,
   wrapAction(SharedPostController.reportSharedPosts),
