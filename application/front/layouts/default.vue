@@ -219,7 +219,7 @@ export default defineComponent({
   cursor: pointer
 
 .mobile-bottom-navigation
-  :deep(.v-btn)
+  :deep(.v-bottom-navigation__content > .v-btn)
     min-width: 0
     padding-inline: 2px
 </style>
