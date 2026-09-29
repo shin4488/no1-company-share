@@ -11,9 +11,9 @@
     "lint:prettier": "prettier --check .",
     "lint": "yarn lint:js && yarn lint:prettier",
     "lintfix": "prettier --write --list-different . && yarn lint:js --fix",
-    "test": "yarn test:dependencies && jest",
+    "test": "nuxt prepare && yarn test:dependencies && jest",
     "test:dependencies": "node --test test/*.test.cjs",
-    "test:integration": "node integration/api-writes.cjs"
+    "test:integration": "nuxt prepare && node integration/api-writes.cjs"
   },
   "dependencies": {
     "@mdi/font": "7.4.47",
