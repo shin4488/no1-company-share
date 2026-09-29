@@ -48,7 +48,11 @@
 
     <!-- ボトムナビゲーション->モバイルのみ -->
     <template v-if="shouldUseBottomBarComputed">
-      <v-bottom-navigation :model-value="selectedSideBarItem" grow>
+      <v-bottom-navigation
+        class="mobile-bottom-navigation"
+        :model-value="selectedSideBarItem"
+        grow
+      >
         <v-btn
           v-for="(item, index) in sideBarItems"
           :key="index"
@@ -59,9 +63,6 @@
           <v-icon>{{ item.icon }}</v-icon>
           <span>{{ item.title }}</span>
         </v-btn>
-        <v-avatar v-if="isLogined" size="32">
-          <v-img class="elevation-6" :src="firebaseUserIconImage"></v-img>
-        </v-avatar>
       </v-bottom-navigation>
     </template>
   </v-app>
@@ -213,4 +214,9 @@ export default defineComponent({
 <style lang="sass" scoped>
 .app-toobar-title
   cursor: pointer
+
+.mobile-bottom-navigation
+  :deep(.v-btn)
+    min-width: 0
+    padding-inline: 2px
 </style>
