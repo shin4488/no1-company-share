@@ -1,16 +1,19 @@
-import { Plugin } from '@nuxt/types';
-import { create, AxiosResponse } from 'axios';
-import {
+import { create, type AxiosResponse } from 'axios';
+import { defineNuxtPlugin, useRequestEvent } from '#app';
+import type {
   AppResponse,
   AppMessageResponse,
 } from '@f/definition/plugins/ajaxResponse';
 import { ArrayUtil } from '@c/util/arrayUtil';
 
-const plugin: Plugin = ({ $accessor }, inject) => {
+export default defineNuxtPlugin((nuxtApp) => {
+  const { $accessor, $store } = nuxtApp;
+  const localPort = useRequestEvent()?.node.req.socket.localPort;
   const api = create({
-    baseURL: process.server
-      ? `http://127.0.0.1:${process.env.NUXT_PORT || 3000}/api/v1`
-      : '/api/v1',
+    baseURL:
+      typeof window === 'undefined'
+        ? `http://127.0.0.1:${localPort || process.env.PORT || 3000}/api/v1`
+        : '/api/v1',
   });
   const notify = (body: AppResponse) => {
     if (!ArrayUtil.isEmpty(body?.messages)) {
@@ -22,10 +25,10 @@ const plugin: Plugin = ({ $accessor }, inject) => {
     }
   };
   api.interceptors.request.use((config) => {
-    config.headers.set(
-      'Authorization',
-      $accessor.firebaseAuthorization.idTokenComputed,
-    );
+    const token = $accessor.firebaseAuthorization.idTokenComputed;
+    if (token) {
+      config.headers.set('Authorization', `Bearer ${token}`);
+    }
     return config;
   });
   api.interceptors.response.use(
@@ -49,6 +52,6 @@ const plugin: Plugin = ({ $accessor }, inject) => {
       return Promise.reject(error);
     },
   );
-  inject('axios', api);
-};
-export default plugin;
+  $store.$axios = api;
+  return { provide: { axios: api } };
+});

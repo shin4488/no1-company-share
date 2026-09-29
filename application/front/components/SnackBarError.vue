@@ -3,11 +3,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue';
 import { SnackBarErrorData } from '@f/definition/components/snackBarError/data';
 import { StringUtil } from '@c/util/stringUtil';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'SnackBarError',
   data(): SnackBarErrorData {
     return {

@@ -41,20 +41,20 @@
     <!-- 投稿者情報 -->
     <v-card-actions>
       <v-list-item dense class="grow full-width">
-        <v-list-item-avatar>
-          <v-img
-            class="elevation-6"
-            :title="postingUserName"
-            :alt="postingUserName"
-            :src="postingUserIcomImageUrl"
-          />
-        </v-list-item-avatar>
+        <template #prepend>
+          <v-avatar size="40">
+            <v-img
+              class="elevation-6"
+              :title="postingUserName"
+              :alt="postingUserName"
+              :src="postingUserIcomImageUrl"
+            />
+          </v-avatar>
+        </template>
 
-        <v-list-item-content :title="postingUserName">
-          <v-list-item-title>
-            {{ postingUserName }}
-          </v-list-item-title>
-        </v-list-item-content>
+        <v-list-item-title :title="postingUserName">
+          {{ postingUserName }}
+        </v-list-item-title>
 
         <v-row align="center" justify="end">
           <v-icon dense color="bookmark" @click="onClickedBookmarkButton">
@@ -94,16 +94,16 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import { SelectItem } from '@f/definition/common/selectItem';
 import { PostDetail } from '@f/definition/common/sharedPost';
 import { StringUtil } from '@c/util/stringUtil';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'SharedPostCard',
   props: {
     // postId
-    value: {
+    postId: {
       type: String,
       default: '',
       required: true,
@@ -226,27 +226,27 @@ export default Vue.extend({
       // 「今お気に入り状態でお気に入りクリック」=「お気に入り解除」とみなす
       if (this.isBookmarkedByLoginUser) {
         this.$emit('remove-bookmark', {
-          postId: this.value,
+          postId: this.postId,
         });
       } else {
         this.$emit('add-bookmark', {
-          postId: this.value,
+          postId: this.postId,
         });
       }
     },
     onClickedAlertButton(): void {
       this.$emit('confirm-report', {
-        postId: this.value,
+        postId: this.postId,
       });
     },
     onClickedEditButton(): void {
       this.$emit('click-edit', {
-        postId: this.value,
+        postId: this.postId,
       });
     },
     onClickedDeleteButton(): void {
       this.$emit('confirm-delete', {
-        postId: this.value,
+        postId: this.postId,
       });
     },
   },

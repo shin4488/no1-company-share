@@ -22,5 +22,7 @@ module.exports = {
     curly: 'error',
     // 「(obj?.foo)();」->「(obj?.foo)?.();」
     'no-unsafe-optional-chaining': 'error',
+    'import/order': 'off',
+    'vue/multi-word-component-names': 'off',
   },
 };

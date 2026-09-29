@@ -1,19 +1,17 @@
-import Vue from 'vue';
-import Vuex, { Store } from 'vuex';
+import { createStore } from 'vuex';
 import { signInWithPopup } from 'firebase/auth';
-import plugin from '../plugins/firebase/client';
+import plugin from '../plugins/03.firebase.client';
 import * as authorization from '../store/firebaseAuthorization';
 
-Vue.use(Vuex);
-let listener;
-let ready;
+let mockListener;
 jest.mock('firebase/app', () => ({ getApps: () => ['app'] }));
 jest.mock('firebase/auth', () => ({
   getAuth: () => ({}),
   GoogleAuthProvider: jest.fn(),
   signInWithPopup: jest.fn(),
-  onAuthStateChanged: (_auth, callback) => {
-    listener = callback;
+  signOut: jest.fn(),
+  onAuthStateChanged: (_auth, listener) => {
+    mockListener = listener;
   },
 }));
 jest.mock('firebase/analytics', () => ({ getAnalytics: jest.fn() }));
@@ -23,37 +21,36 @@ const user = (uid) => ({
   uid,
   photoURL: `/${uid}.png`,
   displayName: `User ${uid}`,
-  getIdTokenResult: jest
-    .fn()
-    .mockResolvedValue({ token: `${uid}-token`, claims: {} }),
-  getIdToken: jest
-    .fn()
-    .mockRejectedValue(new Error('unexpected second token fetch')),
+  getIdTokenResult: jest.fn().mockResolvedValue({ token: `${uid}-token` }),
+  getIdToken: jest.fn().mockRejectedValue(new Error('unexpected second fetch')),
 });
 
-async function start() {
-  window.onNuxtReady = (callback) => {
-    ready = callback;
-  };
-  const store = new Store({
+function start() {
+  const store = createStore({
     modules: {
       firebaseAuthorization: { ...authorization, namespaced: true },
     },
   });
-  const error = jest.fn();
-  await plugin({ store, error }, jest.fn());
-  ready();
-  return { store, error };
+  const hooks = {};
+  plugin({
+    $store: store,
+    hook: (name, callback) => {
+      hooks[name] = callback;
+    },
+  });
+  hooks['app:mounted']();
+  return store;
 }
 
-afterEach(() => {
-  delete window.onNuxtReady;
+beforeEach(() => {
+  mockListener = undefined;
+  signInWithPopup.mockReset();
 });
 
-test('実際の認証ストアへトークンとプロフィールを一緒に反映し、ログアウトで消去する', async () => {
-  const { store, error } = await start();
+test('認証ストアにトークンとプロフィールを反映し、ログアウトで消去する', async () => {
+  const store = start();
   const account = user('member');
-  await listener(account);
+  await mockListener(account);
   expect(store.state.firebaseAuthorization).toEqual({
     userId: 'member',
     idToken: 'member-token',
@@ -61,18 +58,17 @@ test('実際の認証ストアへトークンとプロフィールを一緒に�
     displayedName: 'User member',
   });
   expect(account.getIdToken).not.toHaveBeenCalled();
-  await listener(null);
+  await mockListener(null);
   expect(store.state.firebaseAuthorization).toEqual({
     userId: null,
     idToken: null,
     iconImageUrl: null,
     displayedName: null,
   });
-  expect(error).not.toHaveBeenCalled();
 });
 
-test('遅い前ユーザーの同期が後から完了しても、新ユーザーの実ストアを上書きしない', async () => {
-  const { store, error } = await start();
+test('遅い前ユーザーの同期は現在のユーザーを上書きしない', async () => {
+  const store = start();
   const first = user('first');
   let finish;
   first.getIdTokenResult.mockImplementation(
@@ -81,31 +77,27 @@ test('遅い前ユーザーの同期が後から完了しても、新ユーザ�
         finish = resolve;
       }),
   );
-  const pending = listener(first);
-  await listener(user('second'));
-  finish({ token: 'first-token', claims: {} });
+  const pending = mockListener(first);
+  await mockListener(user('second'));
+  finish({ token: 'first-token' });
   await pending;
   expect(store.state.firebaseAuthorization.userId).toBe('second');
   expect(store.state.firebaseAuthorization.idToken).toBe('second-token');
-  expect(error).not.toHaveBeenCalled();
 });
 
-test('Googleログインの完了がログアウト後に届いても、実ストアをログイン状態に戻さない', async () => {
-  const { store } = await start();
-  store.$fire = { auth: {} };
-  const account = user('stale');
-  account.getIdToken.mockResolvedValue('stale-token');
-  let completeLogin;
+test('ログイン完了がログアウト後に届いても状態を戻さない', async () => {
+  const store = start();
+  let finishLogin;
   signInWithPopup.mockImplementation(
     () =>
       new Promise((resolve) => {
-        completeLogin = resolve;
+        finishLogin = resolve;
       }),
   );
   const pending = store.dispatch('firebaseAuthorization/loginByGoogle');
-  await listener(account);
-  await listener(null);
-  completeLogin({ user: account });
+  await mockListener(user('stale'));
+  await mockListener(null);
+  finishLogin({ user: user('stale') });
   await pending;
   expect(store.state.firebaseAuthorization.userId).toBeNull();
   expect(store.state.firebaseAuthorization.idToken).toBeNull();
