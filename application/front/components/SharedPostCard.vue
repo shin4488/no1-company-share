@@ -57,7 +57,16 @@
         </v-list-item-title>
 
         <v-row align="center" justify="end">
-          <v-icon dense color="bookmark" @click="onClickedBookmarkButton">
+          <v-icon
+            dense
+            color="bookmark"
+            :aria-label="
+              isBookmarkedByLoginUser ? 'お気に入りを解除' : 'お気に入りに追加'
+            "
+            @click="onClickedBookmarkButton"
+            @keydown.enter.prevent="onClickedBookmarkButton"
+            @keydown.space.prevent="onClickedBookmarkButton"
+          >
             {{ isBookmarkedByLoginUser ? 'mdi-heart' : 'mdi-heart-outline' }}
           </v-icon>
           <span class="subheading mr-2" v-text="numberOfBookmarksComputed" />
@@ -66,7 +75,10 @@
             v-show="isLogined && !isPostedByLoginUser"
             dense
             color="warning"
+            aria-label="投稿を通報"
             @click="onClickedAlertButton"
+            @keydown.enter.prevent="onClickedAlertButton"
+            @keydown.space.prevent="onClickedAlertButton"
           >
             mdi-alert-outline
           </v-icon>
@@ -75,7 +87,10 @@
             class="mr-2"
             dense
             color="secondary"
+            aria-label="投稿を編集"
             @click="onClickedEditButton"
+            @keydown.enter.prevent="onClickedEditButton"
+            @keydown.space.prevent="onClickedEditButton"
           >
             mdi-pencil
           </v-icon>
@@ -83,7 +98,10 @@
             v-show="isLogined && isPostedByLoginUser"
             dense
             color="secondary"
+            aria-label="投稿を削除"
             @click="onClickedDeleteButton"
+            @keydown.enter.prevent="onClickedDeleteButton"
+            @keydown.space.prevent="onClickedDeleteButton"
           >
             mdi-delete
           </v-icon>
