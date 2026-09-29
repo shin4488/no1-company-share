@@ -1,15 +1,19 @@
 <template>
   <!-- モーダルダイアログよりも上に表示できるようにz-indexを大きめに設定 -->
-  <v-overlay z-index="10000" :value="isShown">
+  <v-overlay
+    :z-index="10000"
+    :model-value="isShown"
+    class="align-center justify-center"
+  >
     <Spinner show />
   </v-overlay>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue';
 import { SpinnerOverlayData } from '@f/definition/components/spinnerOverlay/data';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'SpinnerOverlay',
   data(): SpinnerOverlayData {
     return {

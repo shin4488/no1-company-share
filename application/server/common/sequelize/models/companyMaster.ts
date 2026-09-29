@@ -5,7 +5,7 @@ import {
   HasManyCreateAssociationMixin,
 } from 'sequelize';
 import { CommonModelAttribute } from './commonModelAttribute';
-import SharedPost from './sharedPost';
+import type SharedPost from './sharedPost';
 
 export interface CompanyMasterModelAttribute {
   companyNumber: string;
@@ -64,7 +64,7 @@ export default class CompanyMaster extends Model<
     );
   }
 
-  static associate() {
+  static associate(SharedPost: typeof import('./sharedPost').default) {
     this.hasMany(SharedPost, {
       sourceKey: 'companyNumber',
       foreignKey: 'companyNumber',

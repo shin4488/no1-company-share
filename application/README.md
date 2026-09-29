@@ -1,88 +1,26 @@
-# no1-company-share
+# no1-company-share application
 
-## Build Setup
+This application uses Nuxt 4, Vue 3, Vuetify 3, and an Express API mounted under `/api/`. The Nuxt source is in `front/`, the API is in `server/`, and shared code is in `common/`.
+
+## Development and checks
+
+Use Node 24 and Yarn Classic. Run these commands from `application/`:
 
 ```bash
-# install dependencies
-$ yarn install
-
-# serve with hot reload at localhost:3000
-$ yarn dev
-
-# build for production and launch server
-$ yarn build
-$ yarn start
-
-# generate static project
-$ yarn generate
+yarn install --frozen-lockfile
+yarn dev
+yarn lint
+yarn test
+yarn build
+yarn start
 ```
 
-For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
+`yarn start` loads an existing `.env` and runs the Nitro server built in `.output/`. To run the real API write tests, set `NO1_TEST_DATABASE_URL` to a dedicated local PostgreSQL database whose name starts with `codex_no1_`, then run `yarn test:integration`. These tests write to that database. Do not point them at production or a shared development database.
 
-## Dependency checks
-
-Use the Node.js version specified in `package.json` and install dependencies with `yarn install --frozen-lockfile`. After updating dependencies, run `yarn lint`, `yarn test`, and `yarn build`. To run only the dependency security and compatibility checks, use `yarn test:dependencies`.
-
-When using `resolutions`, verify compatibility with the packages that depend on them. Remove overrides once the parent packages support patched versions.
-
-## Firebase authentication and initial rendering
-
-The client keeps the server-provided authentication state until Nuxt finishes hydrating the page. It then subscribes to Firebase authentication changes through `window.onNuxtReady` and updates the store. Do not update this store before hydration: the first HTML request may lack a Service Worker ID token even when the browser has a signed-in user. Authentication-dependent elements must use the same store for their initial render.
-
-The authentication regression tests use production Vue and server-rendered HTML to cover mismatched server/browser sessions, subsequent login/logout, and synchronization failures.
-
-Only the latest authentication notification may update the store: an older token request must not restore a signed-out or previous user. When the user changes after hydration, refresh personalized page data; return signed-out users from bookmark and my-post pages to home. Ordinary router cancellations during logout are expected, while unexpected navigation errors must still surface.
+The Firebase authentication tests use local fixtures. The service worker passes the current Firebase ID token with same-origin HTML navigation; the server verifies it before initial rendering. The client waits until the Nuxt app is mounted before subscribing to Firebase authentication changes. Only the latest authentication notification may update the store. After a user changes, personalized lists refresh and signed-out users return from bookmark and my-post pages to home.
 
 ## API access limits
 
 The bookmark, shared-post, user and development-user routes share a limit of 120 requests per minute per authenticated Firebase user. The limiter runs after token verification and before database access. Both `/api/v1` and its `/localhost` compatibility paths share the same counter. Excess requests receive HTTP 429 and a `Retry-After` header. The in-process counter resets on restart and is not shared between replicas.
 
 Unauthenticated shared-post reads use the socket IP and do not trust forwarded headers. Anonymous clients behind a reverse proxy share one quota. For a production proxy, configure trust for only its actual addresses and use an ingress limiter or shared store for multiple replicas. Do not enable blanket `trust proxy` or derive the key from unverified headers. Authentication attempts and other endpoints need separate ingress protection.
-
-## Special Directories
-
-You can create the following extra directories, some of which have special behaviors. Only `pages` is required; you can delete them if you don't want to use their functionality.
-
-### `assets`
-
-The assets directory contains your uncompiled assets such as Stylus or Sass files, images, or fonts.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/assets).
-
-### `components`
-
-The components directory contains your Vue.js components. Components make up the different parts of your page and can be reused and imported into your pages, layouts and even other components.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/components).
-
-### `layouts`
-
-Layouts are a great help when you want to change the look and feel of your Nuxt app, whether you want to include a sidebar or have distinct layouts for mobile and desktop.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/layouts).
-
-### `pages`
-
-This directory contains your application views and routes. Nuxt will read all the `*.vue` files inside this directory and setup Vue Router automatically.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/get-started/routing).
-
-### `plugins`
-
-The plugins directory contains JavaScript plugins that you want to run before instantiating the root Vue.js Application. This is the place to add Vue plugins and to inject functions or constants. Every time you need to use `Vue.use()`, you should create a file in `plugins/` and add its path to plugins in `nuxt.config.js`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/plugins).
-
-### `static`
-
-This directory contains your static files. Each file inside this directory is mapped to `/`.
-
-Example: `/static/robots.txt` is mapped as `/robots.txt`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/static).
-
-### `store`
-
-This directory contains your Vuex store files. Creating a file in this directory automatically activates Vuex.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).

@@ -43,7 +43,6 @@ export class SharedPostSaveLogicImpl implements SharedPostSaveLogic {
       [OpenGraphType.IMAGE],
     );
 
-    // 会社マスタ作成
     const company = await this.companyMasterDao.upsertCompany(
       {
         companyNumber: parameter.companyNumber,
@@ -54,11 +53,9 @@ export class SharedPostSaveLogicImpl implements SharedPostSaveLogic {
       transaction,
     );
 
-    // 投稿作成
     const createdPost = await createSharedPost(company);
 
-    // 投稿明細作成
-    // 投稿詳細は、送られたもののみを残すため、delete→insertで更新
+    // 投稿詳細はリクエストの内容で全件置換する。upsertだけでは、利用者が削除した明細が残ってしまう。
     const currentDetails = await createdPost.getSharedPostDetails({
       transaction,
     });

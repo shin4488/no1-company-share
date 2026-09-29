@@ -1,7 +1,7 @@
 import { Model, Sequelize, ForeignKey, DataTypes } from 'sequelize';
 import { CommonModelAttribute } from './commonModelAttribute';
-import SharedPost from './sharedPost';
-import UserMaster from './userMaster';
+import type SharedPost from './sharedPost';
+import type UserMaster from './userMaster';
 
 export interface BookmarkModelAttribute {
   sharedPostId: string;
@@ -51,7 +51,10 @@ export default class Bookmark extends Model<
     );
   }
 
-  static associate() {
+  static associate(
+    SharedPost: typeof import('./sharedPost').default,
+    UserMaster: typeof import('./userMaster').default,
+  ) {
     this.belongsTo(SharedPost, {
       targetKey: 'id',
       foreignKey: 'sharedPostId',

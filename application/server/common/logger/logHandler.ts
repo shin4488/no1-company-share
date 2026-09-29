@@ -1,7 +1,8 @@
-import * as path from 'path';
+/* eslint-disable import/no-named-as-default-member -- log4js is CommonJS and its named imports fail in the Nitro ESM bundle. */
 import express from 'express';
 import { injectable } from 'inversify';
-import log4js, { Level, getLogger, connectLogger, configure } from 'log4js';
+import log4js, { type Level } from 'log4js';
+import config from './config.json';
 import { LogHandler } from './interface/LogHandler';
 
 @injectable()
@@ -12,11 +13,10 @@ export class LogHandlerImpl implements LogHandler {
 
   constructor() {
     // https://github.com/log4js-node/log4js-node/tree/master/docs
-    const configPath = path.resolve(__dirname, 'config.json');
-    configure(configPath);
-    this.systemLogger = getLogger('system');
-    this.errorLogger = getLogger('error');
-    this.accessLogger = getLogger('access');
+    log4js.configure(config as log4js.Configuration);
+    this.systemLogger = log4js.getLogger('system');
+    this.errorLogger = log4js.getLogger('error');
+    this.accessLogger = log4js.getLogger('access');
   }
 
   log(
@@ -31,7 +31,7 @@ export class LogHandlerImpl implements LogHandler {
   }
 
   getAccessLoggerMiddleware(): express.Handler {
-    const accessLoggerMiddleware: express.Handler = connectLogger(
+    const accessLoggerMiddleware: express.Handler = log4js.connectLogger(
       this.accessLogger,
       {},
     );

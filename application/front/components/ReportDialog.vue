@@ -33,20 +33,20 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { ReportDialogData } from '@f/definition/components/reportDialog/data';
+import { defineComponent } from 'vue';
 import { ReportDialogParameter } from '@f/definition/components/reportDialog/parameter';
 import { StringUtil } from '@c/util/stringUtil';
 import { ReportPostRequest } from '@f/definition/components/reportDialog/apiSpec/reportPostRequest';
 import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'ConfirmDialog',
-  data(): ReportDialogData {
+  data() {
     return {
       isDialogShow: false,
       postId: '',
       reportDetail: '',
+      resolveDialog: null as ((reported: boolean) => void) | null,
     };
   },
   computed: {
@@ -60,16 +60,15 @@ export default Vue.extend({
       this.postId = parameter.postId;
       this.reportDetail = '';
 
-      return new Promise((resolve) => {
-        this.$on('success', () => {
-          this.isDialogShow = false;
-          resolve(true);
-        });
-        this.$on('cancel', () => {
-          this.isDialogShow = false;
-          resolve(false);
-        });
+      return new Promise<boolean>((resolve) => {
+        this.resolveDialog = resolve;
       });
+    },
+    close(reported: boolean): void {
+      this.isDialogShow = false;
+      const resolve = this.resolveDialog;
+      this.resolveDialog = null;
+      resolve?.(reported);
     },
     async onClickedConfirmButton(): Promise<void> {
       const reportRequest: ReportPostRequest = {
@@ -91,11 +90,11 @@ export default Vue.extend({
       });
       if (succeeded) {
         this.$accessor.snackBarInfo.open('投稿を通報しました。');
-        this.$emit('success');
+        this.close(true);
       }
     },
     onClickedCancelButton(): void {
-      this.$emit('cancel');
+      this.close(false);
     },
   },
 });

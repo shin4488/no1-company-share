@@ -11,9 +11,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'LoadMoreButton',
   props: {
     text: {
@@ -22,6 +22,7 @@ export default Vue.extend({
       required: false,
     },
   },
+  emits: ['click'],
   methods: {
     onClickedLoadMoreButton(): void {
       this.$emit('click');

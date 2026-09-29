@@ -134,22 +134,9 @@
   </v-row>
 </template>
 
-<script lang="ts">
-import Vue from 'vue';
-import { PageHeadData } from '@f/definition/pages/common/headData';
-import { UsageData } from '@f/definition/pages/usage/data';
+<script setup lang="ts">
+import { useHead } from '#app';
 
-export default Vue.extend({
-  name: 'AppUsage',
-  data(): UsageData {
-    return {
-      columnSpan: '12',
-    };
-  },
-  head(): PageHeadData {
-    return {
-      title: '使い方',
-    };
-  },
-});
+const columnSpan = '12';
+useHead({ title: '使い方' });
 </script>

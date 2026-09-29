@@ -7,11 +7,11 @@ import {
   HasManyGetAssociationsMixin,
   NonAttribute,
 } from 'sequelize';
-import Bookmark from './bookmark';
+import type Bookmark from './bookmark';
 import { CommonModelAttribute } from './commonModelAttribute';
-import CompanyMaster from './companyMaster';
-import SharedPostDetail from './sharedPostDetail';
-import UserMaster from './userMaster';
+import type CompanyMaster from './companyMaster';
+import type SharedPostDetail from './sharedPostDetail';
+import type UserMaster from './userMaster';
 
 export interface SharedPostModelAttribute {
   id: string;
@@ -107,7 +107,12 @@ export default class SharedPost extends Model<
     );
   }
 
-  static associate() {
+  static associate(
+    CompanyMaster: typeof import('./companyMaster').default,
+    UserMaster: typeof import('./userMaster').default,
+    SharedPostDetail: typeof import('./sharedPostDetail').default,
+    Bookmark: typeof import('./bookmark').default,
+  ) {
     this.belongsTo(CompanyMaster, {
       targetKey: 'companyNumber',
       foreignKey: 'companyNumber',

@@ -54,12 +54,12 @@ export class SequelizeHandlerImpl implements SequelizeHandler {
     SharedPostDetail.initialize(SequelizeHandlerImpl._sequelize);
     Bookmark.initialize(SequelizeHandlerImpl._sequelize);
 
-    CompanyMaster.associate();
-    UserMaster.associate();
-    DivisionMaster.associate();
-    SharedPost.associate();
-    SharedPostDetail.associate();
-    Bookmark.associate();
+    CompanyMaster.associate(SharedPost);
+    UserMaster.associate(SharedPost);
+    DivisionMaster.associate(SharedPostDetail);
+    SharedPost.associate(CompanyMaster, UserMaster, SharedPostDetail, Bookmark);
+    SharedPostDetail.associate(SharedPost, DivisionMaster);
+    Bookmark.associate(SharedPost, UserMaster);
   }
 
   public async transact(

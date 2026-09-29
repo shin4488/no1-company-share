@@ -1,25 +1,21 @@
-import plugin from '../plugins/axios/axios';
+import plugin from '../plugins/02.axios';
+
 function setup(token = 'test-id-token') {
-  let api;
   const open = jest.fn();
-  plugin(
-    {
-      $accessor: {
-        firebaseAuthorization: { idTokenComputed: token },
-        snackBarError: { open },
-      },
+  const store = {};
+  const result = plugin({
+    $store: store,
+    $accessor: {
+      firebaseAuthorization: { idTokenComputed: token },
+      snackBarError: { open },
     },
-    (name, value) => {
-      if (name === 'axios') {
-        api = value;
-      }
-    },
-  );
-  return { api, open };
+  });
+  return { api: result.provide.axios, open, store };
 }
-describe('API通信の表示・認証契約', () => {
+
+describe('API通信の表示と認証', () => {
   test.each(['test-id-token', null])(
-    '認証トークン %s と既存ヘッダーを維持する',
+    'トークン %s と既存ヘッダーを維持する',
     async (token) => {
       const { api } = setup(token);
       let config;
@@ -33,7 +29,9 @@ describe('API通信の表示・認証契約', () => {
         });
       };
       await api.get('/posts', { headers: { Accept: 'application/json' } });
-      expect(config.headers.get('Authorization')).toBe(token);
+      expect(config.headers.get('Authorization')).toBe(
+        token ? `Bearer ${token}` : undefined,
+      );
       expect(config.headers.get('Accept')).toBe('application/json');
     },
   );

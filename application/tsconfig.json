@@ -1,29 +1,15 @@
 {
+  "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
-    "target": "ES2018",
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "lib": ["ESNext", "ESNext.AsyncIterable", "DOM"],
-    "esModuleInterop": true,
-    "allowJs": true,
-    "sourceMap": true,
     "strict": true,
     "noEmit": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "baseUrl": ".",
-    "paths": {
-      "@f/*": ["./front/*"],
-      "@s/*": ["./server/*"],
-      "@c/*": ["./common/*"]
-    },
-    "noImplicitAny": true,
-    "types": [
-      "@nuxt/types",
-      "@types/node",
-      "@nuxtjs/vuetify",
-      "reflect-metadata"
-    ]
-  },
-  "exclude": ["node_modules", ".nuxt", "dist"]
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "verbatimModuleSyntax": false,
+    "noUncheckedIndexedAccess": false,
+    "isolatedModules": false,
+    "moduleResolution": "Node10"
+  }
 }

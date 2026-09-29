@@ -212,7 +212,11 @@ let count = 0;
       .rows[0].is_reported,
     true,
   );
-  assert.equal((await call('GET', '/shared-posts/?limit=20')).posts.length, 0);
+  assert.ok(
+    !(await call('GET', '/shared-posts/?limit=20')).posts.some(
+      (post) => post.id === id,
+    ),
+  );
   await call('DELETE', postPath);
   assert.equal(
     (await db.query('SELECT is_deleted FROM shared_post WHERE id=$1', [id]))

@@ -57,7 +57,7 @@ const fetchWithAuthorization = async (original, idToken) => {
   }
 
   // Add ID token to header.
-  headers.append('Authorization', 'Bearer ' + idToken);
+  headers.set('Authorization', 'Bearer ' + idToken);
 
   // Create authorized request
   const { url, ...props } = original.clone();
@@ -74,7 +74,9 @@ const fetchWithAuthorization = async (original, idToken) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  const expectsHTML = event.request.headers.get('accept').includes('text/html');
+  const expectsHTML = (event.request.headers.get('accept') || '').includes(
+    'text/html',
+  );
 
   const isSameOrigin = self.location.origin === url.origin;
   const isHttps =
@@ -92,8 +94,6 @@ self.addEventListener('fetch', (event) => {
 
   // https://github.com/nuxt-community/firebase-module/issues/465
   if (!expectsHTML || !isSameOrigin || !isHttps || isIgnored) {
-    event.respondWith(fetch(event.request));
-
     return;
   }
 

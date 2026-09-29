@@ -1,16 +1,14 @@
 <template>
-  <v-snackbar v-model="isShownComputed" top max-width="60%" :color="color">
+  <v-snackbar
+    v-model="isShownComputed"
+    location="top"
+    max-width="60%"
+    :color="color"
+  >
     <div class="pre-wrap" v-text="message" />
 
-    <template #action="{ attrs }">
-      <v-btn
-        small
-        plain
-        shaped
-        multi-line
-        v-bind="attrs"
-        @click="onClickedCloseButton"
-      >
+    <template #actions>
+      <v-btn small plain shaped multi-line @click="onClickedCloseButton">
         <v-icon> mdi-close </v-icon>
       </v-btn>
     </template>
@@ -18,12 +16,12 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'SnackBarBase',
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
       default: false,
       required: true,
@@ -39,13 +37,14 @@ export default Vue.extend({
       required: false,
     },
   },
+  emits: ['update:modelValue'],
   computed: {
     isShownComputed: {
       get(): boolean {
-        return this.value;
+        return this.modelValue;
       },
       set(value: boolean) {
-        this.$emit('input', value);
+        this.$emit('update:modelValue', value);
       },
     },
   },

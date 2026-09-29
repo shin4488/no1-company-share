@@ -3,11 +3,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue';
 import { SnackBarInfoData } from '@f/definition/components/snackBarInfo/data';
 import { StringUtil } from '@c/util/stringUtil';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'SnackBarInfo',
   data(): SnackBarInfoData {
     return {

@@ -104,6 +104,37 @@ test("Firebase auth CSV import preserves quoted fields and batching without cont
   assert.equal(captured.batches[1][0].localId, "user-1000");
 });
 
+test("Firebase auth JSON import streams users without contacting Firebase", async (t) => {
+  const importer = require("firebase-tools/lib/accountImporter");
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "no1-json-test-"));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const file = path.join(dir, "users.json");
+  fs.writeFileSync(
+    file,
+    JSON.stringify({
+      users: [
+        { localId: "user-1", email: "one@example.invalid" },
+        { localId: "user-2", displayName: "企業, 二" },
+      ],
+    })
+  );
+  let captured;
+  t.mock.method(importer, "serialImportUsers", async (project, options, batches) => {
+    captured = { project, batches };
+    return { imported: 2 };
+  });
+  const { command } = require("firebase-tools/lib/commands/auth-import");
+  const result = await command.actionFn(file, { project: "demo-test" });
+  assert.deepEqual(result, { imported: 2 });
+  assert.equal(captured.project, "demo-test");
+  assert.deepEqual(captured.batches, [
+    [
+      { localId: "user-1", email: "one@example.invalid" },
+      { localId: "user-2", displayName: "企業, 二" },
+    ],
+  ]);
+});
+
 test("duplicate __proto__ CSV headers cannot replace record prototypes", async () => {
   const records = [];
   const parser = parse({ columns: true, group_columns_by_name: true });
@@ -114,6 +145,29 @@ test("duplicate __proto__ CSV headers cannot replace record prototypes", async (
   assert.equal(Object.getPrototypeOf(records[0]), Object.prototype);
   assert.equal(records[0].name, "company");
   assert.deepEqual(records[0].__proto__, ["a", "b"]);
+});
+
+test("Firebase CLI access logs escape quotes in request headers", () => {
+  const morgan = fromCli("morgan");
+  let line = "";
+  const log = morgan("combined", {
+    immediate: true,
+    stream: { write: (value) => (line = value) },
+  });
+  log(
+    {
+      headers: { "user-agent": 'browser" forged-field' },
+      method: "GET",
+      url: "/",
+      httpVersionMajor: 1,
+      httpVersionMinor: 1,
+      socket: { remoteAddress: "127.0.0.1" },
+    },
+    { statusCode: 200, getHeader: () => undefined },
+    () => {}
+  );
+  assert.match(line, /"browser\\" forged-field"/);
+  assert.doesNotMatch(line, /"browser" forged-field"/);
 });
 
 test("Firebase analytics creates a v4 client ID without sending events", () => {
