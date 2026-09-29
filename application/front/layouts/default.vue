@@ -7,7 +7,10 @@
 
     <template v-if="!shouldUseBottomBarComputed">
       <v-app-bar density="compact">
-        <v-app-bar-nav-icon @click.stop="onClickedNavigationBar" />
+        <v-app-bar-nav-icon
+          aria-label="メニューを開閉"
+          @click.stop="onClickedNavigationBar"
+        />
         <v-toolbar-title
           class="app-toobar-title"
           @click="routeToHome"
@@ -216,7 +219,7 @@ export default defineComponent({
   cursor: pointer
 
 .mobile-bottom-navigation
-  :deep(.v-btn)
+  :deep(.v-bottom-navigation__content > .v-btn)
     min-width: 0
     padding-inline: 2px
 </style>
