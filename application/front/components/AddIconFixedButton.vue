@@ -5,6 +5,7 @@
     elevation="6"
     color="primary"
     class="add-post-button"
+    aria-label="新規投稿"
     :class="additionButtonClassComputed"
     @click="onClickedAddButton"
   >
