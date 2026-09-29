@@ -147,6 +147,29 @@ test("duplicate __proto__ CSV headers cannot replace record prototypes", async (
   assert.deepEqual(records[0].__proto__, ["a", "b"]);
 });
 
+test("Firebase CLI access logs escape quotes in request headers", () => {
+  const morgan = fromCli("morgan");
+  let line = "";
+  const log = morgan("combined", {
+    immediate: true,
+    stream: { write: (value) => (line = value) },
+  });
+  log(
+    {
+      headers: { "user-agent": 'browser" forged-field' },
+      method: "GET",
+      url: "/",
+      httpVersionMajor: 1,
+      httpVersionMinor: 1,
+      socket: { remoteAddress: "127.0.0.1" },
+    },
+    { statusCode: 200, getHeader: () => undefined },
+    () => {}
+  );
+  assert.match(line, /"browser\\" forged-field"/);
+  assert.doesNotMatch(line, /"browser" forged-field"/);
+});
+
 test("Firebase analytics creates a v4 client ID without sending events", () => {
   const analytics = require("universal-analytics");
   const uuid = createRequire(require.resolve("universal-analytics"))("uuid");
