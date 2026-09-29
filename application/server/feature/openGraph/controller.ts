@@ -7,6 +7,8 @@ import { types } from '@s/common/dependencyInjection/types';
 import { BaseController } from '@s/common/controller/baseController';
 import { throwIfHasSimpleValidationResult } from '@s/common/middleware/simpleValidationResult';
 import { wrapAction } from '@s/common/middleware/controllerCatcher';
+import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthorization';
+import { apiRateLimiter } from '@s/common/middleware/apiRateLimit';
 
 /**
  * 投稿処理に関するコントローラクラス
@@ -36,6 +38,8 @@ class OpenGraphController extends BaseController {
 const openGraphRouter = Router();
 openGraphRouter.get(
   OpenGraphController.openGraphGetEndpoint,
+  authorizationFirebaseUser(),
+  apiRateLimiter,
   openGraphSimpleValidators,
   throwIfHasSimpleValidationResult,
   wrapAction(OpenGraphController.getOpenGraph),
