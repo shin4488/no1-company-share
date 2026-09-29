@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import { reactive, nextTick } from 'vue';
 import { shallowMount } from '@vue/test-utils';
 import SharedPostCardList from '../components/SharedPostCardList.vue';
 import ReportDialog from '../components/ReportDialog.vue';
@@ -10,32 +10,34 @@ const post = (postId = 'one', bookmarked = false) => ({
   numberOfBookmarks: bookmarked ? 1 : 0,
 });
 function mountList(posts = [post()], path = '/home') {
-  const state = Vue.observable({ userIdComputed: 'owner' });
+  const state = reactive({ userIdComputed: 'owner' });
   const request = jest
     .fn()
     .mockResolvedValue({ data: { messages: [], data: null } });
   const info = jest.fn();
   const error = jest.fn();
   const wrapper = shallowMount(SharedPostCardList, {
-    propsData: { value: posts },
-    stubs: [
-      'v-row',
-      'v-col',
-      'SharedPostCard',
-      'AddIconFixedButton',
-      'ConfirmDialog',
-      'ReportDialog',
-      'SharedPostDialog',
-    ],
-    mocks: {
-      $axios: { request },
-      $accessor: {
-        firebaseAuthorization: state,
-        snackBarError: { open: error },
-        snackBarInfo: { open: info },
+    props: { modelValue: posts },
+    global: {
+      stubs: [
+        'v-row',
+        'v-col',
+        'SharedPostCard',
+        'AddIconFixedButton',
+        'ConfirmDialog',
+        'ReportDialog',
+        'SharedPostDialog',
+      ],
+      mocks: {
+        $axios: { request },
+        $accessor: {
+          firebaseAuthorization: state,
+          snackBarError: { open: error },
+          snackBarInfo: { open: info },
+        },
+        $cloner: { deepClone: (value) => JSON.parse(JSON.stringify(value)) },
+        $route: { path },
       },
-      $cloner: { deepClone: (value) => JSON.parse(JSON.stringify(value)) },
-      $nuxt: { $route: { path } },
     },
   });
   return { wrapper, request, state, info, error };
@@ -56,11 +58,13 @@ test('お気に入りは保存成功後だけ更新し、連打中は重複送�
   const write = wrapper.vm.onAddedBookmark({ postId: 'one' });
   await wrapper.vm.onAddedBookmark({ postId: 'one' });
   expect(request).toHaveBeenCalledTimes(1);
-  expect(wrapper.emitted('input')).toBeUndefined();
+  expect(wrapper.emitted('update:modelValue')).toBeUndefined();
   pending.resolve(success);
   await write;
-  expect(wrapper.emitted('input')[0][0]).toEqual([post('one', true)]);
-  wrapper.destroy();
+  expect(wrapper.emitted('update:modelValue')[0][0]).toEqual([
+    post('one', true),
+  ]);
+  wrapper.unmount();
 });
 
 test.each([false, true])(
@@ -70,10 +74,10 @@ test.each([false, true])(
     request.mockRejectedValueOnce(new Error('500'));
     const method = bookmarked ? 'onRemovedBookmark' : 'onAddedBookmark';
     await wrapper.vm[method]({ postId: 'one' });
-    expect(wrapper.emitted('input')).toBeUndefined();
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
     await wrapper.vm[method]({ postId: 'one' });
-    expect(wrapper.emitted('input')).toHaveLength(1);
-    wrapper.destroy();
+    expect(wrapper.emitted('update:modelValue')).toHaveLength(1);
+    wrapper.unmount();
   },
 );
 
@@ -83,8 +87,10 @@ test('お気に入り一覧では解除の保存後に対象カードを除く',
     '/bookmark',
   );
   await wrapper.vm.onRemovedBookmark({ postId: 'one' });
-  expect(wrapper.emitted('input')[0][0]).toEqual([post('two', true)]);
-  wrapper.destroy();
+  expect(wrapper.emitted('update:modelValue')[0][0]).toEqual([
+    post('two', true),
+  ]);
+  wrapper.unmount();
 });
 
 test('ログアウト後に届いた保存結果で表示を上書きしない', async () => {
@@ -95,10 +101,10 @@ test('ログアウト後に届いた保存結果で表示を上書きしない',
   state.userIdComputed = null;
   pending.resolve(success);
   await write;
-  expect(wrapper.emitted('input')).toBeUndefined();
+  expect(wrapper.emitted('update:modelValue')).toBeUndefined();
   await wrapper.vm.onAddedBookmark({ postId: 'one' });
   expect(request).toHaveBeenCalledTimes(1);
-  wrapper.destroy();
+  wrapper.unmount();
 });
 
 test('削除に失敗したカードを消さず成功通知もしない', async () => {
@@ -106,9 +112,9 @@ test('削除に失敗したカードを消さず成功通知もしない', async
   wrapper.vm.$refs.confirmDialog.open = jest.fn().mockResolvedValue(true);
   request.mockRejectedValue(new Error('network'));
   await wrapper.vm.onDeleted({ postId: 'one' });
-  expect(wrapper.emitted('input')).toBeUndefined();
+  expect(wrapper.emitted('update:modelValue')).toBeUndefined();
   expect(info).not.toHaveBeenCalled();
-  wrapper.destroy();
+  wrapper.unmount();
 });
 
 test('削除の待機中に一覧の順番が変わっても対象投稿だけを除く', async () => {
@@ -117,12 +123,12 @@ test('削除の待機中に一覧の順番が変わっても対象投稿だけ�
   const pending = later();
   request.mockReturnValue(pending.promise);
   const write = wrapper.vm.onDeleted({ postId: 'one' });
-  await Vue.nextTick();
-  await wrapper.setProps({ value: [post('two'), post()] });
+  await nextTick();
+  await wrapper.setProps({ modelValue: [post('two'), post()] });
   pending.resolve(success);
   await write;
-  expect(wrapper.emitted('input')[0][0]).toEqual([post('two')]);
-  wrapper.destroy();
+  expect(wrapper.emitted('update:modelValue')[0][0]).toEqual([post('two')]);
+  wrapper.unmount();
 });
 
 test('削除キャンセルではAPIを呼ばない', async () => {
@@ -130,7 +136,7 @@ test('削除キャンセルではAPIを呼ばない', async () => {
   wrapper.vm.$refs.confirmDialog.open = jest.fn().mockResolvedValue(false);
   await wrapper.vm.onDeleted({ postId: 'one' });
   expect(request).not.toHaveBeenCalled();
-  wrapper.destroy();
+  wrapper.unmount();
 });
 
 test.each([true, false])(
@@ -141,29 +147,38 @@ test.each([true, false])(
       ? jest.fn().mockResolvedValue(success)
       : jest.fn().mockRejectedValue(new Error('offline'));
     const wrapper = shallowMount(ReportDialog, {
-      stubs: [
-        'v-dialog',
-        'v-card',
-        'v-card-text',
-        'v-row',
-        'v-col',
-        'v-textarea',
-        'v-card-actions',
-        'v-btn',
-      ],
-      mocks: {
-        $axios: { request },
-        $accessor: {
-          spinnerOverlay: { open: (task) => task() },
-          snackBarInfo: { open: info },
+      global: {
+        stubs: [
+          'v-dialog',
+          'v-card',
+          'v-card-text',
+          'v-row',
+          'v-col',
+          'v-textarea',
+          'v-card-actions',
+          'v-btn',
+        ],
+        mocks: {
+          $axios: { request },
+          $accessor: {
+            spinnerOverlay: { open: (task) => task() },
+            snackBarInfo: { open: info },
+          },
         },
       },
     });
+    const outcome = wrapper.vm.open({ postId: 'one' });
     await wrapper.setData({ postId: 'one', reportDetail: 'test report' });
     await wrapper.vm.onClickedConfirmButton();
-    expect(!!wrapper.emitted('success')).toBe(succeeds);
+    expect(wrapper.vm.isDialogShow).toBe(!succeeds);
+    if (succeeds) {
+      await expect(outcome).resolves.toBe(true);
+    } else {
+      wrapper.vm.onClickedCancelButton();
+      await expect(outcome).resolves.toBe(false);
+    }
     expect(info.mock.calls.length).toBe(succeeds ? 1 : 0);
-    wrapper.destroy();
+    wrapper.unmount();
   },
 );
 

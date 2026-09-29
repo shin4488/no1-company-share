@@ -18,14 +18,16 @@
             <v-autocomplete
               v-model="companyNumber"
               :items="selectableCompanies"
+              item-title="text"
+              item-value="value"
               :disabled="isEditMode"
               clearable
               :loading="isAutocompleteLoadingShown"
               append-icon="mdi-magnify"
               :rules="[requiredRule]"
               @click:clear="onClickedAutocompleteClear"
-              @change="onClickedCompany"
-              @update:search-input="onChangedSearchedCompanyText"
+              @update:model-value="onClickedCompany"
+              @update:search="onChangedSearchedCompanyText"
             >
               <template #label>
                 <span class="required"><strong>* </strong></span
@@ -69,6 +71,8 @@
             <v-select
               v-model="item.no1Division"
               :items="no1Divisions"
+              item-title="text"
+              item-value="value"
               class="required"
               :rules="[requiredRule]"
             ></v-select>
@@ -149,7 +153,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import { SelectItem } from '@f/definition/common/selectItem';
 import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
 import { StringUtil } from '@c/util/stringUtil';
@@ -175,7 +179,7 @@ import {
   SharedPostPutResponseItem,
 } from '@f/definition/components/sharedPostDialog/apiSpec/sharedPostPutResponse';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'SharedPostCard',
   props: {
     no1Divisions: {
@@ -189,13 +193,16 @@ export default Vue.extend({
       required: true,
     },
   },
-  data(): SharedPostDialogData {
+  data(): SharedPostDialogData & {
+    resolveDialog: ((result: SharedPostDialogResult | void) => void) | null;
+  } {
     return {
       isOpenDialog: false,
       selectableCompanies: [],
       isAutocompleteLoadingShown: false,
       imageAlternativeMessage: '',
       isImageLoadingShown: false,
+      resolveDialog: null,
 
       // 投稿関連
       postId: '',
@@ -317,17 +324,15 @@ export default Vue.extend({
       }
 
       return new Promise((resolve) => {
-        this.$on('confirm', (result: SharedPostDialogResult) => {
-          this.isOpenDialog = false;
-          this.clear();
-          resolve(result);
-        });
-        this.$on('cancel', () => {
-          this.isOpenDialog = false;
-          this.clear();
-          resolve();
-        });
+        this.resolveDialog = resolve;
       });
+    },
+    close(result?: SharedPostDialogResult): void {
+      this.isOpenDialog = false;
+      const resolve = this.resolveDialog;
+      this.resolveDialog = null;
+      this.clear();
+      resolve?.(result);
     },
     /**
      * 確定ボタン押下処理
@@ -367,7 +372,7 @@ export default Vue.extend({
           no1Division: x.no1Division,
         })),
       };
-      this.$emit('confirm', result);
+      this.close(result);
     },
     /**
      * 新規投稿作成用のサーバ処理呼び出し
@@ -445,7 +450,7 @@ export default Vue.extend({
         '編集内容が破棄されます。よろしいですか。',
       );
       if (isConfirmed) {
-        this.$emit('cancel');
+        this.close();
       }
     },
     /**

@@ -14,15 +14,15 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { ConfirmDialogData } from '@f/definition/components/confirmDialog/data';
+import { defineComponent } from 'vue';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'ConfirmDialog',
-  data(): ConfirmDialogData {
+  data() {
     return {
       isDialogShow: false,
       contentText: '',
+      resolveDialog: null as ((confirmed: boolean) => void) | null,
     };
   },
   methods: {
@@ -30,22 +30,21 @@ export default Vue.extend({
       this.isDialogShow = true;
       this.contentText = contentText;
 
-      return new Promise((resolve) => {
-        this.$on('click-yes', () => {
-          this.isDialogShow = false;
-          resolve(true);
-        });
-        this.$on('click-no', () => {
-          this.isDialogShow = false;
-          resolve(false);
-        });
+      return new Promise<boolean>((resolve) => {
+        this.resolveDialog = resolve;
       });
     },
+    close(confirmed: boolean): void {
+      this.isDialogShow = false;
+      const resolve = this.resolveDialog;
+      this.resolveDialog = null;
+      resolve?.(confirmed);
+    },
     onClickedYesButton(): void {
-      this.$emit('click-yes');
+      this.close(true);
     },
     onClickedNoButton(): void {
-      this.$emit('click-no');
+      this.close(false);
     },
   },
 });

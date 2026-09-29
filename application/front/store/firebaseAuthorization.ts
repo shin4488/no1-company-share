@@ -88,6 +88,9 @@ export const actions = actionTree(
       AjaxHelper.post(this.$axios, '/users/', requestBody);
     },
     async loginByGoogle() {
+      if (!this.$fire) {
+        throw new Error('Firebase client is unavailable');
+      }
       const provider = new GoogleAuthProvider();
       // ストアへの反映は認証リスナーに集約し、古いログイン結果による上書きを防ぐ。
       await signInWithPopup(this.$fire.auth, provider)
@@ -95,6 +98,9 @@ export const actions = actionTree(
         .catch((error) => error);
     },
     async logout() {
+      if (!this.$fire) {
+        throw new Error('Firebase client is unavailable');
+      }
       await signOut(this.$fire.auth);
     },
   },

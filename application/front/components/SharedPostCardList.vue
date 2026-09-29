@@ -5,7 +5,7 @@
 
       <!-- xsだけは指定できないため、cols指定となる -->
       <v-col
-        v-for="item in value"
+        v-for="item in modelValue"
         :key="item.postId"
         xl="3"
         md="4"
@@ -13,7 +13,7 @@
         cols="12"
       >
         <SharedPostCard
-          v-model="item.postId"
+          :post-id="item.postId"
           :company-number="item.companyNumber"
           :company-name="item.companyName"
           :company-homepage-url="item.companyHomepageUrl"
@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import SharedPostDialog from '@f/components/SharedPostDialog.vue';
 import ReportDialog from '@f/components/ReportDialog.vue';
 import ConfirmDialog from '@f/components/ConfirmDialog.vue';
@@ -55,10 +55,10 @@ import { SharedPostDialogResult } from '@f/definition/components/sharedPostDialo
 import { StringUtil } from '@c/util/stringUtil';
 import { ArrayUtil } from '@c/util/arrayUtil';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'SharedPostCardList',
   props: {
-    value: {
+    modelValue: {
       type: Array as PropType<SharedPost[]>,
       default: () => [],
       required: true,
@@ -78,6 +78,7 @@ export default Vue.extend({
       required: false,
     },
   },
+  emits: ['update:modelValue'],
   data() {
     return { pendingBookmarkIds: [] as string[] };
   },
@@ -88,7 +89,7 @@ export default Vue.extend({
       );
     },
     hasNoItem(): boolean {
-      return ArrayUtil.isEmpty(this.value);
+      return ArrayUtil.isEmpty(this.modelValue);
     },
   },
   methods: {
@@ -132,7 +133,7 @@ export default Vue.extend({
         if (index === -1) {
           return;
         }
-        const posts = this.$cloner.deepClone(this.value);
+        const posts = this.$cloner.deepClone(this.modelValue);
         const post = posts[index];
         if (post.isBookmarkedByLoginUser !== bookmarked) {
           post.numberOfBookmarks = Math.max(
@@ -141,10 +142,10 @@ export default Vue.extend({
           );
           post.isBookmarkedByLoginUser = bookmarked;
         }
-        if (!bookmarked && this.$nuxt.$route.path === '/bookmark') {
+        if (!bookmarked && this.$route.path === '/bookmark') {
           posts.splice(index, 1);
         }
-        this.$emit('input', posts);
+        this.$emit('update:modelValue', posts);
       } finally {
         this.pendingBookmarkIds = this.pendingBookmarkIds.filter(
           (id) => id !== postId,
@@ -181,9 +182,9 @@ export default Vue.extend({
       if (currentIndex === -1) {
         return;
       }
-      const clonedPosts = this.$cloner.deepClone(this.value);
+      const clonedPosts = this.$cloner.deepClone(this.modelValue);
       clonedPosts.splice(currentIndex, 1);
-      this.$emit('input', clonedPosts);
+      this.$emit('update:modelValue', clonedPosts);
     },
     /**
      * 投稿削除処理
@@ -224,9 +225,9 @@ export default Vue.extend({
         return;
       }
       this.$accessor.snackBarInfo.open('投稿を削除しました。');
-      const clonedPosts = this.$cloner.deepClone(this.value);
+      const clonedPosts = this.$cloner.deepClone(this.modelValue);
       clonedPosts.splice(currentIndex, 1);
-      this.$emit('input', clonedPosts);
+      this.$emit('update:modelValue', clonedPosts);
     },
     /**
      * 投稿編集時処理
@@ -237,7 +238,7 @@ export default Vue.extend({
         return;
       }
 
-      const clonedPosts = this.$cloner.deepClone(this.value);
+      const clonedPosts = this.$cloner.deepClone(this.modelValue);
       const clonedEditedPost = clonedPosts[editedPostIndex];
       const parameter: SharedPostDialogParameter = {
         postId: clonedEditedPost.postId,
@@ -271,7 +272,7 @@ export default Vue.extend({
         no1Division: x.no1Division,
       }));
       clonedPosts[editedPostIndex] = clonedEditedPost;
-      this.$emit('input', clonedPosts);
+      this.$emit('update:modelValue', clonedPosts);
     },
     /**
      * 新規投稿追加ボタン押下処理
@@ -306,7 +307,7 @@ export default Vue.extend({
       };
       const result = await this.openSharedPostDialog(parameter);
       // 新規に作成した投稿はお気に入り未追加であるため、お気に入りページでは新規投稿は画面に表示しない
-      const currentPagePath = this.$nuxt.$route.path;
+      const currentPagePath = this.$route.path;
       const isBookmarkPage = currentPagePath === '/bookmark';
       if (result === undefined || isBookmarkPage) {
         return;
@@ -339,9 +340,9 @@ export default Vue.extend({
       };
 
       // 新規作成したデータは最新投稿であるため、最上位に表示
-      const clonedPosts = this.$cloner.deepClone(this.value);
+      const clonedPosts = this.$cloner.deepClone(this.modelValue);
       clonedPosts.unshift(newPost);
-      this.$emit('input', clonedPosts);
+      this.$emit('update:modelValue', clonedPosts);
     },
 
     // #region private
@@ -363,7 +364,7 @@ export default Vue.extend({
      * 投稿IDから投稿要素番号を取得
      */
     getTargetPostIndex(keyPostId: string): number {
-      return this.value.findIndex((x) => x.postId === keyPostId);
+      return this.modelValue.findIndex((x) => x.postId === keyPostId);
     },
     /**
      * ユーザがログイン済みであるか

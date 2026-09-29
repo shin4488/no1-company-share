@@ -6,7 +6,7 @@
     <SpinnerOverlay />
 
     <template v-if="!shouldUseBottomBarComputed">
-      <v-app-bar clipped-left fixed dense app>
+      <v-app-bar density="compact">
         <v-app-bar-nav-icon @click.stop="onClickedNavigationBar" />
         <v-toolbar-title
           class="app-toobar-title"
@@ -14,21 +14,18 @@
           v-text="title"
         />
         <v-spacer></v-spacer>
-        <v-list-item-avatar v-if="isLogined" dense>
+        <v-avatar v-if="isLogined" size="32">
           <v-img class="elevation-6" :src="firebaseUserIconImage"></v-img>
-        </v-list-item-avatar>
+        </v-avatar>
       </v-app-bar>
 
       <!-- mini-variant:アイコンのみナビゲーション表示 -->
       <!-- clipped:app-barの下にナビゲーション表示 -->
       <v-navigation-drawer
         v-model="isDrawerOpened"
-        :mini-variant="isDrawerMini"
+        :rail="isDrawerMini"
         width="190"
-        clipped
         permanent
-        fixed
-        app
       >
         <v-list shaped>
           <v-list-item
@@ -36,16 +33,8 @@
             :key="index"
             :to="item.to"
             :title="item.title"
-            router
-            exact
-            nuxt
+            :prepend-icon="item.icon"
           >
-            <v-list-item-action>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title v-text="item.title" />
-            </v-list-item-content>
           </v-list-item>
         </v-list>
       </v-navigation-drawer>
@@ -53,47 +42,38 @@
 
     <v-main>
       <v-container>
-        <Nuxt />
+        <slot />
       </v-container>
     </v-main>
 
     <!-- ボトムナビゲーション->モバイルのみ -->
     <template v-if="shouldUseBottomBarComputed">
-      <v-bottom-navigation app fixed>
-        <v-slide-group :value="selectedSideBarItem">
-          <v-slide-item
-            v-for="(item, index) in sideBarItems"
-            :key="index"
-            v-slot="{ active }"
-          >
-            <v-btn
-              :to="item.to"
-              :input-value="active"
-              :color="active ? 'primary' : ''"
-              text
-              nuxt
-            >
-              <span>{{ item.title }}</span>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-btn>
-          </v-slide-item>
-
-          <v-list-item-avatar v-if="isLogined" dense>
-            <v-img class="elevation-6" :src="firebaseUserIconImage"></v-img>
-          </v-list-item-avatar>
-        </v-slide-group>
+      <v-bottom-navigation :model-value="selectedSideBarItem" grow>
+        <v-btn
+          v-for="(item, index) in sideBarItems"
+          :key="index"
+          :to="item.to"
+          :value="index"
+          :color="selectedSideBarItem === index ? 'primary' : undefined"
+        >
+          <v-icon>{{ item.icon }}</v-icon>
+          <span>{{ item.title }}</span>
+        </v-btn>
+        <v-avatar v-if="isLogined" size="32">
+          <v-img class="elevation-6" :src="firebaseUserIconImage"></v-img>
+        </v-avatar>
       </v-bottom-navigation>
     </template>
   </v-app>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { isNavigationFailure } from 'vue-router';
+import { defineComponent } from 'vue';
+import { refreshNuxtData } from '#app';
 import { DefaultData, SidebarItem } from '@f/definition/layouts/default/data';
 import { StringUtil } from '@c/util/stringUtil';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'DefaultLayout',
   data(): DefaultData {
     return {
@@ -183,11 +163,11 @@ export default Vue.extend({
       );
     },
     shouldUseBottomBarComputed(): boolean {
-      return this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm;
+      return this.$vuetify.display.smAndDown;
     },
     selectedSideBarItem(): number {
       const selectedSideBarIndex = this.sideBarItems.findIndex(
-        (x) => x.to === this.$nuxt.$route.path,
+        (x) => x.to === this.$route.path,
       );
       return selectedSideBarIndex === -1 ? 0 : selectedSideBarIndex;
     },
@@ -197,20 +177,15 @@ export default Vue.extend({
     async firebaseUserId() {
       this.sideBarItems = this.$cloner.deepClone(this.decideSidebarItems());
 
-      const path = this.$nuxt.$route.path;
+      const path = this.$route.path;
       const isPrivatePage = ['/bookmark', '/my-post'].includes(path);
       if (isPrivatePage && !this.isLogined) {
-        await this.$router.replace(this.homePath).catch((error: Error) => {
-          // /logoutのルート処理も同時にホームへ戻すため、遷移が取り消され得る。
-          if (!isNavigationFailure(error)) {
-            throw error;
-          }
-        });
+        await this.$router.replace(this.homePath);
         return;
       }
       // 初期認証の同期やアカウント変更後に、前のユーザーの表示を残さない。
       if (path === this.homePath || isPrivatePage) {
-        await this.$nuxt.refresh();
+        await refreshNuxtData();
       }
     },
   },

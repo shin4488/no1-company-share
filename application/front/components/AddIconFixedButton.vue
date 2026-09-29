@@ -1,11 +1,10 @@
 <template>
   <v-btn
-    dark
-    fab
-    bottom
-    right
+    icon
+    size="large"
+    elevation="6"
     color="primary"
-    fixed
+    class="add-post-button"
     :class="additionButtonClassComputed"
     @click="onClickedAddButton"
   >
@@ -14,13 +13,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'AddIconFixedButton',
+  emits: ['click'],
   computed: {
     additionButtonClassComputed(): string {
-      return this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm
+      return this.$vuetify.display.smAndDown
         ? // 追加ボタンでカード側のアイコンボタンが押せなくなるのを防ぐため、マージンを設定
           'mb-16'
         : 'mb-10';
@@ -33,3 +33,12 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style scoped>
+.add-post-button {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 100;
+}
+</style>

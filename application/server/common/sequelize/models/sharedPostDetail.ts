@@ -1,7 +1,7 @@
 import { Model, Sequelize, DataTypes, ForeignKey } from 'sequelize';
 import { CommonModelAttribute } from './commonModelAttribute';
-import DivisionMaster from './divisionMaster';
-import SharedPost from './sharedPost';
+import type DivisionMaster from './divisionMaster';
+import type SharedPost from './sharedPost';
 
 export interface SharedPostDetailModelAttribute {
   id: number;
@@ -57,7 +57,10 @@ export default class SharedPostDetail extends Model<
     );
   }
 
-  static associate() {
+  static associate(
+    SharedPost: typeof import('./sharedPost').default,
+    DivisionMaster: typeof import('./divisionMaster').default,
+  ) {
     this.belongsTo(SharedPost, { targetKey: 'id', foreignKey: 'sharedPostId' });
     this.belongsTo(DivisionMaster, {
       targetKey: 'id',
