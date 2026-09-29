@@ -20,7 +20,6 @@ export default defineNuxtConfig({
   },
   css: ['@mdi/font/css/materialdesignicons.css'],
   modules: ['vuetify-nuxt-module', '@vite-pwa/nuxt'],
-  // @ts-expect-error Nuxt's config type omits the supported Nitro esbuild option.
   nitro: {
     esbuild: {
       options: {
