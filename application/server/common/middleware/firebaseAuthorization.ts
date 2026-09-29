@@ -1,6 +1,5 @@
 import express from 'express';
 import { getAuth } from 'firebase-admin/auth';
-import { StringUtil } from '@c/util/stringUtil';
 import { NotAuthorizedError } from '@s/common/error/notAuthorizedError';
 
 /**
@@ -12,13 +11,11 @@ export const authorizationFirebaseUser = (shouldThrowError: boolean = true) => {
     response: express.Response,
     next: express.NextFunction,
   ) => {
-    const firebaseIdToken = request.headers.authorization;
-    const token =
-      StringUtil.isEmpty(firebaseIdToken) ||
-      firebaseIdToken === 'null' ||
-      firebaseIdToken === 'undefined'
-        ? ''
-        : firebaseIdToken || '';
+    // 現行クライアントの Bearer 形式と旧クライアントの生トークンを受け付ける。
+    const token = (request.headers.authorization || '').replace(
+      /^Bearer /i,
+      '',
+    );
     // デコードできない時は例外が発生する
     try {
       const firebaseDecodedToken = await getAuth().verifyIdToken(token);
