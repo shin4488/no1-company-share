@@ -78,6 +78,8 @@ npm test
 npm run lint
 ```
 
+企業画像の日次更新は Firebase の `scheduledCompanyMasterUpdate` が日本時間0時に実行します。Function の Secret Manager とアプリ本番環境の `.env` に、同じ `COMPANY_UPDATE_SECRET` を設定してください。アプリの配備とは別に、`functions/` から対象 Function を配備する必要があります。値はリポジトリやログへ記録しないでください。
+
 ---
 
 ## 書き込みAPIの結合テスト

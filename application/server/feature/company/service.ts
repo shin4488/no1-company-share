@@ -63,7 +63,6 @@ export class CompanyServiceImpl implements CompanyService {
   }
 
   public async updateCompanies(): Promise<void> {
-    // バッチ処理での起動を想定しており、リアルタイム性は要求されないため処理の完了を待っていない
     const companyMasterRecords = await CompanyMaster.findAll({
       attributes: ['companyNumber', 'homepageUrl'],
       raw: true,
@@ -75,13 +74,20 @@ export class CompanyServiceImpl implements CompanyService {
           companyMasterRecord.homepageUrl,
           [OpenGraphType.IMAGE],
         );
-        companyMasterRecord.imageUrl = ogResult.image;
+        if (ogResult.image) {
+          companyMasterRecord.imageUrl = ogResult.image;
+        }
         return companyMasterRecord;
       }),
     );
-    // 複数レコードをまとめてupdateしたいためbulkCreateを使用
-    CompanyMaster.bulkCreate(overwrittenCompanyMasters, {
-      updateOnDuplicate: ['imageUrl', 'updatedAt'],
-    });
+    const updates = overwrittenCompanyMasters.filter(
+      (record) => record.imageUrl,
+    );
+    if (updates.length > 0) {
+      // DBへの反映が完了してからバッチの呼び出し元へ成功を返す。
+      await CompanyMaster.bulkCreate(updates, {
+        updateOnDuplicate: ['imageUrl', 'updatedAt'],
+      });
+    }
   }
 }
