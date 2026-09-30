@@ -2,11 +2,10 @@
   <!-- ダイアログ閉じるごとに入力ボックスのrulesをリセットしたいためv-ifでコンポーネントを再構築している -->
   <v-dialog v-if="isOpenDialog" v-model="isOpenDialog" scrollable persistent>
     <v-card>
-      <v-toolbar color="primary" dark
-        >No.1企業投稿
-        <v-spacer></v-spacer>
+      <v-toolbar color="primary" dark>
+        <v-toolbar-title>No.1企業投稿</v-toolbar-title>
         <v-toolbar-items>
-          <v-btn icon dark right @click="onClickedCloseButton">
+          <v-btn icon dark class="mr-2" @click="onClickedCloseButton">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar-items>
@@ -43,7 +42,7 @@
           align="center"
           dense
         >
-          <v-col cols="1">
+          <v-col cols="2" sm="1">
             <v-icon
               :disabled="disabledToDeleteDetail"
               dense
@@ -54,10 +53,9 @@
               mdi-delete
             </v-icon>
           </v-col>
-          <v-col sm="7" cols="6">
+          <v-col cols="10" sm="7">
             <v-text-field
               v-model="item.no1Content"
-              class="required"
               :rules="[requiredRule]"
               clearable
             >
@@ -67,19 +65,18 @@
               >
             </v-text-field>
           </v-col>
-          <v-col sm="4" cols="5">
+          <v-col cols="10" offset="2" sm="4" offset-sm="0">
             <v-select
               v-model="item.no1Division"
               :items="no1Divisions"
               item-title="text"
               item-value="value"
-              class="required"
               :rules="[requiredRule]"
             ></v-select>
           </v-col>
         </v-row>
         <v-row align="start" dense>
-          <v-col offset="1" cols="1">
+          <v-col cols="2" offset="2" sm="1" offset-sm="1">
             <v-icon
               title="1位内容の追加"
               dense
@@ -92,7 +89,7 @@
         </v-row>
 
         <v-row dense>
-          <v-col sm="8" cols="9">
+          <v-col cols="12" sm="8">
             <v-text-field
               v-model="companyHomepageUrl"
               :label="companyHomePageUrlInputLabelComputed"
@@ -101,7 +98,7 @@
               @blur="onBluredCompanyHomePageUrl"
             ></v-text-field>
           </v-col>
-          <v-col class="d-flex align-start justify-center" sm="4" cols="3">
+          <v-col class="d-flex align-start justify-center" cols="12" sm="4">
             <div>
               <Spinner :show="isImageLoadingShown" />
             </div>
