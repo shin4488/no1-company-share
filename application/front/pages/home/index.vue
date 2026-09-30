@@ -15,8 +15,11 @@
 
 <script setup lang="ts">
 import { useHead } from '#app';
+import { definePageMeta } from '#imports';
 import { usePostList } from '@f/composables/usePostList';
 
+// 認証操作はglobal middlewareが処理する。リンク解決時にもURLを既知の経路にする。
+definePageMeta({ alias: ['/login', '/logout'] });
 useHead({ title: 'ホーム' });
 const {
   sharedPosts,

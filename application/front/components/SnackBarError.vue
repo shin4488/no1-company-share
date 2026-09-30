@@ -35,8 +35,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="sass" scoped>
-.pre-wrap
-  white-space: pre-wrap
-</style>
