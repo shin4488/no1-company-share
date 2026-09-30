@@ -1,5 +1,7 @@
 <template>
   <div>
+    <AddIconFixedButton v-show="isLogined" @click="onClickedAddPostButton" />
+
     <v-row>
       <v-col v-show="hasNoItem">{{ messageIfNoData }}</v-col>
 
@@ -38,7 +40,6 @@
     <ConfirmDialog ref="confirmDialog" />
     <ReportDialog ref="reportDialog" />
     <SharedPostDialog ref="sharedPostDialog" :no1-divisions="no1Divisions" />
-    <AddIconFixedButton v-show="isLogined" @click="onClickedAddPostButton" />
   </div>
 </template>
 
