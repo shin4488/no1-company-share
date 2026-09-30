@@ -22,8 +22,7 @@ export default defineComponent({
   computed: {
     additionButtonClassComputed(): string {
       return this.$vuetify.display.smAndDown
-        ? // 追加ボタンでカード側のアイコンボタンが押せなくなるのを防ぐため、マージンを設定
-          'mb-16'
+        ? 'add-post-button--mobile'
         : 'mb-10';
     },
   },
@@ -41,5 +40,11 @@ export default defineComponent({
   right: 24px;
   bottom: 24px;
   z-index: 100;
+}
+
+.add-post-button--mobile {
+  position: static;
+  display: flex;
+  margin: 0 0 16px auto;
 }
 </style>
