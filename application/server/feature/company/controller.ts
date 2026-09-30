@@ -7,6 +7,7 @@ import { types } from '@s/common/dependencyInjection/types';
 import { BaseController } from '@s/common/controller/baseController';
 import { StringUtil } from '@c/util/stringUtil';
 import { wrapAction } from '@s/common/middleware/controllerCatcher';
+import { authorizeCompanyUpdate } from './authorizeUpdate';
 
 /**
  * 投稿処理に関するコントローラクラス
@@ -30,6 +31,15 @@ class CompanyController extends BaseController {
     const responseDataBody = await service.getCompanies(parameter);
     super.success(response, responseDataBody);
   }
+
+  public static async updateCompanies(
+    _request: express.Request,
+    response: express.Response,
+  ) {
+    const service = appContainer.get<CompanyService>(types.CompanyService);
+    await service.updateCompanies();
+    super.success(response);
+  }
 }
 
 const companyRouter = Router();
@@ -37,5 +47,10 @@ companyRouter.get(
   CompanyController.companyGetEndpoint,
   companySimpleValidators,
   wrapAction(CompanyController.getCompanies),
+);
+companyRouter.put(
+  CompanyController.companyGetEndpoint,
+  authorizeCompanyUpdate,
+  wrapAction(CompanyController.updateCompanies),
 );
 export { companyRouter };
