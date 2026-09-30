@@ -1,7 +1,8 @@
 <template>
-  <div>
-    <AddIconFixedButton v-show="isLogined" @click="onClickedAddPostButton" />
-
+  <div
+    class="shared-post-list"
+    :class="{ 'shared-post-list--with-button': isLogined }"
+  >
     <v-row>
       <v-col v-show="hasNoItem">{{ messageIfNoData }}</v-col>
 
@@ -40,6 +41,7 @@
     <ConfirmDialog ref="confirmDialog" />
     <ReportDialog ref="reportDialog" />
     <SharedPostDialog ref="sharedPostDialog" :no1-divisions="no1Divisions" />
+    <AddIconFixedButton v-show="isLogined" @click="onClickedAddPostButton" />
   </div>
 </template>
 
@@ -379,3 +381,12 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+@media (max-width: 959.98px) {
+  .shared-post-list--with-button {
+    position: relative;
+    padding-top: 72px;
+  }
+}
+</style>
