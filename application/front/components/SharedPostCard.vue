@@ -39,24 +39,22 @@
     <v-divider />
 
     <!-- 投稿者情報 -->
-    <v-card-actions>
-      <v-list-item dense class="grow full-width">
-        <template #prepend>
-          <v-avatar size="40">
-            <v-img
-              class="elevation-6"
-              :title="postingUserName"
-              :alt="postingUserName"
-              :src="postingUserIcomImageUrl"
-            />
-          </v-avatar>
-        </template>
+    <v-card-actions class="post-card-actions">
+      <v-avatar size="40">
+        <v-img
+          class="elevation-6"
+          :title="postingUserName"
+          :alt="postingUserName"
+          :src="postingUserIcomImageUrl"
+        />
+      </v-avatar>
 
-        <v-list-item-title :title="postingUserName">
-          {{ postingUserName }}
-        </v-list-item-title>
+      <span class="post-card-actions__name" :title="postingUserName">
+        {{ postingUserName }}
+      </span>
 
-        <v-row align="center" justify="end">
+      <div class="post-card-actions__controls">
+        <span class="post-card-actions__bookmark">
           <v-icon
             dense
             color="bookmark"
@@ -69,44 +67,43 @@
           >
             {{ isBookmarkedByLoginUser ? 'mdi-heart' : 'mdi-heart-outline' }}
           </v-icon>
-          <span class="subheading mr-2" v-text="numberOfBookmarksComputed" />
+          <span class="subheading" v-text="numberOfBookmarksComputed" />
+        </span>
 
-          <v-icon
-            v-show="isLogined && !isPostedByLoginUser"
-            dense
-            color="warning"
-            aria-label="投稿を通報"
-            @click="onClickedAlertButton"
-            @keydown.enter.prevent="onClickedAlertButton"
-            @keydown.space.prevent="onClickedAlertButton"
-          >
-            mdi-alert-outline
-          </v-icon>
-          <v-icon
-            v-show="isLogined && isPostedByLoginUser"
-            class="mr-2"
-            dense
-            color="secondary"
-            aria-label="投稿を編集"
-            @click="onClickedEditButton"
-            @keydown.enter.prevent="onClickedEditButton"
-            @keydown.space.prevent="onClickedEditButton"
-          >
-            mdi-pencil
-          </v-icon>
-          <v-icon
-            v-show="isLogined && isPostedByLoginUser"
-            dense
-            color="secondary"
-            aria-label="投稿を削除"
-            @click="onClickedDeleteButton"
-            @keydown.enter.prevent="onClickedDeleteButton"
-            @keydown.space.prevent="onClickedDeleteButton"
-          >
-            mdi-delete
-          </v-icon>
-        </v-row>
-      </v-list-item>
+        <v-icon
+          v-show="isLogined && !isPostedByLoginUser"
+          dense
+          color="warning"
+          aria-label="投稿を通報"
+          @click="onClickedAlertButton"
+          @keydown.enter.prevent="onClickedAlertButton"
+          @keydown.space.prevent="onClickedAlertButton"
+        >
+          mdi-alert-outline
+        </v-icon>
+        <v-icon
+          v-show="isLogined && isPostedByLoginUser"
+          dense
+          color="secondary"
+          aria-label="投稿を編集"
+          @click="onClickedEditButton"
+          @keydown.enter.prevent="onClickedEditButton"
+          @keydown.space.prevent="onClickedEditButton"
+        >
+          mdi-pencil
+        </v-icon>
+        <v-icon
+          v-show="isLogined && isPostedByLoginUser"
+          dense
+          color="secondary"
+          aria-label="投稿を削除"
+          @click="onClickedDeleteButton"
+          @keydown.enter.prevent="onClickedDeleteButton"
+          @keydown.space.prevent="onClickedDeleteButton"
+        >
+          mdi-delete
+        </v-icon>
+      </div>
     </v-card-actions>
   </v-card>
 </template>
@@ -278,8 +275,25 @@ export default defineComponent({
   white-space: pre-wrap
 .auto-cursor
   cursor: auto
-.full-width
-  width: 100%
+.post-card-actions
+  gap: 12px
+  min-width: 0
+  &__name
+    flex: 1 1 auto
+    min-width: 0
+    overflow: hidden
+    text-overflow: ellipsis
+    white-space: nowrap
+  &__controls
+    display: flex
+    align-items: center
+    flex: 0 0 auto
+    gap: 12px
+  &__bookmark
+    display: inline-flex
+    align-items: center
+    gap: 4px
+    white-space: nowrap
 .shared-post-text-max
   max-height: 250px
 
