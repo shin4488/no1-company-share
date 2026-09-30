@@ -43,8 +43,10 @@ export default defineComponent({
 }
 
 .add-post-button--mobile {
-  position: static;
-  display: flex;
-  margin: 0 0 16px auto;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: auto;
+  margin: 0;
 }
 </style>
