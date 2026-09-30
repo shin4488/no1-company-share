@@ -17,7 +17,7 @@
           v-text="title"
         />
         <v-spacer></v-spacer>
-        <v-avatar v-if="isLogined" size="32">
+        <v-avatar v-if="isLogined" class="mr-4" size="32">
           <v-img class="elevation-6" :src="firebaseUserIconImage"></v-img>
         </v-avatar>
       </v-app-bar>
