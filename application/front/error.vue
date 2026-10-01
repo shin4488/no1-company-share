@@ -1,5 +1,5 @@
 <template>
-  <main class="error-page">
+  <main class="pa-8">
     <h1>{{ message }}</h1>
     <NuxtLink to="/home">ホームへ戻る</NuxtLink>
   </main>
@@ -17,9 +17,3 @@ const message = computed(() =>
 );
 useHead({ title: message });
 </script>
-
-<style scoped>
-.error-page {
-  padding: 2rem;
-}
-</style>

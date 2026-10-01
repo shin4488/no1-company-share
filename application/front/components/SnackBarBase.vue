@@ -5,7 +5,7 @@
     max-width="60%"
     :color="color"
   >
-    <div class="pre-wrap" v-text="message" />
+    <div class="text-pre-wrap" v-text="message" />
 
     <template #actions>
       <v-btn small plain shaped multi-line @click="onClickedCloseButton">
@@ -55,8 +55,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="sass" scoped>
-.pre-wrap
-  white-space: pre-wrap
-</style>

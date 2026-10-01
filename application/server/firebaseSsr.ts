@@ -1,7 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import { firebaseConfig } from '../common/firebaseConfig';
+import { getFirebaseApp } from './firebaseApp';
 
 type ResponseWithUser = ServerResponse & { locals?: Record<string, unknown> };
 
@@ -11,8 +10,7 @@ export default async (
   res: ResponseWithUser,
   next: () => void,
 ) => {
-  const app =
-    getApps()[0] || initializeApp({ projectId: firebaseConfig.projectId });
+  const app = getFirebaseApp();
   const header = req.headers.authorization || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : '';
   if (token) {
