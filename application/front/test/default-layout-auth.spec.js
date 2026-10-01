@@ -11,6 +11,8 @@ const stubs = Object.fromEntries(
     'v-toolbar-title',
     'v-spacer',
     'v-avatar',
+    'v-btn',
+    'v-icon',
     'v-navigation-drawer',
     'v-list',
     'v-main',

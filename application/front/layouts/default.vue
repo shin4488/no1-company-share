@@ -12,7 +12,7 @@
           @click.stop="onClickedNavigationBar"
         />
         <v-toolbar-title
-          class="app-toobar-title"
+          class="cursor-pointer"
           @click="routeToHome"
           v-text="title"
         />
@@ -215,9 +215,6 @@ export default defineComponent({
 </script>
 
 <style lang="sass" scoped>
-.app-toobar-title
-  cursor: pointer
-
 .mobile-bottom-navigation
   :deep(.v-bottom-navigation__content > .v-btn)
     min-width: 0

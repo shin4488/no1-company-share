@@ -6,13 +6,18 @@
     <v-card-title>
       <a
         v-if="hasCompanyUrl"
-        class="wrapped-button"
+        class="text-decoration-none"
         text
         :href="companyHomepageUrl"
         target="_blank"
         v-text="companyName"
       />
-      <a v-else class="auto-cursor wrapped-button" text v-text="companyName" />
+      <a
+        v-else
+        class="cursor-auto text-decoration-none"
+        text
+        v-text="companyName"
+      />
     </v-card-title>
 
     <!-- 一位内容 -->
@@ -33,13 +38,13 @@
       />
 
       <!-- 備考（投稿説明） -->
-      <div class="text--primary pre-wrap" v-text="remarks" />
+      <div class="text--primary text-pre-wrap" v-text="remarks" />
     </v-card-text>
 
     <v-divider />
 
     <!-- 投稿者情報 -->
-    <v-card-actions class="post-card-actions">
+    <v-card-actions class="post-card-actions ga-3">
       <v-avatar size="40">
         <v-img
           class="elevation-6"
@@ -49,12 +54,15 @@
         />
       </v-avatar>
 
-      <span class="post-card-actions__name" :title="postingUserName">
+      <span
+        class="post-card-actions__name flex-grow-1 flex-shrink-1 text-truncate"
+        :title="postingUserName"
+      >
         {{ postingUserName }}
       </span>
 
-      <div class="post-card-actions__controls">
-        <span class="post-card-actions__bookmark">
+      <div class="d-flex align-center flex-grow-0 flex-shrink-0 ga-3">
+        <span class="d-inline-flex align-center ga-1 text-no-wrap">
           <v-icon
             dense
             color="bookmark"
@@ -269,31 +277,11 @@ export default defineComponent({
 </script>
 
 <style lang="sass" scoped>
-.wrapped-button
-  text-decoration: none
-.pre-wrap
-  white-space: pre-wrap
-.auto-cursor
-  cursor: auto
+// 長い投稿者名が操作ボタンを押し出さないよう、flex itemの最小幅だけを補う。
 .post-card-actions
-  gap: 12px
   min-width: 0
   &__name
-    flex: 1 1 auto
     min-width: 0
-    overflow: hidden
-    text-overflow: ellipsis
-    white-space: nowrap
-  &__controls
-    display: flex
-    align-items: center
-    flex: 0 0 auto
-    gap: 12px
-  &__bookmark
-    display: inline-flex
-    align-items: center
-    gap: 4px
-    white-space: nowrap
 .shared-post-text-max
   max-height: 250px
 
