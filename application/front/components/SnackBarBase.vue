@@ -2,10 +2,11 @@
   <v-snackbar
     v-model="isShownComputed"
     location="top"
+    min-width="min(344px, 100%)"
     max-width="60%"
     :color="color"
   >
-    <div class="text-pre-wrap" v-text="message" />
+    <div class="text-pre-wrap text-break" v-text="message" />
 
     <template #actions>
       <v-btn small plain shaped multi-line @click="onClickedCloseButton">
