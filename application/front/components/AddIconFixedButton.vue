@@ -1,12 +1,12 @@
 <template>
-  <div
-    class="add-post-button position-fixed bottom-0 right-0 mr-6 mb-16 pb-2 pb-md-0"
-  >
+  <div class="add-post-button position-fixed bottom-0 right-0 mr-6 mb-16">
     <v-btn
       icon
       size="large"
+      max-width="none"
       elevation="6"
       color="primary"
+      class="position-absolute bottom-0 right-0 mb-16 mb-md-0"
       aria-label="新規投稿"
       @click="onClickedAddButton"
     >
