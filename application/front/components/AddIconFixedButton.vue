@@ -1,18 +1,18 @@
 <template>
-  <v-btn
-    icon
-    size="large"
-    elevation="6"
-    color="primary"
-    class="add-post-button"
-    :position="$vuetify.display.smAndDown ? 'absolute' : 'fixed'"
-    :location="$vuetify.display.smAndDown ? 'top right' : 'bottom right'"
-    aria-label="新規投稿"
-    :class="additionButtonClassComputed"
-    @click="onClickedAddButton"
+  <div
+    class="add-post-button position-fixed bottom-0 right-0 mr-6 mb-16 pb-2 pb-md-0"
   >
-    <v-icon>mdi-plus</v-icon>
-  </v-btn>
+    <v-btn
+      icon
+      size="large"
+      elevation="6"
+      color="primary"
+      aria-label="新規投稿"
+      @click="onClickedAddButton"
+    >
+      <v-icon>mdi-plus</v-icon>
+    </v-btn>
+  </div>
 </template>
 
 <script lang="ts">
@@ -21,11 +21,6 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'AddIconFixedButton',
   emits: ['click'],
-  computed: {
-    additionButtonClassComputed(): string {
-      return this.$vuetify.display.smAndDown ? 'ma-0' : 'mr-6 mb-16';
-    },
-  },
   methods: {
     onClickedAddButton(): void {
       this.$emit('click');
