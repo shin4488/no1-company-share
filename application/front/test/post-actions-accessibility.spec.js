@@ -73,16 +73,21 @@ test('他人の投稿では通報とお気に入り解除をキーボードで�
   wrapper.unmount();
 });
 
-test('新規投稿ボタンには読み上げ名がある', () => {
-  const wrapper = mount(AddIconFixedButton, {
-    global: {
-      stubs: {
-        'v-btn': { template: '<button><slot /></button>' },
-        'v-icon': { template: '<i><slot /></i>' },
+test.each([false, true])(
+  '新規投稿ボタンの読み上げ名とクリック通知を維持する（スマホ: %s）',
+  async (smAndDown) => {
+    const wrapper = mount(AddIconFixedButton, {
+      global: {
+        stubs: {
+          'v-btn': { template: '<button><slot /></button>' },
+          'v-icon': { template: '<i><slot /></i>' },
+        },
+        mocks: { $vuetify: { display: { smAndDown } } },
       },
-      mocks: { $vuetify: { display: { smAndDown: false } } },
-    },
-  });
-  expect(wrapper.find('button').attributes('aria-label')).toBe('新規投稿');
-  wrapper.unmount();
-});
+    });
+    expect(wrapper.find('button').attributes('aria-label')).toBe('新規投稿');
+    await wrapper.find('button').trigger('click');
+    expect(wrapper.emitted('click')).toEqual([[]]);
+    wrapper.unmount();
+  },
+);

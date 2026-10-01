@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="shared-post-list"
-    :class="{ 'shared-post-list--with-button': isLogined }"
-  >
+  <div>
     <v-row>
       <v-col v-show="hasNoItem">{{ messageIfNoData }}</v-col>
 
@@ -381,12 +378,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-@media (max-width: 959.98px) {
-  .shared-post-list--with-button {
-    position: relative;
-    padding-top: 72px;
-  }
-}
-</style>
