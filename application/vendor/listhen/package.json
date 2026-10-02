@@ -1,0 +1,62 @@
+{
+  "name": "listhen",
+  "version": "1.10.1",
+  "description": "👂 Elegant HTTP Listener",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "unjs/listhen"
+  },
+  "bin": {
+    "listen": "./bin/listhen.mjs",
+    "listhen": "./bin/listhen.mjs"
+  },
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.mjs",
+      "require": "./dist/cli.cjs"
+    },
+    "./native-tls.cjs": "./native-tls.cjs"
+  },
+  "dependencies": {
+    "@parcel/watcher-wasm": "^2.5.6",
+    "citty": "^0.2.2",
+    "consola": "^3.4.2",
+    "crossws": "^0.4.10",
+    "defu": "^6.1.7",
+    "get-port-please": "^3.2.0",
+    "h3": "^1.15.11",
+    "http-shutdown": "^1.2.2",
+    "jiti": "^2.7.0",
+    "pathe": "^2.0.3",
+    "std-env": "^4.2.0",
+    "tinyclip": "^0.1.15",
+    "ufo": "^1.6.4",
+    "untun": "^0.2.2",
+    "uqr": "^0.1.3",
+    "selfsigned": "5.5.0",
+    "tar": "7.5.22"
+  },
+  "peerDependencies": {
+    "@parcel/watcher": "^2.5.6"
+  },
+  "peerDependenciesMeta": {
+    "@parcel/watcher": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "postinstall": "node patch.cjs"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

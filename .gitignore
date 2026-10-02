@@ -97,3 +97,6 @@ database/data
 logs/
 # firebase認証用の秘密鍵はリポジトリにあげない
 application/server/common/middleware/secret/no1-company-share-firebase-adminsdk-secret.json
+
+# Audited upstream source for the local listhen TLS patch.
+!application/vendor/listhen/upstream.tgz
