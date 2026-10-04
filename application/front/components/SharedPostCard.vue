@@ -44,7 +44,7 @@
     <v-divider />
 
     <!-- 投稿者情報 -->
-    <v-card-actions class="post-card-actions ga-3">
+    <v-card-actions class="ga-3">
       <v-avatar size="40">
         <v-img
           class="elevation-6"
@@ -54,8 +54,9 @@
         />
       </v-avatar>
 
+      <!-- text-truncateのoverflow: hiddenで最小幅が0になり、長い投稿者名は操作ボタンを押し出さずに省略される。 -->
       <span
-        class="post-card-actions__name flex-grow-1 flex-shrink-1 text-truncate"
+        class="flex-grow-1 flex-shrink-1 text-truncate"
         :title="postingUserName"
       >
         {{ postingUserName }}
@@ -277,11 +278,6 @@ export default defineComponent({
 </script>
 
 <style lang="sass" scoped>
-// 長い投稿者名が操作ボタンを押し出さないよう、flex itemの最小幅だけを補う。
-.post-card-actions
-  min-width: 0
-  &__name
-    min-width: 0
 .shared-post-text-max
   max-height: 250px
 
