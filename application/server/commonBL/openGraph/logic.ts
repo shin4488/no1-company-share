@@ -27,7 +27,7 @@ const publicOnlyLookup: LookupFunction = (hostname, options, callback) => {
         return;
       }
       // 接続時に解決されたすべてのアドレスを確認し、内部宛てを混ぜた応答も拒否する。
-      let publicAddressesOnly = false;
+      let publicAddressesOnly: boolean;
       try {
         publicAddressesOnly =
           addresses.length > 0 &&

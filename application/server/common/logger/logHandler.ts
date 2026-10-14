@@ -1,4 +1,4 @@
-/* eslint-disable import/no-named-as-default-member -- log4js is CommonJS and its named imports fail in the Nitro ESM bundle. */
+// log4js is CommonJS and its named imports fail in the Nitro ESM bundle.
 import express from 'express';
 import { injectable } from 'inversify';
 import log4js, { type Level } from 'log4js';
