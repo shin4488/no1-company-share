@@ -1,8 +1,10 @@
 import { createConfigForNuxt } from '@nuxt/eslint-config/flat';
 import prettier from 'eslint-config-prettier/flat';
+import n from 'eslint-plugin-n';
+import promise from 'eslint-plugin-promise';
 import globals from 'globals';
 
-// 使わない引数は、後ろの引数を使う場合も「_」始まりの名前にする（document/application.md）
+// 使わない引数は、後ろの引数を使う場合も「_」始まりの名前にする
 const unusedVarsOptions = { args: 'all', argsIgnorePattern: '^_' };
 
 export default createConfigForNuxt({
@@ -10,7 +12,6 @@ export default createConfigForNuxt({
     typescript: true,
     // 書式はprettierで統一する
     stylistic: false,
-    // 旧設定のunicornルールを引き継ぐ。jsdocとregexpは旧設定に無いため有効にしない
     tooling: { unicorn: true, jsdoc: false, regexp: false },
   },
   dirs: {
@@ -35,6 +36,7 @@ export default createConfigForNuxt({
   },
   prettier,
   {
+    plugins: { n, promise },
     rules: {
       'no-console': 'warn',
       'no-extra-semi': 'warn',
@@ -49,7 +51,7 @@ export default createConfigForNuxt({
       'vue/multi-word-component-names': 'off',
       // 必須のpropsにもdefaultを書いている
       'vue/no-required-prop-with-default': 'off',
-      // 以下は旧設定（@nuxtjs/eslint-config）から引き継ぐルール
+      // 以下は、eslint-config-standardの検査のうち@nuxt/eslint-configに無いもの、またはオプションが異なるもの
       'accessor-pairs': 'error',
       'array-callback-return': 'error',
       camelcase: [
@@ -61,6 +63,17 @@ export default createConfigForNuxt({
       'import/export': 'error',
       'import/no-absolute-path': 'error',
       'import/no-webpack-loader-syntax': 'error',
+      'lines-between-class-members': [
+        'error',
+        'always',
+        { exceptAfterSingleLine: true },
+      ],
+      'n/handle-callback-err': ['error', '^(err|error)$'],
+      'n/no-callback-literal': 'error',
+      'n/no-deprecated-api': 'error',
+      'n/no-exports-assign': 'error',
+      'n/no-new-require': 'error',
+      'n/no-path-concat': 'error',
       'new-cap': ['error', { capIsNew: false }],
       'no-caller': 'error',
       'no-eval': 'error',
@@ -100,7 +113,20 @@ export default createConfigForNuxt({
       'prefer-exponentiation-operator': 'error',
       'prefer-promise-reject-errors': 'error',
       'prefer-regex-literals': ['error', { disallowRedundantWrapping: true }],
+      'promise/param-names': 'error',
       'require-await': 'error',
+      'spaced-comment': [
+        'error',
+        'always',
+        {
+          line: { markers: ['*package', '!', '/', ',', '='] },
+          block: {
+            balanced: true,
+            markers: ['*package', '!', ',', ':', '::', 'flow-include'],
+            exceptions: ['*'],
+          },
+        },
+      ],
       'symbol-description': 'error',
       'use-isnan': ['error', { enforceForIndexOf: true }],
       'valid-typeof': ['error', { requireStringLiterals: true }],
