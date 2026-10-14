@@ -1,5 +1,5 @@
+<!-- https://vuetifyjs.com/ja/getting-started/wireframes/ -->
 <template>
-  <!-- https://vuetifyjs.com/ja/getting-started/wireframes/ -->
   <v-app>
     <SnackBarError />
     <SnackBarInfo />
@@ -11,11 +11,13 @@
           aria-label="メニューを開閉"
           @click.stop="onClickedNavigationBar"
         />
+        <!-- eslint-disable vue/no-v-text-v-html-on-component -- textやslotに変えると見出しのDOM構造が変わるため、v-textの描画を保つ -->
         <v-toolbar-title
           class="cursor-pointer"
           @click="routeToHome"
           v-text="title"
         />
+        <!-- eslint-enable vue/no-v-text-v-html-on-component -->
         <v-spacer></v-spacer>
         <v-avatar v-if="isLogined" class="mr-4" size="32">
           <v-img class="elevation-6" :src="firebaseUserIconImage"></v-img>

@@ -204,6 +204,13 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: [
+    'remove-bookmark',
+    'add-bookmark',
+    'confirm-report',
+    'click-edit',
+    'confirm-delete',
+  ],
   computed: {
     isLogined(): boolean {
       return StringUtil.isNotEmpty(

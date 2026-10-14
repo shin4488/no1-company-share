@@ -14,7 +14,7 @@ export const mutations = mutationTree(state, {
 export const actions = actionTree(
   { state, mutations },
   {
-    async open({ commit }, action: Function) {
+    async open({ commit }, action: () => unknown) {
       // actionを実行中のみスピナーをオン、実行後はオフとする
       commit('change', true);
       try {
