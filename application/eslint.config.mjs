@@ -51,7 +51,7 @@ export default createConfigForNuxt({
       'vue/multi-word-component-names': 'off',
       // 必須のpropsにもdefaultを書いている
       'vue/no-required-prop-with-default': 'off',
-      // 以下は、eslint-config-standardの検査のうち@nuxt/eslint-configに無いもの、またはオプションが異なるもの
+      // 以下は、@nuxt/eslint-configに無い、またはオプションが異なる検査
       'accessor-pairs': 'error',
       'array-callback-return': 'error',
       camelcase: [
