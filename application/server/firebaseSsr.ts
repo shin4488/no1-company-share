@@ -1,4 +1,4 @@
-import { IncomingMessage, ServerResponse } from 'http';
+import { IncomingMessage, ServerResponse } from 'node:http';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirebaseApp } from './firebaseApp';
 
