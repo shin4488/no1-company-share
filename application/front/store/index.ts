@@ -1,27 +1,14 @@
-import {
-  getAccessorType,
-  getterTree,
-  mutationTree,
-  actionTree,
-} from 'typed-vuex';
-import * as firebaseAuthorization from './firebaseAuthorization';
-import * as snackBarError from './snackBarError';
-import * as snackBarInfo from './snackBarInfo';
-import * as spinnerOverlay from './spinnerOverlay';
+import type { Pinia } from 'pinia';
+import { useFirebaseAuthorizationStore } from './firebaseAuthorization';
+import { useSnackBarErrorStore } from './snackBarError';
+import { useSnackBarInfoStore } from './snackBarInfo';
+import { useSpinnerOverlayStore } from './spinnerOverlay';
 
-export const state = () => ({});
-export const getters = getterTree(state, {});
-export const mutations = mutationTree(state, {});
-export const actions = actionTree({ state, getters, mutations }, {});
-export const accessorType = getAccessorType({
-  state,
-  getters,
-  mutations,
-  actions,
-  modules: {
-    firebaseAuthorization,
-    snackBarError,
-    snackBarInfo,
-    spinnerOverlay,
-  },
+export const createAccessor = (pinia: Pinia) => ({
+  firebaseAuthorization: useFirebaseAuthorizationStore(pinia),
+  snackBarError: useSnackBarErrorStore(pinia),
+  snackBarInfo: useSnackBarInfoStore(pinia),
+  spinnerOverlay: useSpinnerOverlayStore(pinia),
 });
+
+export type Accessor = ReturnType<typeof createAccessor>;

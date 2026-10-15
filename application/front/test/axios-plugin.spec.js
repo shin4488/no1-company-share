@@ -2,15 +2,14 @@ import plugin from '../plugins/02.axios';
 
 function setup(token = 'test-id-token') {
   const open = vi.fn();
-  const store = {};
+  const authorization = { idTokenComputed: token };
   const result = plugin({
-    $store: store,
     $accessor: {
-      firebaseAuthorization: { idTokenComputed: token },
+      firebaseAuthorization: authorization,
       snackBarError: { open },
     },
   });
-  return { api: result.provide.axios, open, store };
+  return { api: result.provide.axios, open, authorization };
 }
 
 describe('API通信の表示と認証', () => {

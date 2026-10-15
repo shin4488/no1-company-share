@@ -19,7 +19,7 @@ export default defineNuxtConfig({
     '@s': fileURLToPath(new URL('./server', import.meta.url)),
   },
   css: ['@mdi/font/css/materialdesignicons.css'],
-  modules: ['vuetify-nuxt-module', '@vite-pwa/nuxt'],
+  modules: ['@pinia/nuxt', 'vuetify-nuxt-module', '@vite-pwa/nuxt'],
   nitro: {
     esbuild: {
       options: {

@@ -1,8 +1,10 @@
 import { mount } from '@vue/test-utils';
-import { createStore } from 'vuex';
+import { createPinia } from 'pinia';
 import SnackBarBase from '../components/SnackBarBase.vue';
 import SnackBarInfo from '../components/SnackBarInfo.vue';
 import SnackBarError from '../components/SnackBarError.vue';
+import { useSnackBarInfoStore } from '../store/snackBarInfo';
+import { useSnackBarErrorStore } from '../store/snackBarError';
 
 const stubs = {
   'v-snackbar': {
@@ -17,25 +19,17 @@ const stubs = {
 };
 
 describe.each([
-  [SnackBarInfo, 'snackBarInfo', 'primary'],
-  [SnackBarError, 'snackBarError', 'error'],
-])('%s の通知', (component, moduleName, color) => {
+  [SnackBarInfo, 'snackBarInfo', useSnackBarInfoStore, 'primary'],
+  [SnackBarError, 'snackBarError', useSnackBarErrorStore, 'error'],
+])('%s の通知', (component, moduleName, useStore, color) => {
   function mountNotification() {
-    const store = createStore({
-      modules: {
-        [moduleName]: {
-          namespaced: true,
-          state: () => ({ message: '' }),
-          mutations: {
-            open(state, message) {
-              state.message = message;
-            },
-          },
-        },
-      },
-    });
+    const store = useStore(createPinia());
     const wrapper = mount(component, {
-      global: { plugins: [store], components: { SnackBarBase }, stubs },
+      global: {
+        mocks: { $accessor: { [moduleName]: store } },
+        components: { SnackBarBase },
+        stubs,
+      },
     });
     return { store, wrapper };
   }
@@ -45,7 +39,7 @@ describe.each([
     const message =
       '日本語の通知\n\nhttps://example.invalid/長いURL\n<b>原文</b>';
     expect(wrapper.find('section').exists()).toBe(false);
-    store.commit(`${moduleName}/open`, message);
+    store.open(message);
     await wrapper.vm.$nextTick();
     expect(wrapper.find('section').attributes('data-color')).toBe(color);
     expect(wrapper.find('section > div').element.textContent).toBe(message);
@@ -55,7 +49,7 @@ describe.each([
 
   test('空の通知では開かない', async () => {
     const { store, wrapper } = mountNotification();
-    store.commit(`${moduleName}/open`, '');
+    store.open('');
     await wrapper.vm.$nextTick();
     expect(wrapper.find('section').exists()).toBe(false);
     wrapper.unmount();
@@ -63,12 +57,12 @@ describe.each([
 
   test('閉じたあとに別の通知を開ける', async () => {
     const { store, wrapper } = mountNotification();
-    store.commit(`${moduleName}/open`, '最初の通知');
+    store.open('最初の通知');
     await wrapper.vm.$nextTick();
     await wrapper.find('button').trigger('click');
     expect(wrapper.find('section').exists()).toBe(false);
-    expect(store.state[moduleName].message).toBe('最初の通知');
-    store.commit(`${moduleName}/open`, '次の通知');
+    expect(store.message).toBe('最初の通知');
+    store.open('次の通知');
     await wrapper.vm.$nextTick();
     expect(wrapper.find('section > div').element.textContent).toBe('次の通知');
     wrapper.unmount();

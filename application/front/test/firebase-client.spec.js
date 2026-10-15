@@ -30,15 +30,15 @@ const user = (uid) => ({
 function start() {
   const dispatch = vi.fn().mockResolvedValue(undefined);
   const hooks = {};
-  const store = { dispatch };
+  const authorization = { onAuthStateChangedAction: dispatch };
   const result = plugin({
-    $store: store,
+    $accessor: { firebaseAuthorization: authorization },
     hook: (name, callback) => {
       hooks[name] = callback;
     },
   });
   expect(result.provide.fire.auth).toBe(mockAuth);
-  expect(store.$fire).toBe(result.provide.fire);
+  expect(authorization.$fire).toBe(result.provide.fire);
   expect(mockAuthListener).toBeUndefined();
   hooks['app:mounted']();
   return { dispatch };
@@ -55,22 +55,16 @@ test('描画後にFirebase認証を購読しトークンを一度だけ取得す
   const account = user('member');
   await mockAuthListener(account);
   expect(account.getIdTokenResult).toHaveBeenCalledWith(true);
-  expect(dispatch).toHaveBeenCalledWith(
-    'firebaseAuthorization/onAuthStateChangedAction',
-    {
-      authUser: {
-        uid: 'member',
-        idToken: 'member-token',
-        photoURL: '/member.png',
-        displayName: 'member',
-      },
+  expect(dispatch).toHaveBeenCalledWith({
+    authUser: {
+      uid: 'member',
+      idToken: 'member-token',
+      photoURL: '/member.png',
+      displayName: 'member',
     },
-  );
+  });
   await mockAuthListener(null);
-  expect(dispatch).toHaveBeenLastCalledWith(
-    'firebaseAuthorization/onAuthStateChangedAction',
-    { authUser: null },
-  );
+  expect(dispatch).toHaveBeenLastCalledWith({ authUser: null });
 });
 
 test('古い認証結果が後で届いても新しいユーザーを上書きしない', async () => {
@@ -88,7 +82,7 @@ test('古い認証結果が後で届いても新しいユーザーを上書き�
   finish({ token: 'first-token' });
   await pending;
   expect(dispatch).toHaveBeenCalledTimes(1);
-  expect(dispatch.mock.calls[0][1].authUser.uid).toBe('second');
+  expect(dispatch.mock.calls[0][0].authUser.uid).toBe('second');
 });
 
 test('認証状態を確認できないときはエラーを表示する', () => {
