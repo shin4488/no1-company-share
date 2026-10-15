@@ -12,7 +12,7 @@
       </v-toolbar>
 
       <v-card-text>
-        <v-row dense>
+        <v-row density="compact">
           <v-col>
             <v-autocomplete
               v-model="companyNumber"
@@ -39,8 +39,8 @@
         <v-row
           v-for="(item, index) in postDetails"
           :key="index"
-          align="center"
-          dense
+          class="align-center"
+          density="compact"
         >
           <v-col cols="2" sm="1">
             <v-icon
@@ -75,7 +75,7 @@
             ></v-select>
           </v-col>
         </v-row>
-        <v-row align="start" dense>
+        <v-row class="align-start" density="compact">
           <v-col cols="2" offset="2" sm="1" offset-sm="1">
             <v-icon
               title="1位内容の追加"
@@ -88,7 +88,7 @@
           </v-col>
         </v-row>
 
-        <v-row dense>
+        <v-row density="compact">
           <v-col cols="12" sm="8">
             <v-text-field
               v-model="companyHomepageUrl"
@@ -119,7 +119,7 @@
           </v-col>
         </v-row>
 
-        <v-row dense>
+        <v-row density="compact">
           <v-col>
             <v-textarea
               v-model="remarks"

@@ -41,7 +41,7 @@
     "reflect-metadata": "0.2.2",
     "sequelize": "^6.19.0",
     "vue": "3.5.43",
-    "vuetify": "3.13.5",
+    "vuetify": "4.2.4",
     "vuetify-nuxt-module": "1.0.0-rc.6"
   },
   "devDependencies": {

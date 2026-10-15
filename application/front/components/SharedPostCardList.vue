@@ -8,7 +8,7 @@
         v-for="item in modelValue"
         :key="item.postId"
         xl="3"
-        md="4"
+        lg="4"
         sm="6"
         cols="12"
       >
