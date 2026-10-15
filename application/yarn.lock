@@ -3725,6 +3725,11 @@
     semver "^7.7.4"
     unplugin "^3.0.0"
 
+"@vuetify/v0@^1.2.1":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@vuetify/v0/-/v0-1.2.3.tgz#4502d0a668db380a326def5aa644cbfa0b67b3a4"
+  integrity sha512-8qpYa88KxKrvi4jQcz+Zg4WH04un48Lt7Tj0Qq+LqvbUvHi+H177vWqBn9tQWgpxBVs1RXrTz5zw0Cy6txJHlw==
+
 abbrev@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-3.0.1.tgz#8ac8b3b5024d31464fe2a5feeea9f4536bf44025"
@@ -10637,10 +10642,12 @@ vuetify-nuxt-module@1.0.0-rc.6:
     ufo "^1.6.4"
     unconfig "^7.5.0"
 
-vuetify@3.13.5:
-  version "3.13.5"
-  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.13.5.tgz#4cd96b92cbacacf8a39a712cf701dd514127149d"
-  integrity sha512-1PKESHKgyIj6BfjVbpF1bLWvKIBOvyDqIcP6C0R173fNZDr4jyXH7ssigAZvfqV5nRmVS/N9sGtY/IekGQ9TSQ==
+vuetify@4.2.4:
+  version "4.2.4"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-4.2.4.tgz#20f47f5503ca9a50e1b96b1d87249d7d8700a75d"
+  integrity sha512-zLYtVGJcg2hK3DHoeiBXSImpzg4E0N19p3zCgGnNhMp/YwaVQZXP4cPkIKeL/evVnUeLP/CjSnFsFBThWSl2Ew==
+  dependencies:
+    "@vuetify/v0" "^1.2.1"
 
 w3c-xmlserializer@^6.0.0:
   version "6.0.0"
