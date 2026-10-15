@@ -1,7 +1,9 @@
 import { navigateTo, useNuxtApp } from '#app';
 import routerMiddleware from '../middleware/router.global';
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 test.each([
   ['/login', 'loginByGoogle'],
@@ -12,8 +14,8 @@ test.each([
     finish = resolve;
   });
   const authorization = {
-    loginByGoogle: jest.fn(() => pending),
-    logout: jest.fn(() => pending),
+    loginByGoogle: vi.fn(() => pending),
+    logout: vi.fn(() => pending),
   };
   useNuxtApp.mockReturnValue({
     $accessor: { firebaseAuthorization: authorization },
@@ -34,8 +36,8 @@ test.each(['/home', '/usage'])(
   async (path) => {
     const authorization = {
       userIdComputed: null,
-      loginByGoogle: jest.fn(),
-      logout: jest.fn(),
+      loginByGoogle: vi.fn(),
+      logout: vi.fn(),
     };
     useNuxtApp.mockReturnValue({
       $accessor: { firebaseAuthorization: authorization },

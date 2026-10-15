@@ -4,19 +4,19 @@ import { showError } from '#app';
 let mockAuthListener;
 let mockAuthError;
 const mockAuth = { currentUser: null };
-jest.mock('firebase/app', () => ({
+vi.mock('firebase/app', () => ({
   getApps: () => ['app'],
-  initializeApp: jest.fn(),
+  initializeApp: vi.fn(),
 }));
-jest.mock('firebase/auth', () => ({
+vi.mock('firebase/auth', () => ({
   getAuth: () => mockAuth,
   onAuthStateChanged: (_auth, listener, onError) => {
     mockAuthListener = listener;
     mockAuthError = onError;
   },
 }));
-jest.mock('firebase/analytics', () => ({ getAnalytics: jest.fn() }));
-jest.mock('@c/firebaseConfig', () => ({
+vi.mock('firebase/analytics', () => ({ getAnalytics: vi.fn() }));
+vi.mock('@c/firebaseConfig', () => ({
   firebaseConfig: { projectId: 'demo-test' },
 }));
 
@@ -24,11 +24,11 @@ const user = (uid) => ({
   uid,
   photoURL: `/${uid}.png`,
   displayName: uid,
-  getIdTokenResult: jest.fn().mockResolvedValue({ token: `${uid}-token` }),
+  getIdTokenResult: vi.fn().mockResolvedValue({ token: `${uid}-token` }),
 });
 
 function start() {
-  const dispatch = jest.fn().mockResolvedValue(undefined);
+  const dispatch = vi.fn().mockResolvedValue(undefined);
   const hooks = {};
   const store = { dispatch };
   const result = plugin({

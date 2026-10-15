@@ -1,22 +1,24 @@
 import middleware from '../../server/firebaseSsr';
-jest.mock('firebase-admin/app', () => ({
-  getApps: jest.fn(() => ['app']),
-  initializeApp: jest.fn(),
+vi.mock('firebase-admin/app', () => ({
+  getApps: vi.fn(() => ['app']),
+  initializeApp: vi.fn(),
 }));
-jest.mock('firebase-admin/auth', () => ({
+vi.mock('firebase-admin/auth', () => ({
   getAuth: () => ({ verifyIdToken: mockVerifyToken }),
 }));
-jest.mock('../../common/firebaseConfig', () => ({
+vi.mock('../../common/firebaseConfig', () => ({
   firebaseConfig: { projectId: 'demo-test' },
 }));
-const mockVerifyToken = jest.fn();
+const mockVerifyToken = vi.fn();
 describe('SSRの認証境界', () => {
-  beforeEach(() => mockVerifyToken.mockReset());
+  beforeEach(() => {
+    mockVerifyToken.mockReset();
+  });
   test.each([undefined, '', 'raw-token'])(
     'Bearerなしの要求 %s は未認証として続行する',
     async (authorization) => {
       const res = {};
-      const next = jest.fn();
+      const next = vi.fn();
       await middleware({ headers: { authorization } }, res, next);
       expect(mockVerifyToken).not.toHaveBeenCalled();
       expect(res.locals).toBeUndefined();
@@ -32,7 +34,7 @@ describe('SSRの認証境界', () => {
     };
     mockVerifyToken.mockResolvedValue(claims);
     const res = { locals: { existing: true } };
-    const next = jest.fn();
+    const next = vi.fn();
     await middleware(
       { headers: { authorization: 'Bearer test-token' } },
       res,
@@ -58,7 +60,7 @@ describe('SSRの認証境界', () => {
         mockVerifyToken.mockRejectedValue(new Error('invalid'));
       }
       const res = {};
-      const next = jest.fn();
+      const next = vi.fn();
       await middleware(
         { headers: { authorization: 'Bearer invalid' } },
         res,

@@ -4,25 +4,25 @@ import plugin from '../plugins/03.firebase.client';
 import * as authorization from '../store/firebaseAuthorization';
 
 let mockListener;
-jest.mock('firebase/app', () => ({ getApps: () => ['app'] }));
-jest.mock('firebase/auth', () => ({
+vi.mock('firebase/app', () => ({ getApps: () => ['app'] }));
+vi.mock('firebase/auth', () => ({
   getAuth: () => ({}),
-  GoogleAuthProvider: jest.fn(),
-  signInWithPopup: jest.fn(),
-  signOut: jest.fn(),
+  GoogleAuthProvider: vi.fn(),
+  signInWithPopup: vi.fn(),
+  signOut: vi.fn(),
   onAuthStateChanged: (_auth, listener) => {
     mockListener = listener;
   },
 }));
-jest.mock('firebase/analytics', () => ({ getAnalytics: jest.fn() }));
-jest.mock('@c/firebaseConfig', () => ({ firebaseConfig: {} }));
+vi.mock('firebase/analytics', () => ({ getAnalytics: vi.fn() }));
+vi.mock('@c/firebaseConfig', () => ({ firebaseConfig: {} }));
 
 const user = (uid) => ({
   uid,
   photoURL: `/${uid}.png`,
   displayName: `User ${uid}`,
-  getIdTokenResult: jest.fn().mockResolvedValue({ token: `${uid}-token` }),
-  getIdToken: jest.fn().mockRejectedValue(new Error('unexpected second fetch')),
+  getIdTokenResult: vi.fn().mockResolvedValue({ token: `${uid}-token` }),
+  getIdToken: vi.fn().mockRejectedValue(new Error('unexpected second fetch')),
 });
 
 function start() {
