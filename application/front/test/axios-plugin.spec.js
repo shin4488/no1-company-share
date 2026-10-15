@@ -70,3 +70,14 @@ describe('API通信の表示と認証', () => {
     );
   });
 });
+
+test('配列のクエリは同じ名前を繰り返して送る', () => {
+  const { api } = setup();
+  const pageUris = ['https://example.com/a', 'https://example.com/b'];
+  const uri = new URL(
+    api.getUri({ url: '/open-graph/', params: { pageUris } }),
+    'http://localhost',
+  );
+  expect([...uri.searchParams.keys()]).toEqual(['pageUris', 'pageUris']);
+  expect(uri.searchParams.getAll('pageUris')).toEqual(pageUris);
+});

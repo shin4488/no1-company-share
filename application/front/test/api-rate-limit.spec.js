@@ -10,6 +10,7 @@ import { catchError } from '../../server/common/middleware/appErrorHandler';
 import { userRouter } from '../../server/feature/user/controller';
 import { bookmarkRouter } from '../../server/feature/bookmark/controller';
 import { sharedPostRouter } from '../../server/feature/sharedPost/controller';
+import { openGraphRouter } from '../../server/feature/openGraph/controller';
 import { userDevelopmentRouter } from '../../server/feature/development/user/controller';
 
 vi.mock('firebase-admin/auth', () => ({ getAuth: vi.fn() }));
@@ -29,6 +30,7 @@ const service = {
   updateSharedPosts: vi.fn(),
   deleteSharedPostsLogically: vi.fn(),
   reportSharedPosts: vi.fn(),
+  getOpenGraph: vi.fn(),
 };
 const validUser = {
   iconImageUrl: 'https://example.com/icon.png',
@@ -65,6 +67,7 @@ beforeAll(async () => {
     userRouter,
     bookmarkRouter,
     sharedPostRouter,
+    openGraphRouter,
     userDevelopmentRouter,
   );
   app.use('/api/v1/localhost', router);
@@ -100,6 +103,7 @@ beforeEach(() => {
         types.UserService,
         types.BookmarkService,
         types.SharedPostService,
+        types.OpenGraphService,
       ].includes(type)
     ) {
       return service;
@@ -263,4 +267,45 @@ test('60秒の窓が過ぎると同じ利用者が再試行できる', async () 
   } finally {
     vi.useRealTimers();
   }
+});
+
+test.each([
+  ['DELETE', 'deleteBookmarks'],
+  ['POST', 'postNewBookmarks'],
+])(
+  '本文のない %s /bookmarked-posts/ は対象なしとして処理する',
+  async (method, operation) => {
+    const response = await request(method, '/bookmarked-posts/');
+    expect(response.status).toBe(200);
+    expect(service[operation]).toHaveBeenCalledWith({
+      posts: [],
+      userId: user,
+    });
+  },
+);
+
+test.each([
+  [['https://example.com/'], 'pageUris=https%3A%2F%2Fexample.com%2F'],
+  [
+    ['https://example.com/a', 'https://example.com/b'],
+    'pageUris=https%3A%2F%2Fexample.com%2Fa&pageUris=https%3A%2F%2Fexample.com%2Fb',
+  ],
+])('OGP取得は %j を配列として受け取る', async (pageUris, query) => {
+  const response = await request('GET', `/open-graph/?${query}`);
+  expect(response.status).toBe(200);
+  expect(service.getOpenGraph).toHaveBeenCalledWith({ pageUris });
+});
+
+test.each([
+  'pageUris=javascript%3Aalert(1)',
+  'pageUris=https%3A%2F%2Fexample.com%2F&pageUris=not-a-url',
+  Array.from(
+    { length: 4 },
+    (_, i) => `pageUris=https%3A%2F%2Fexample.com%2F${i}`,
+  ).join('&'),
+  '',
+])('OGP取得は不正なURL・件数 %s を400で拒否する', async (query) => {
+  const response = await request('GET', `/open-graph/?${query}`);
+  expect(response.status).toBe(400);
+  expect(service.getOpenGraph).not.toHaveBeenCalled();
 });

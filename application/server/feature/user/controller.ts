@@ -26,11 +26,10 @@ class UserController extends BaseController {
     >,
     response: express.Response,
   ) {
-    const requestBody = request.body;
     const parameter: UserSaveParameter = {
       id: StringUtil.ifEmpty(response.locals.firebaseUserId),
-      iconImageUrl: StringUtil.ifEmpty(requestBody.iconImageUrl),
-      displayedName: StringUtil.ifEmpty(requestBody.displayedName),
+      iconImageUrl: StringUtil.ifEmpty(request.body?.iconImageUrl),
+      displayedName: StringUtil.ifEmpty(request.body?.displayedName),
     };
 
     const service = appContainer.get<UserService>(types.UserService);

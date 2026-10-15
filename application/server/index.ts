@@ -23,7 +23,7 @@ appContainer.get<SequelizeHandler>(types.SequelizeHandler);
 getFirebaseApp();
 
 const app = express();
-// リクエストボディがundefinedにならないようにする
+// JSONのリクエストボディを解析する。解析対象がないリクエストではbodyはundefinedのまま
 app.use(json());
 app.use(urlencoded({ extended: true }));
 // アクセスログをログファイルに出力
