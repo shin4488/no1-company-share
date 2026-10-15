@@ -1,26 +1,32 @@
 const assert = require('node:assert/strict');
+const http = require('node:http');
+const { once } = require('node:events');
 const { Readable } = require('node:stream');
 const { createRequire } = require('node:module');
 const { test } = require('node:test');
 
-test('Storage transport builds a multipart body with a valid UUID boundary without network access', async (t) => {
-  const fromTeeny = createRequire(require.resolve('teeny-request'));
-  const fetch = fromTeeny('node-fetch');
-  const uuid = fromTeeny('uuid');
+const uuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+
+test('Storage transport builds a multipart body with a valid UUID boundary', async (t) => {
+  // Receive the upload on a local server so the test needs no external network.
   let captured;
-  t.mock.method(fetch, 'default', async (url, options) => {
+  const server = http.createServer(async (request, response) => {
     let body = '';
-    for await (const chunk of options.body) {
+    for await (const chunk of request) {
       body += chunk;
     }
-    captured = { headers: options.headers, body };
-    return new fetch.Response('ok', { status: 200 });
+    captured = { headers: request.headers, body };
+    response.end('ok');
   });
+  server.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  t.after(() => server.close());
   const { teenyRequest } = require('teeny-request');
   await new Promise((resolve, reject) => {
     teenyRequest(
       {
-        uri: 'https://example.invalid/upload',
+        uri: `http://127.0.0.1:${server.address().port}/upload`,
         method: 'POST',
         headers: {},
         multipart: [
@@ -34,16 +40,16 @@ test('Storage transport builds a multipart body with a valid UUID boundary witho
       (error) => (error ? reject(error) : resolve()),
     );
   });
-  const boundary = captured.headers['Content-Type'].split('boundary=')[1];
-  assert.equal(uuid.validate(boundary), true);
-  assert.equal(uuid.version(boundary), 4);
+  const boundary = captured.headers['content-type'].split('boundary=')[1];
+  assert.match(boundary, uuidPattern);
   assert.ok(captured.body.includes(`--${boundary}\r\n`));
   assert.ok(captured.body.includes('企業情報'));
   assert.ok(captured.body.endsWith(`--${boundary}--`));
 });
 
-test('UUID rejects writes outside a caller-provided buffer', () => {
-  const uuid = createRequire(require.resolve('teeny-request'))('uuid');
+test('UUID used by the Functions Framework rejects writes outside a caller-provided buffer', () => {
+  const uuid = createRequire(require.resolve('cloudevents'))('uuid');
+  assert.match(uuid.v4(), uuidPattern);
   assert.throws(
     () => uuid.v5('company', uuid.v5.DNS, new Uint8Array(8)),
     RangeError,
