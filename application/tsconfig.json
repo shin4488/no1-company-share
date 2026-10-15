@@ -9,7 +9,6 @@
     "esModuleInterop": true,
     "verbatimModuleSyntax": false,
     "noUncheckedIndexedAccess": false,
-    "isolatedModules": false,
-    "moduleResolution": "Node10"
+    "isolatedModules": false
   }
 }

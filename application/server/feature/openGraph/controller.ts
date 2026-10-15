@@ -1,4 +1,5 @@
 import express, { Router } from 'express';
+import { matchedData } from 'express-validator';
 import { openGraphGetRequest } from './definition/openGraphGetRequest';
 import { OpenGraphService } from './interface/service';
 import { openGraphSimpleValidators } from './simpleValidator';
@@ -24,7 +25,10 @@ class OpenGraphController extends BaseController {
     >,
     response: express.Response,
   ) {
-    const requestQuery = request.query;
+    // 配列にそろえた値は、Expressのrequest.queryではなく検査結果から取り出す
+    const requestQuery = matchedData<openGraphGetRequest>(request, {
+      locations: ['query'],
+    });
     const service = appContainer.get<OpenGraphService>(types.OpenGraphService);
     const parameter = {
       pageUris: requestQuery.pageUris || [],

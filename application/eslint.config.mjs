@@ -21,7 +21,7 @@ export default createConfigForNuxt({
   {
     files: ['front/test/**'],
     languageOptions: {
-      globals: globals.jest,
+      globals: globals.vitest,
     },
   },
   {
@@ -153,7 +153,7 @@ export default createConfigForNuxt({
   {
     files: ['**/*.ts', '**/*.vue'],
     rules: {
-      // typescript-eslintは型検査に任せてこれらを無効にするが、lint・buildは型検査をせず、testの型検査（ts-jest）もテストが読み込むtsファイルに限られる
+      // typescript-eslintは型検査に任せてこれらを無効にするが、型検査はtestでだけ行うため、lintでも検出する
       'constructor-super': 'error',
       'getter-return': 'error',
       'no-class-assign': 'error',

@@ -1,8 +1,8 @@
 <template>
-  <v-row dense>
+  <v-row density="compact">
     <v-col :cols="columnSpan">
       <v-card>
-        <v-card-title>
+        <v-card-title class="text-wrap">
           <v-icon>mdi-clover</v-icon>
           このアプリについて
         </v-card-title>
@@ -22,7 +22,7 @@
 
     <v-col :cols="columnSpan">
       <v-card>
-        <v-card-title>
+        <v-card-title class="text-wrap">
           <v-icon>mdi-web</v-icon>
           推奨環境（ブラウザ・OS）
         </v-card-title>
@@ -42,7 +42,7 @@
 
     <v-col :cols="columnSpan">
       <v-card>
-        <v-card-title>
+        <v-card-title class="text-wrap">
           <v-icon>mdi-google</v-icon>
           ログイン
         </v-card-title>
@@ -57,7 +57,7 @@
 
     <v-col :cols="columnSpan">
       <v-card>
-        <v-card-title>
+        <v-card-title class="text-wrap">
           <v-icon>mdi-plus</v-icon>
           新規投稿
         </v-card-title>
@@ -86,7 +86,7 @@
 
     <v-col :cols="columnSpan">
       <v-card>
-        <v-card-title>
+        <v-card-title class="text-wrap">
           <v-icon>mdi-text-search</v-icon>
           投稿閲覧
         </v-card-title>
@@ -107,7 +107,7 @@
 
     <v-col :cols="columnSpan">
       <v-card>
-        <v-card-title>
+        <v-card-title class="text-wrap">
           <v-icon>mdi-alert</v-icon>
           通報
         </v-card-title>
@@ -122,7 +122,7 @@
 
     <v-col :cols="columnSpan">
       <v-card>
-        <v-card-title>
+        <v-card-title class="text-wrap">
           <v-icon>mdi-check</v-icon>
           利用規約
         </v-card-title>

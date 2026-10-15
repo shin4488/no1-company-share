@@ -1,7 +1,7 @@
 export const defineNuxtPlugin = (plugin) => plugin;
 export const defineNuxtRouteMiddleware = (middleware) => middleware;
-export const refreshNuxtData = jest.fn().mockResolvedValue(undefined);
-export const showError = jest.fn();
-export const useRequestEvent = jest.fn(() => undefined);
-export const useNuxtApp = jest.fn();
-export const navigateTo = jest.fn();
+export const refreshNuxtData = vi.fn().mockResolvedValue(undefined);
+export const showError = vi.fn();
+export const useRequestEvent = vi.fn(() => undefined);
+export const useNuxtApp = vi.fn();
+export const navigateTo = vi.fn();

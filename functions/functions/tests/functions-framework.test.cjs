@@ -24,7 +24,9 @@ for (const outcome of ['success', 'reject', 'missing-secret']) {
       COMPANY_UPDATE_SECRET: 'framework-test-secret',
       FRAMEWORK_TEST_OUTCOME: outcome,
     };
-    if (outcome === 'missing-secret') delete env.COMPANY_UPDATE_SECRET;
+    if (outcome === 'missing-secret') {
+      delete env.COMPANY_UPDATE_SECRET;
+    }
     const child = spawn(process.execPath, [
       '--require', path.join(__dirname, 'fixtures/framework-preload.cjs'),
       path.join(path.dirname(require.resolve('@google-cloud/functions-framework')), 'main.js'),
@@ -72,9 +74,15 @@ for (const outcome of ['success', 'reject', 'missing-secret']) {
     const body = await response.text();
     assert.equal(response.status, outcome === 'success' ? 204 : 500, body);
     assert.equal((output.match(/FRAMEWORK_TEST_API_CALL/g) || []).length, outcome === 'missing-secret' ? 0 : 1);
-    if (outcome === 'success') assert.match(output, /FRAMEWORK_TEST_API_FINISHED/);
-    if (outcome === 'reject') assert.match(body + output, /Company image update failed/);
-    if (outcome === 'missing-secret') assert.match(body + output, /secret is unavailable/);
+    if (outcome === 'success') {
+      assert.match(output, /FRAMEWORK_TEST_API_FINISHED/);
+    }
+    if (outcome === 'reject') {
+      assert.match(body + output, /Company image update failed/);
+    }
+    if (outcome === 'missing-secret') {
+      assert.match(body + output, /secret is unavailable/);
+    }
     assert.doesNotMatch(body + output, /framework-test-secret/);
   });
 }

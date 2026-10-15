@@ -33,7 +33,7 @@ describe('共有投稿の入力契約', () => {
         await errors(sharedPostPostSimpleValidators, {
           body: { posts: [post] },
         })
-      ).some((x) => x.param === 'posts[0].companyNumber'),
+      ).some((x) => x.path === 'posts[0].companyNumber'),
     ).toBe(true);
   });
   test.each([
@@ -86,7 +86,7 @@ describe('共有投稿の入力契約', () => {
     expect(
       (
         await errors(sharedPostGetSimpleValidators, { query: { [key]: value } })
-      ).some((x) => x.param === key),
+      ).some((x) => x.path === key),
     ).toBe(true);
   });
 });

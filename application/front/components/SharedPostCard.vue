@@ -47,7 +47,7 @@
     <v-card-actions class="ga-3">
       <v-avatar size="40">
         <v-img
-          class="elevation-6"
+          class="elevation-3"
           :title="postingUserName"
           :alt="postingUserName"
           :src="postingUserIcomImageUrl"

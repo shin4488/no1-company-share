@@ -7,7 +7,7 @@
             <div>通報した投稿は全ユーザに対して表示されなくなります。</div>
           </v-col>
         </v-row>
-        <v-row dense>
+        <v-row density="compact">
           <v-col>
             <v-textarea v-model="reportDetail" rows="3" auto-grow>
               <template #label>

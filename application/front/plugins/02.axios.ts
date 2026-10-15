@@ -1,4 +1,5 @@
 import { create, type AxiosResponse } from 'axios';
+import { markRaw } from 'vue';
 import { defineNuxtPlugin, useRequestEvent } from '#app';
 import type {
   AppResponse,
@@ -7,13 +8,15 @@ import type {
 import { ArrayUtil } from '@c/util/arrayUtil';
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const { $accessor, $store } = nuxtApp;
+  const { $accessor } = nuxtApp;
   const localPort = useRequestEvent()?.node.req.socket.localPort;
   const api = create({
     baseURL:
       typeof window === 'undefined'
         ? `http://127.0.0.1:${localPort || process.env.PORT || 3000}/api/v1`
         : '/api/v1',
+    // APIのExpressは配列のクエリを「key=a&key=b」の形で受け取る
+    paramsSerializer: { indexes: null },
   });
   const notify = (body: AppResponse) => {
     if (!ArrayUtil.isEmpty(body?.messages)) {
@@ -52,6 +55,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       return Promise.reject(error);
     },
   );
-  $store.$axios = api;
+  $accessor.firebaseAuthorization.$axios = markRaw(api);
   return { provide: { axios: api } };
 });

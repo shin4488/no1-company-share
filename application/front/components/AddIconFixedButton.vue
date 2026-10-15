@@ -4,7 +4,7 @@
       icon
       size="large"
       max-width="none"
-      elevation="6"
+      elevation="3"
       color="primary"
       class="position-absolute bottom-0 right-0 mb-16 mb-md-0"
       aria-label="新規投稿"

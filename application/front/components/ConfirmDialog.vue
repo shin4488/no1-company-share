@@ -1,7 +1,8 @@
 <template>
   <v-dialog v-model="isDialogShow" max-width="70%" width="auto" persistent>
     <v-card>
-      <v-card-title dense>
+      <!-- 確認の文言は省略せず折り返して表示する -->
+      <v-card-title class="text-wrap">
         {{ contentText }}
       </v-card-title>
 

@@ -1,10 +1,11 @@
-const mockLog = jest.fn();
-jest.mock('@s/common/dependencyInjection/inversify.config', () => ({
+import { logRequestResponse } from '@s/common/middleware/logger';
+
+const mockLog = vi.hoisted(() => vi.fn());
+vi.mock('@s/common/dependencyInjection/inversify.config', () => ({
   appContainer: { get: () => ({ log: mockLog }) },
 }));
-const { logRequestResponse } = require('@s/common/middleware/logger');
 test('障害調査ログに認証情報や入力内容を残さない', () => {
-  const next = jest.fn();
+  const next = vi.fn();
   logRequestResponse(
     {
       method: 'POST',

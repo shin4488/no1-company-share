@@ -1,27 +1,18 @@
-import { mutationTree, actionTree } from 'typed-vuex';
+import { defineStore } from 'pinia';
 
-export const state = () => ({
-  isShown: false as boolean,
-});
-export type RootState = ReturnType<typeof state>;
-
-export const mutations = mutationTree(state, {
-  change(state, isShown: boolean) {
-    state.isShown = isShown;
-  },
-});
-
-export const actions = actionTree(
-  { state, mutations },
-  {
-    async open({ commit }, action: () => unknown) {
+export const useSpinnerOverlayStore = defineStore('spinnerOverlay', {
+  state: () => ({
+    isShown: false as boolean,
+  }),
+  actions: {
+    async open(action: () => unknown) {
       // actionを実行中のみスピナーをオン、実行後はオフとする
-      commit('change', true);
+      this.isShown = true;
       try {
         await action();
       } finally {
-        commit('change', false);
+        this.isShown = false;
       }
     },
   },
-);
+});

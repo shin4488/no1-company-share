@@ -10,9 +10,13 @@ updates:
     cooldown:
       default-days: 7
     groups:
+      # メジャー版は移行作業が要るため、グループに含めず依存ごとのPRにする
       npm:
         patterns:
           - "*"
+        update-types:
+          - minor
+          - patch
     ignore:
       # 型定義のメジャー版は、実行するNodeのメジャー版を上げるときに合わせて上げる
       - dependency-name: "@types/node"

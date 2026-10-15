@@ -1,4 +1,4 @@
-/** @jest-environment node */
+// @vitest-environment node
 
 import CompanyMaster from '../../server/common/sequelize/models/companyMaster';
 import { CompanyServiceImpl } from '../../server/feature/company/service';
@@ -8,16 +8,16 @@ test('画像取得が成功した企業だけを更新しDB書き込みの完了
     { companyNumber: '1', homepageUrl: 'https://one.example' },
     { companyNumber: '2', homepageUrl: 'https://two.example' },
   ];
-  const findAll = jest.spyOn(CompanyMaster, 'findAll').mockResolvedValue(rows);
+  const findAll = vi.spyOn(CompanyMaster, 'findAll').mockResolvedValue(rows);
   let finish;
-  const bulkCreate = jest.spyOn(CompanyMaster, 'bulkCreate').mockImplementation(
+  const bulkCreate = vi.spyOn(CompanyMaster, 'bulkCreate').mockImplementation(
     () =>
       new Promise((resolve) => {
         finish = resolve;
       }),
   );
   const openGraphLogic = {
-    getOpenGraph: jest
+    getOpenGraph: vi
       .fn()
       .mockResolvedValueOnce({ image: 'https://one.example/og.png' })
       .mockResolvedValueOnce({ image: '' }),

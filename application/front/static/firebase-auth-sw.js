@@ -5,10 +5,10 @@ const ignorePaths = [
 ];
 
 importScripts(
-  'https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js',
+  'https://www.gstatic.com/firebasejs/13.0.0/firebase-app-compat.js',
 );
 importScripts(
-  'https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js',
+  'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js',
 );
 firebase.initializeApp({
   apiKey: 'AIzaSyCPvuvm4wNrjLlpixP2xyUgsaYnIj2cub0',

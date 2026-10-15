@@ -1,16 +1,15 @@
 import plugin from '../plugins/02.axios';
 
 function setup(token = 'test-id-token') {
-  const open = jest.fn();
-  const store = {};
+  const open = vi.fn();
+  const authorization = { idTokenComputed: token };
   const result = plugin({
-    $store: store,
     $accessor: {
-      firebaseAuthorization: { idTokenComputed: token },
+      firebaseAuthorization: authorization,
       snackBarError: { open },
     },
   });
-  return { api: result.provide.axios, open, store };
+  return { api: result.provide.axios, open, authorization };
 }
 
 describe('API通信の表示と認証', () => {
@@ -70,4 +69,15 @@ describe('API通信の表示と認証', () => {
       '通信に失敗しました。接続を確認して再試行してください。',
     );
   });
+});
+
+test('配列のクエリは同じ名前を繰り返して送る', () => {
+  const { api } = setup();
+  const pageUris = ['https://example.com/a', 'https://example.com/b'];
+  const uri = new URL(
+    api.getUri({ url: '/open-graph/', params: { pageUris } }),
+    'http://localhost',
+  );
+  expect([...uri.searchParams.keys()]).toEqual(['pageUris', 'pageUris']);
+  expect(uri.searchParams.getAll('pageUris')).toEqual(pageUris);
 });

@@ -8,7 +8,7 @@
         v-for="item in modelValue"
         :key="item.postId"
         xl="3"
-        md="4"
+        lg="4"
         sm="6"
         cols="12"
       >
@@ -200,9 +200,8 @@ export default defineComponent({
       const confirmDialog = this.$refs.confirmDialog as InstanceType<
         typeof ConfirmDialog
       >;
-      const isConfirmed = await confirmDialog.open(
-        '投稿を削除します。よろしいですか。',
-      );
+      const isConfirmed =
+        await confirmDialog.open('投稿を削除します。よろしいですか。');
       if (!isConfirmed) {
         return;
       }

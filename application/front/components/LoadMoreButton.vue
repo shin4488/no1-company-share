@@ -2,7 +2,7 @@
   <div class="d-flex justify-center mt-6">
     <v-btn
       color="primary"
-      elevation="7"
+      elevation="3"
       rounded
       @click="onClickedLoadMoreButton"
       >{{ text }}</v-btn

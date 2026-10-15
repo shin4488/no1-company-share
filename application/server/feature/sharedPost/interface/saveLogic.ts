@@ -1,4 +1,4 @@
-import { Transaction } from 'sequelize/types';
+import { Transaction } from 'sequelize';
 import { SharedPostIdCreationParameter } from '../definition/sharedPostIdCreationParameter';
 import { SharedPostSaveParameter } from '../definition/sharedPostSaveParameter';
 import { SharedPostSaveResult } from '../definition/sharedPostSaveResult';

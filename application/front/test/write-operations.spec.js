@@ -11,11 +11,11 @@ const post = (postId = 'one', bookmarked = false) => ({
 });
 function mountList(posts = [post()], path = '/home') {
   const state = reactive({ userIdComputed: 'owner' });
-  const request = jest
+  const request = vi
     .fn()
     .mockResolvedValue({ data: { messages: [], data: null } });
-  const info = jest.fn();
-  const error = jest.fn();
+  const info = vi.fn();
+  const error = vi.fn();
   const wrapper = shallowMount(SharedPostCardList, {
     props: { modelValue: posts },
     global: {
@@ -109,7 +109,7 @@ test('ログアウト後に届いた保存結果で表示を上書きしない',
 
 test('削除に失敗したカードを消さず成功通知もしない', async () => {
   const { wrapper, request, info } = mountList();
-  wrapper.vm.$refs.confirmDialog.open = jest.fn().mockResolvedValue(true);
+  wrapper.vm.$refs.confirmDialog.open = vi.fn().mockResolvedValue(true);
   request.mockRejectedValue(new Error('network'));
   await wrapper.vm.onDeleted({ postId: 'one' });
   expect(wrapper.emitted('update:modelValue')).toBeUndefined();
@@ -119,7 +119,7 @@ test('削除に失敗したカードを消さず成功通知もしない', async
 
 test('削除の待機中に一覧の順番が変わっても対象投稿だけを除く', async () => {
   const { wrapper, request } = mountList([post(), post('two')]);
-  wrapper.vm.$refs.confirmDialog.open = jest.fn().mockResolvedValue(true);
+  wrapper.vm.$refs.confirmDialog.open = vi.fn().mockResolvedValue(true);
   const pending = later();
   request.mockReturnValue(pending.promise);
   const write = wrapper.vm.onDeleted({ postId: 'one' });
@@ -133,7 +133,7 @@ test('削除の待機中に一覧の順番が変わっても対象投稿だけ�
 
 test('削除キャンセルではAPIを呼ばない', async () => {
   const { wrapper, request } = mountList();
-  wrapper.vm.$refs.confirmDialog.open = jest.fn().mockResolvedValue(false);
+  wrapper.vm.$refs.confirmDialog.open = vi.fn().mockResolvedValue(false);
   await wrapper.vm.onDeleted({ postId: 'one' });
   expect(request).not.toHaveBeenCalled();
   wrapper.unmount();
@@ -142,10 +142,10 @@ test('削除キャンセルではAPIを呼ばない', async () => {
 test.each([true, false])(
   '通報の保存成功=%sを画面の結果に反映する',
   async (succeeds) => {
-    const info = jest.fn();
+    const info = vi.fn();
     const request = succeeds
-      ? jest.fn().mockResolvedValue(success)
-      : jest.fn().mockRejectedValue(new Error('offline'));
+      ? vi.fn().mockResolvedValue(success)
+      : vi.fn().mockRejectedValue(new Error('offline'));
     const wrapper = shallowMount(ReportDialog, {
       global: {
         stubs: [

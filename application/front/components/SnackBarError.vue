@@ -16,16 +16,21 @@ export default defineComponent({
     };
   },
   created() {
-    this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'snackBarError/open') {
-        const message = state.snackBarError.message;
+    const store = this.$accessor.snackBarError;
+    // 同じ内容の通知でも開き直すため、状態ではなく通知の操作を監視する。監視はコンポーネントの破棄時に解除される
+    store.$onAction(({ name, after }) => {
+      if (name !== 'open') {
+        return;
+      }
+      after(() => {
+        const message = store.message;
         if (StringUtil.isEmpty(message)) {
           return;
         }
 
         this.message = message;
         this.isShown = true;
-      }
+      });
     });
   },
   methods: {

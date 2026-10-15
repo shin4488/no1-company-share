@@ -32,7 +32,7 @@ stubs['v-app-bar-nav-icon'] = { template: '<button />' };
 
 function mountLayout(userId, iconImageUrl, currentPath = '/home') {
   const state = reactive({ userId, iconImageUrl });
-  const replace = jest.fn().mockResolvedValue(undefined);
+  const replace = vi.fn().mockResolvedValue(undefined);
   const wrapper = mount(DefaultLayout, {
     global: {
       stubs,
@@ -49,7 +49,7 @@ function mountLayout(userId, iconImageUrl, currentPath = '/home') {
         },
         $vuetify: { display: { smAndDown: false } },
         $route: { path: currentPath },
-        $router: { replace, push: jest.fn() },
+        $router: { replace, push: vi.fn() },
         $cloner: { deepClone: (value) => JSON.parse(JSON.stringify(value)) },
       },
     },
@@ -57,7 +57,9 @@ function mountLayout(userId, iconImageUrl, currentPath = '/home') {
   return { wrapper, state, replace };
 }
 
-beforeEach(() => refreshNuxtData.mockClear());
+beforeEach(() => {
+  refreshNuxtData.mockClear();
+});
 
 test('SSRからの画像とログイン後の画像更新を表示する', async () => {
   const { wrapper, state } = mountLayout('server-user', '/initial.png');
