@@ -15,9 +15,7 @@ import { SharedPostDao } from '@s/commonBL/dao/sharedPost/interface/dao';
 import { ArrayUtil } from '@c/util/arrayUtil';
 
 @injectable()
-export class SharedPostComplexValidatorImpl
-  implements SharedPostComplexValidator
-{
+export class SharedPostComplexValidatorImpl implements SharedPostComplexValidator {
   private sharedPostDao: SharedPostDao;
 
   constructor(@inject(types.SharedPostDao) sharedPostDao: SharedPostDao) {
@@ -69,9 +67,8 @@ export class SharedPostComplexValidatorImpl
     for (const post of posts) {
       const sharedPostId = post.id;
       // 投稿の存在チェック
-      const validateErrorMessage = await this.validateExistingSharedPost(
-        sharedPostId,
-      );
+      const validateErrorMessage =
+        await this.validateExistingSharedPost(sharedPostId);
       if (StringUtil.isNotEmpty(validateErrorMessage)) {
         errorHandler.addMessage(validateErrorMessage);
       }
@@ -121,9 +118,8 @@ export class SharedPostComplexValidatorImpl
       const sharedPostId = post.id;
 
       // 削除しようとしている投稿の存在
-      const notExistingPostErrorMessage = await this.validateExistingSharedPost(
-        sharedPostId,
-      );
+      const notExistingPostErrorMessage =
+        await this.validateExistingSharedPost(sharedPostId);
       if (StringUtil.isNotEmpty(notExistingPostErrorMessage)) {
         errorHandler.addMessage(notExistingPostErrorMessage);
       }
@@ -153,9 +149,8 @@ export class SharedPostComplexValidatorImpl
       const sharedPostId = post.id;
 
       // 削除しようとしている投稿の存在
-      const notExistingPostErrorMessage = await this.validateExistingSharedPost(
-        sharedPostId,
-      );
+      const notExistingPostErrorMessage =
+        await this.validateExistingSharedPost(sharedPostId);
       if (StringUtil.isNotEmpty(notExistingPostErrorMessage)) {
         errorHandler.addMessage(notExistingPostErrorMessage);
       }

@@ -11,7 +11,8 @@
     "lint:prettier": "prettier --check .",
     "lint": "yarn lint:js && yarn lint:prettier",
     "lintfix": "prettier --write --list-different . && yarn lint:js --fix",
-    "test": "nuxt prepare && yarn test:dependencies && vitest run",
+    "test": "nuxt prepare && yarn typecheck && yarn test:dependencies && vitest run",
+    "typecheck": "nuxt typecheck",
     "test:dependencies": "node --test test/*.test.cjs",
     "test:integration": "nuxt prepare && node integration/api-writes.cjs",
     "prepare:tls": "node node_modules/listhen/patch.cjs"
@@ -57,9 +58,9 @@
     "eslint-plugin-n": "18.4.1",
     "eslint-plugin-promise": "7.3.0",
     "globals": "17.13.0",
-    "prettier": "^2.5.1",
+    "prettier": "3.9.9",
     "sass-embedded": "^1.105.1",
-    "typescript": "5.9.3",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "5.0.3",
     "vue-tsc": "3.3.12"
   },

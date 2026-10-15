@@ -290,8 +290,8 @@ export default defineComponent({
       this.imageAlternativeMessage = hasHomePageNoImage
         ? this.imageAlternativeMessageWithHomepage
         : hasNoHomePageNoImage
-        ? this.imageAlternativeMessageWithoutHomepage
-        : '';
+          ? this.imageAlternativeMessageWithoutHomepage
+          : '';
       const companyNumber = parameter.companyNumber;
       const companyName = parameter.companyName;
       this.postId = parameter.postId;
