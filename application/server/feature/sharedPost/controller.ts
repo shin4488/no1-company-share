@@ -54,7 +54,7 @@ import { wrapAction } from '@s/common/middleware/controllerCatcher';
  * 投稿処理に関するコントローラクラス
  */
 class SharedPostController extends BaseController {
-  public static sharedPostsGetEndpoint: string = '/shared-posts/:postId?';
+  public static sharedPostsGetEndpoint: string = '/shared-posts{/:postId}';
   public static async getAliveSharedPosts(
     request: express.Request<
       SharedPostGetRequestParameter,
@@ -93,9 +93,8 @@ class SharedPostController extends BaseController {
     >,
     response: express.Response,
   ) {
-    const requestBody = request.body;
     const postsParameter: SharedPostPostParameterItem[] =
-      requestBody.posts?.map((request) => ({
+      request.body?.posts?.map((request) => ({
         key: request.key === undefined ? '' : request.key,
         companyNumber: StringUtil.ifEmpty(request.companyNumber),
         companyName: StringUtil.ifEmpty(request.companyName),
@@ -120,7 +119,9 @@ class SharedPostController extends BaseController {
     super.success(response, responseDataBody);
   }
 
-  public static sharedPostsPutEndpoint: string = '/shared-posts/:sharedPostId?';
+  public static sharedPostsPutEndpoint: string =
+    '/shared-posts{/:sharedPostId}';
+
   public static async updateSharedPosts(
     request: express.Request<
       SharedPostPutRequestParameter,
@@ -130,9 +131,8 @@ class SharedPostController extends BaseController {
     >,
     response: express.Response,
   ) {
-    const requestBody = request.body;
     let postsParameter: SharedPostPutParameterItem[] =
-      requestBody.posts?.map((request) => ({
+      request.body?.posts?.map((request) => ({
         id: StringUtil.ifEmpty(request.id),
         companyNumber: StringUtil.ifEmpty(request.companyNumber),
         companyName: StringUtil.ifEmpty(request.companyName),
@@ -168,7 +168,7 @@ class SharedPostController extends BaseController {
   }
 
   public static sharedPostsLogicalDeleteEndpoint: string =
-    '/shared-posts/:postId?';
+    '/shared-posts{/:postId}';
 
   public static async deleteSharedPostsLogically(
     request: express.Request<
@@ -191,8 +191,7 @@ class SharedPostController extends BaseController {
         id: requestParameterPostId as string,
       });
     } else {
-      const requestBody = request.body;
-      const bodyPosts = requestBody.posts;
+      const bodyPosts = request.body?.posts;
       parameter.posts =
         bodyPosts?.map<SharedPostDeleteParameterItem>((x) => ({
           id: StringUtil.ifEmpty(x.id),
@@ -219,8 +218,7 @@ class SharedPostController extends BaseController {
     const parameter: ReportPostParameter = {
       posts: [],
     };
-    const requestBody = request.body;
-    const bodyPosts = requestBody.posts;
+    const bodyPosts = request.body?.posts;
     parameter.posts =
       bodyPosts?.map<ReportPostParameterItem>((x) => ({
         id: StringUtil.ifEmpty(x.id),

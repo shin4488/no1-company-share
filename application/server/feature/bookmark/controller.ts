@@ -29,7 +29,7 @@ import { throwIfHasSimpleValidationResult } from '@s/common/middleware/simpleVal
  * お気に入りの投稿処理に関するコントローラクラス
  */
 class SharedPostController extends BaseController {
-  public static bookmarkGetEndpoint: string = '/bookmarked-posts/:postId?';
+  public static bookmarkGetEndpoint: string = '/bookmarked-posts{/:postId}';
   public static async getBookamrks(
     request: express.Request<
       BookmarkRequestParameter,
@@ -54,7 +54,7 @@ class SharedPostController extends BaseController {
     super.success(response, responseBody);
   }
 
-  public static bookmarkPostEndpoint: string = '/bookmarked-posts/:postId?';
+  public static bookmarkPostEndpoint: string = '/bookmarked-posts{/:postId}';
   public static async postNewBookmarks(
     request: express.Request<
       BookmarkRequestParameter,
@@ -76,8 +76,7 @@ class SharedPostController extends BaseController {
         id: requestParameterPostId as string,
       });
     } else {
-      const body = request.body;
-      const bodyPosts = body.posts;
+      const bodyPosts = request.body?.posts;
       parameter.posts =
         bodyPosts?.map<BookmarkPostParameterItem>((x) => ({
           id: StringUtil.ifEmpty(x.id),
@@ -89,7 +88,7 @@ class SharedPostController extends BaseController {
     super.success(response);
   }
 
-  public static bookmarkDeleteEndpoint: string = '/bookmarked-posts/:postId?';
+  public static bookmarkDeleteEndpoint: string = '/bookmarked-posts{/:postId}';
   public static async deleteBookmarks(
     request: express.Request<
       BookmarkRequestParameter,
@@ -111,8 +110,7 @@ class SharedPostController extends BaseController {
         id: requestParameterPostId as string,
       });
     } else {
-      const body = request.body;
-      const bodyPosts = body.posts;
+      const bodyPosts = request.body?.posts;
       parameter.posts =
         bodyPosts?.map<BookmarkDeleteParameterItem>((x) => ({
           id: StringUtil.ifEmpty(x.id),

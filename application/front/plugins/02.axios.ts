@@ -15,6 +15,8 @@ export default defineNuxtPlugin((nuxtApp) => {
       typeof window === 'undefined'
         ? `http://127.0.0.1:${localPort || process.env.PORT || 3000}/api/v1`
         : '/api/v1',
+    // APIのExpressは配列のクエリを「key=a&key=b」の形で受け取る
+    paramsSerializer: { indexes: null },
   });
   const notify = (body: AppResponse) => {
     if (!ArrayUtil.isEmpty(body?.messages)) {
