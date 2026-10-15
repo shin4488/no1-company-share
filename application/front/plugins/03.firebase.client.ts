@@ -1,4 +1,5 @@
 import { getApps, initializeApp } from 'firebase/app';
+import { markRaw } from 'vue';
 import { defineNuxtPlugin, showError } from '#app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getAnalytics } from 'firebase/analytics';
@@ -8,7 +9,8 @@ export default defineNuxtPlugin((nuxtApp) => {
   const app = getApps()[0] || initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const fire = { auth };
-  nuxtApp.$store.$fire = fire;
+  const authorization = nuxtApp.$accessor.firebaseAuthorization;
+  authorization.$fire = markRaw(fire);
   const isLocalhost = ['localhost', '127.0.0.1', '[::1]'].includes(
     window.location.hostname,
   );
@@ -29,20 +31,17 @@ export default defineNuxtPlugin((nuxtApp) => {
           if (version !== authVersion) {
             return;
           }
-          await nuxtApp.$store.dispatch(
-            'firebaseAuthorization/onAuthStateChangedAction',
-            {
-              authUser:
-                authUser && result
-                  ? {
-                      uid: authUser.uid,
-                      idToken: result.token,
-                      photoURL: authUser.photoURL,
-                      displayName: authUser.displayName,
-                    }
-                  : null,
-            },
-          );
+          await authorization.onAuthStateChangedAction({
+            authUser:
+              authUser && result
+                ? {
+                    uid: authUser.uid,
+                    idToken: result.token,
+                    photoURL: authUser.photoURL,
+                    displayName: authUser.displayName,
+                  }
+                : null,
+          });
         } catch {
           if (version === authVersion) {
             showError({

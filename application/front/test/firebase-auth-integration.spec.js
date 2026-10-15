@@ -1,7 +1,7 @@
-import { createStore } from 'vuex';
+import { createPinia } from 'pinia';
 import { signInWithPopup } from 'firebase/auth';
 import plugin from '../plugins/03.firebase.client';
-import * as authorization from '../store/firebaseAuthorization';
+import { useFirebaseAuthorizationStore } from '../store/firebaseAuthorization';
 
 let mockListener;
 vi.mock('firebase/app', () => ({ getApps: () => ['app'] }));
@@ -26,14 +26,10 @@ const user = (uid) => ({
 });
 
 function start() {
-  const store = createStore({
-    modules: {
-      firebaseAuthorization: { ...authorization, namespaced: true },
-    },
-  });
+  const store = useFirebaseAuthorizationStore(createPinia());
   const hooks = {};
   plugin({
-    $store: store,
+    $accessor: { firebaseAuthorization: store },
     hook: (name, callback) => {
       hooks[name] = callback;
     },
@@ -51,7 +47,7 @@ test('認証ストアにトークンとプロフィールを反映し、ログ�
   const store = start();
   const account = user('member');
   await mockListener(account);
-  expect(store.state.firebaseAuthorization).toEqual({
+  expect(store.$state).toEqual({
     userId: 'member',
     idToken: 'member-token',
     iconImageUrl: '/member.png',
@@ -59,7 +55,7 @@ test('認証ストアにトークンとプロフィールを反映し、ログ�
   });
   expect(account.getIdToken).not.toHaveBeenCalled();
   await mockListener(null);
-  expect(store.state.firebaseAuthorization).toEqual({
+  expect(store.$state).toEqual({
     userId: null,
     idToken: null,
     iconImageUrl: null,
@@ -81,8 +77,8 @@ test('遅い前ユーザーの同期は現在のユーザーを上書きしな�
   await mockListener(user('second'));
   finish({ token: 'first-token' });
   await pending;
-  expect(store.state.firebaseAuthorization.userId).toBe('second');
-  expect(store.state.firebaseAuthorization.idToken).toBe('second-token');
+  expect(store.userId).toBe('second');
+  expect(store.idToken).toBe('second-token');
 });
 
 test('ログイン完了がログアウト後に届いても状態を戻さない', async () => {
@@ -94,11 +90,11 @@ test('ログイン完了がログアウト後に届いても状態を戻さな�
         finishLogin = resolve;
       }),
   );
-  const pending = store.dispatch('firebaseAuthorization/loginByGoogle');
+  const pending = store.loginByGoogle();
   await mockListener(user('stale'));
   await mockListener(null);
   finishLogin({ user: user('stale') });
   await pending;
-  expect(store.state.firebaseAuthorization.userId).toBeNull();
-  expect(store.state.firebaseAuthorization.idToken).toBeNull();
+  expect(store.userId).toBeNull();
+  expect(store.idToken).toBeNull();
 });

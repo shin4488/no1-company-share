@@ -1,4 +1,5 @@
 import { create, type AxiosResponse } from 'axios';
+import { markRaw } from 'vue';
 import { defineNuxtPlugin, useRequestEvent } from '#app';
 import type {
   AppResponse,
@@ -7,7 +8,7 @@ import type {
 import { ArrayUtil } from '@c/util/arrayUtil';
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const { $accessor, $store } = nuxtApp;
+  const { $accessor } = nuxtApp;
   const localPort = useRequestEvent()?.node.req.socket.localPort;
   const api = create({
     baseURL:
@@ -52,6 +53,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       return Promise.reject(error);
     },
   );
-  $store.$axios = api;
+  $accessor.firebaseAuthorization.$axios = markRaw(api);
   return { provide: { axios: api } };
 });

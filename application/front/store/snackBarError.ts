@@ -1,21 +1,12 @@
-import { mutationTree, actionTree } from 'typed-vuex';
+import { defineStore } from 'pinia';
 
-export const state = () => ({
-  message: '' as string,
-});
-export type RootState = ReturnType<typeof state>;
-
-export const mutations = mutationTree(state, {
-  open(state, message: string) {
-    state.message = message;
-  },
-});
-
-export const actions = actionTree(
-  { state, mutations },
-  {
-    open({ commit }, message: string) {
-      commit('open', message);
+export const useSnackBarErrorStore = defineStore('snackBarError', {
+  state: () => ({
+    message: '' as string,
+  }),
+  actions: {
+    open(message: string) {
+      this.message = message;
     },
   },
-);
+});

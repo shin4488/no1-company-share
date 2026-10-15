@@ -11,21 +11,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { SpinnerOverlayData } from '@f/definition/components/spinnerOverlay/data';
 
 export default defineComponent({
   name: 'SpinnerOverlay',
-  data(): SpinnerOverlayData {
-    return {
-      isShown: false,
-    };
-  },
-  created() {
-    this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'spinnerOverlay/change') {
-        this.isShown = state.spinnerOverlay.isShown;
-      }
-    });
+  computed: {
+    isShown(): boolean {
+      return this.$accessor.spinnerOverlay.isShown;
+    },
   },
 });
 </script>
