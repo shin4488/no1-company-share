@@ -30,7 +30,7 @@
     "h3": "1.15.11",
     "inversify": "^6.0.1",
     "ipaddr.js": "1.9.1",
-    "jsdom": "^19.0.0",
+    "jsdom": "30.1.2",
     "lodash.clonedeep": "^4.5.0",
     "log4js": "^6.4.5",
     "module-alias": "^2.2.2",
@@ -47,7 +47,7 @@
   "devDependencies": {
     "@nuxt/eslint-config": "1.17.0",
     "@types/express": "4.17.25",
-    "@types/jsdom": "^16.2.14",
+    "@types/jsdom": "30.0.0",
     "@types/lodash.clonedeep": "^4.5.7",
     "@types/log4js": "^2.3.5",
     "@vitejs/plugin-vue": "6.0.9",
