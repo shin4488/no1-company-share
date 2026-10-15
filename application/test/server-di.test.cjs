@@ -7,7 +7,7 @@ require('module-alias').addAliases({
   '@s': path.join(root, 'server'),
   '@c': path.join(root, 'common'),
 });
-// Exercise the same TypeScript runtime loader as Nuxt server middleware, not ts-jest.
+// Exercise the same TypeScript runtime loader as Nuxt server middleware, not Vitest.
 const load = require('jiti')(__filename);
 const { appContainer } = load(
   path.join(root, 'server/common/dependencyInjection/inversify.config.ts'),

@@ -1,19 +1,21 @@
 import { authorizationFirebaseUser } from '../../server/common/middleware/firebaseAuthorization';
 
-const mockVerifyToken = jest.fn();
-jest.mock('firebase-admin/auth', () => ({
+const mockVerifyToken = vi.fn();
+vi.mock('firebase-admin/auth', () => ({
   getAuth: () => ({ verifyIdToken: mockVerifyToken }),
 }));
 
 describe('APIのFirebase認証', () => {
-  beforeEach(() => mockVerifyToken.mockReset());
+  beforeEach(() => {
+    mockVerifyToken.mockReset();
+  });
 
   test.each(['Bearer test-token', 'bearer test-token', 'test-token'])(
     '%s からIDトークンを検証してユーザーを設定する',
     async (authorization) => {
       mockVerifyToken.mockResolvedValue({ uid: 'user-a' });
       const response = { locals: {} };
-      const next = jest.fn();
+      const next = vi.fn();
 
       await authorizationFirebaseUser()(
         { headers: { authorization } },
@@ -30,7 +32,7 @@ describe('APIのFirebase認証', () => {
   test('無効なトークンは認証必須APIで拒否する', async () => {
     mockVerifyToken.mockRejectedValue(new Error('invalid'));
     const response = { locals: {} };
-    const next = jest.fn();
+    const next = vi.fn();
 
     await authorizationFirebaseUser()(
       { headers: { authorization: 'Bearer invalid' } },
@@ -48,7 +50,7 @@ describe('APIのFirebase認証', () => {
   test('認証任意のAPIはトークンがなくても続行する', async () => {
     mockVerifyToken.mockRejectedValue(new Error('missing'));
     const response = { locals: {} };
-    const next = jest.fn();
+    const next = vi.fn();
 
     await authorizationFirebaseUser(false)({ headers: {} }, response, next);
 

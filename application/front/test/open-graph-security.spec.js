@@ -1,12 +1,12 @@
-/** @jest-environment node */
+// @vitest-environment node
 
 import axios from 'axios';
 import { lookup } from 'node:dns';
 import { OpenGraphLogicImpl } from '../../server/commonBL/openGraph/logic';
 import { OpenGraphType } from '../../server/commonBL/openGraph/definition/openGraphType';
 
-jest.mock('axios');
-jest.mock('node:dns', () => ({ lookup: jest.fn() }));
+vi.mock('axios');
+vi.mock('node:dns', () => ({ lookup: vi.fn() }));
 
 const logic = new OpenGraphLogicImpl();
 
@@ -96,7 +96,7 @@ describe('OG画像の取得先', () => {
         { address: '169.254.169.254', family: 4 },
       ]),
     );
-    const callback = jest.fn();
+    const callback = vi.fn();
 
     safeLookup('example.com', { all: false }, callback);
 
@@ -110,7 +110,7 @@ describe('OG画像の取得先', () => {
     lookup.mockImplementation((_hostname, _options, callback) =>
       callback(null, [{ address: '8.8.8.8', family: 4 }]),
     );
-    const callback = jest.fn();
+    const callback = vi.fn();
 
     safeLookup('example.com', { all: false }, callback);
 
@@ -124,7 +124,7 @@ describe('OG画像の取得先', () => {
     lookup.mockImplementation((_hostname, _options, callback) =>
       callback(null, [{ address: '64:ff9b:1::a9fe:a9fe', family: 6 }]),
     );
-    const callback = jest.fn();
+    const callback = vi.fn();
 
     safeLookup('example.com', { all: false }, callback);
 

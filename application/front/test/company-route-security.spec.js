@@ -1,4 +1,4 @@
-/** @jest-environment node */
+// @vitest-environment node
 
 import { companyRouter } from '../../server/feature/company/controller';
 import { authorizeCompanyUpdate } from '../../server/feature/company/authorizeUpdate';
@@ -29,8 +29,8 @@ test.each([
   }
   try {
     const request = { get: () => supplied };
-    const response = { sendStatus: jest.fn() };
-    const next = jest.fn();
+    const response = { sendStatus: vi.fn() };
+    const next = vi.fn();
     authorizeCompanyUpdate(request, response, next);
     if (authorized) {
       expect(next).toHaveBeenCalledTimes(1);

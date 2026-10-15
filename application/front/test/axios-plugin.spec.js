@@ -1,7 +1,7 @@
 import plugin from '../plugins/02.axios';
 
 function setup(token = 'test-id-token') {
-  const open = jest.fn();
+  const open = vi.fn();
   const store = {};
   const result = plugin({
     $store: store,

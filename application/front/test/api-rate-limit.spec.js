@@ -1,4 +1,4 @@
-/** @jest-environment node */
+// @vitest-environment node
 import 'reflect-metadata';
 import express, { Router, json } from 'express';
 import { getAuth } from 'firebase-admin/auth';
@@ -12,23 +12,23 @@ import { bookmarkRouter } from '../../server/feature/bookmark/controller';
 import { sharedPostRouter } from '../../server/feature/sharedPost/controller';
 import { userDevelopmentRouter } from '../../server/feature/development/user/controller';
 
-jest.mock('firebase-admin/auth', () => ({ getAuth: jest.fn() }));
-jest.mock('../../server/common/dependencyInjection/inversify.config', () => ({
-  appContainer: { get: jest.fn() },
+vi.mock('firebase-admin/auth', () => ({ getAuth: vi.fn() }));
+vi.mock('../../server/common/dependencyInjection/inversify.config', () => ({
+  appContainer: { get: vi.fn() },
 }));
 
 // HTTP、認証ミドルウェア、実ルート、入力検証、エラー変換は本物を使う。
 // Firebaseの検証とDBに接続するサービスだけを境界で差し替える。
 const service = {
-  save: jest.fn(),
-  getBookmarks: jest.fn(),
-  postNewBookmarks: jest.fn(),
-  deleteBookmarks: jest.fn(),
-  getAliveSharedPosts: jest.fn(),
-  insertSharedPosts: jest.fn(),
-  updateSharedPosts: jest.fn(),
-  deleteSharedPostsLogically: jest.fn(),
-  reportSharedPosts: jest.fn(),
+  save: vi.fn(),
+  getBookmarks: vi.fn(),
+  postNewBookmarks: vi.fn(),
+  deleteBookmarks: vi.fn(),
+  getAliveSharedPosts: vi.fn(),
+  insertSharedPosts: vi.fn(),
+  updateSharedPosts: vi.fn(),
+  deleteSharedPostsLogically: vi.fn(),
+  reportSharedPosts: vi.fn(),
 };
 const validUser = {
   iconImageUrl: 'https://example.com/icon.png',
@@ -78,7 +78,7 @@ beforeAll(async () => {
   base = `http://127.0.0.1:${server.address().port}`;
 });
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   user = `rate-test-${++sequence}`;
   getAuth.mockReturnValue({
     verifyIdToken: (token) => {
@@ -93,7 +93,7 @@ beforeEach(() => {
       return new ApiResponseHandlerImpl();
     }
     if (type === types.LogHandler) {
-      return { error: jest.fn() };
+      return { error: vi.fn() };
     }
     if (
       [
@@ -239,7 +239,7 @@ test('同時に150件到着しても120件だけを許可する', async () => {
 
 test('60秒の窓が過ぎると同じ利用者が再試行できる', async () => {
   // HTTPイベントと実タイマーは維持し、MemoryStoreが参照する時計だけ進める。
-  jest.useFakeTimers({
+  vi.useFakeTimers({
     doNotFake: [
       'nextTick',
       'setImmediate',
@@ -256,11 +256,11 @@ test('60秒の窓が過ぎると同じ利用者が再試行できる', async () 
   try {
     await exhaust();
     expect((await request('POST', '/users/', validUser)).status).toBe(429);
-    jest.setSystemTime(Date.now() + 60001);
+    vi.setSystemTime(Date.now() + 60001);
     const retried = await request('POST', '/users/', validUser);
     expect(retried.status).toBe(200);
     expect(retried.headers.get('ratelimit')).toContain('r=119');
   } finally {
-    jest.useRealTimers();
+    vi.useRealTimers();
   }
 });
