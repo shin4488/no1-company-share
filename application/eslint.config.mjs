@@ -153,7 +153,7 @@ export default createConfigForNuxt({
   {
     files: ['**/*.ts', '**/*.vue'],
     rules: {
-      // typescript-eslintは型検査に任せてこれらを無効にするが、lint・build・testは型検査をしない
+      // typescript-eslintは型検査に任せてこれらを無効にするが、型検査はtestでだけ行うため、lintでも検出する
       'constructor-super': 'error',
       'getter-return': 'error',
       'no-class-assign': 'error',

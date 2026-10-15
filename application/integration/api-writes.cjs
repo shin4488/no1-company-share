@@ -153,9 +153,8 @@ let count = 0;
   assert.equal(
     new Date(updated.posts[0].updatedAt).getTime(),
     new Date(
-      (
-        await db.query('SELECT updated_at FROM shared_post WHERE id=$1', [id])
-      ).rows[0].updated_at,
+      (await db.query('SELECT updated_at FROM shared_post WHERE id=$1', [id]))
+        .rows[0].updated_at,
     ).getTime(),
   );
   assert.equal(

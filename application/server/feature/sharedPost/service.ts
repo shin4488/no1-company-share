@@ -58,9 +58,8 @@ export class SharedPostServiceImpl implements SharedPostService {
       isMyBookmarkOnly: false,
       baseDateTime: parameter.baseDateTime,
     };
-    const responsePosts = await this.sharedPostLogic.getSharedPosts(
-      parameterDto,
-    );
+    const responsePosts =
+      await this.sharedPostLogic.getSharedPosts(parameterDto);
     const response: SharedPostGetResponse = {
       posts: responsePosts,
     };

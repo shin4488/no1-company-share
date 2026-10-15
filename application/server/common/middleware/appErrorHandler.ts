@@ -21,11 +21,11 @@ export const catchError = (
     error instanceof NotAuthorizedError
       ? 401
       : error instanceof RecordNotFoundError
-      ? 404
-      : // badParameter系は400として処理
-      appErrorInstance
-      ? 400
-      : 500;
+        ? 404
+        : // badParameter系は400として処理
+          appErrorInstance
+          ? 400
+          : 500;
   const expressResponse = response.status(statusCode);
   const responseHandler = appContainer.get<ApiResponseHandler>(
     types.ApiResponseHandler,
