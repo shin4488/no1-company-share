@@ -1,0 +1,39 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directories:
+      - /application
+      - /functions
+      - /functions/functions
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      npm:
+        patterns:
+          - "*"
+    ignore:
+      # 型定義のメジャー版は、実行するNodeのメジャー版を上げるときに合わせて上げる
+      - dependency-name: "@types/node"
+        update-types:
+          - version-update:semver-major
+
+  - package-ecosystem: docker
+    directories:
+      - /application
+      - /database
+      - /web
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      docker:
+        patterns:
+          - "*"
+    ignore:
+      # Nodeのメジャー版は、package.jsonのenginesと合わせて手動で上げる
+      - dependency-name: node
+        update-types:
+          - version-update:semver-major
