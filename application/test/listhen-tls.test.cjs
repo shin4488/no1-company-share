@@ -102,9 +102,16 @@ test('custom SANs exclude defaults and PEM files and PFX keystores work', async 
     const pfx = join(directory, 'test.pfx');
     await writeFile(key, tls.key, { mode: 0o600 });
     await writeFile(certificate, tls.cert);
+    // OpenSSL 1.1.1 and LibreSSL default to RC2, which Node's OpenSSL 3 cannot read.
     execFileSync('openssl', [
       'pkcs12',
       '-export',
+      '-keypbe',
+      'AES-256-CBC',
+      '-certpbe',
+      'AES-256-CBC',
+      '-macalg',
+      'sha256',
       '-inkey',
       key,
       '-in',
