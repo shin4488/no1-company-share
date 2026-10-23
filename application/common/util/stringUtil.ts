@@ -42,16 +42,4 @@ export class StringUtil {
       ? elseValue
       : value;
   }
-
-  /**
-   * 非空の要素を連結し、一つの文字列にします。
-   * @param separator セパレータ
-   * @param args 要素一覧
-   */
-  public static joinNotEmpty(separator: string, ...args: unknown[]) {
-    const filterd = args.filter(
-      (x) => !(x === null || x === undefined || x === ''),
-    );
-    return filterd.join(separator);
-  }
 }

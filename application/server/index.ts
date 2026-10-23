@@ -1,10 +1,6 @@
 // 本来はバリデーション用のクラス・マッピング用のクラスを使用したいがプロパティにデコれーたをつけるとエラーとなってしまう
 // https://github.com/nuxt/nuxt.js/issues/9677
 
-// serverMiddlewareに登録されたサーバ処理ではaliasを使用できないので、module-aliasというライブラリを使っている
-// https://github.com/nuxt/nuxt.js/issues/4580
-// https://github.com/nuxt/nuxt.js/issues/7017
-import 'module-alias/register';
 import express, { json, urlencoded } from 'express';
 import { getFirebaseApp } from '@s/firebaseApp';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
