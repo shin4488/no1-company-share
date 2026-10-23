@@ -6,7 +6,7 @@ import { BaseController } from '@s/common/controller/baseController';
 import { wrapAction } from '@s/common/middleware/controllerCatcher';
 
 /**
- * 投稿処理に関するコントローラクラス
+ * 区分値に関するコントローラクラス
  */
 class DivisionController extends BaseController {
   public static no1DivisionSelectItemsGetEndpoint: string = '/divisions/no1';

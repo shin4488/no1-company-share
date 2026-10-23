@@ -1,6 +1,3 @@
-// 本来はバリデーション用のクラス・マッピング用のクラスを使用したいがプロパティにデコれーたをつけるとエラーとなってしまう
-// https://github.com/nuxt/nuxt.js/issues/9677
-
 import express, { json, urlencoded } from 'express';
 import { getFirebaseApp } from '@s/firebaseApp';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
@@ -11,9 +8,8 @@ import { logRequestResponse } from '@s/common/middleware/logger';
 import { catchError } from '@s/common/middleware/appErrorHandler';
 import { appRouter } from '@s/feature/router';
 
-// DIコンテナからインスタンス取得
 const logger = appContainer.get<LogHandler>(types.LogHandler);
-// Sequelize初期化のため
+// モデルの静的メソッドを使う前に、生成時の処理でSequelizeとモデルを初期化しておく
 appContainer.get<SequelizeHandler>(types.SequelizeHandler);
 
 getFirebaseApp();

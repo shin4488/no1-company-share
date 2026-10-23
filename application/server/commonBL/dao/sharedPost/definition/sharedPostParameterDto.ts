@@ -6,7 +6,7 @@ export interface SharedPostParameterDto {
   isMyBookmarkOnly: boolean;
   /**
    * 取得基準日時
-   * 全取得の場合は、nullとなる
+   * nullのときは更新日時で絞り込まない
    */
   baseDateTime: Date | null;
 }

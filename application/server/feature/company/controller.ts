@@ -10,7 +10,7 @@ import { wrapAction } from '@s/common/middleware/controllerCatcher';
 import { authorizeCompanyUpdate } from './authorizeUpdate';
 
 /**
- * 投稿処理に関するコントローラクラス
+ * 会社に関するコントローラクラス
  */
 class CompanyController extends BaseController {
   public static companyGetEndpoint: string = '/companies/';

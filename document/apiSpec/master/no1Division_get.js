@@ -1,4 +1,4 @@
-// 投稿取得
+// No.1区分の選択肢取得
 
 // URI:/api/v1/divisions/no1/
 // method:GET
@@ -9,7 +9,7 @@
 const responseBody = {
     "messages": [],
     "data": {
-        "no1Divisions": [
+        "no1DivisionSelectItems": [
             {
                 "text": "世界一",
                 "value": "1"

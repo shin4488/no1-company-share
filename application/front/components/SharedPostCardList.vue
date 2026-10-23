@@ -93,9 +93,6 @@ export default defineComponent({
     },
   },
   methods: {
-    /**
-     * お気に入り追加処理
-     */
     async onAddedBookmark({ postId }: { postId: string }): Promise<void> {
       await this.changeBookmark(postId, true);
     },
@@ -152,9 +149,6 @@ export default defineComponent({
         );
       }
     },
-    /**
-     * 通報処理
-     */
     async onConfirmedReport({ postId }: { postId: string }): Promise<void> {
       if (this.isNotLogined()) {
         this.$accessor.snackBarError.open(
@@ -186,9 +180,6 @@ export default defineComponent({
       clonedPosts.splice(currentIndex, 1);
       this.$emit('update:modelValue', clonedPosts);
     },
-    /**
-     * 投稿削除処理
-     */
     async onDeleted({ postId }: { postId: string }): Promise<void> {
       if (this.isNotLogined()) {
         this.$accessor.snackBarError.open(
@@ -228,9 +219,6 @@ export default defineComponent({
       clonedPosts.splice(currentIndex, 1);
       this.$emit('update:modelValue', clonedPosts);
     },
-    /**
-     * 投稿編集時処理
-     */
     async onEdited({ postId }: { postId: string }): Promise<void> {
       const editedPostIndex = this.getTargetPostIndex(postId);
       if (editedPostIndex === -1) {
@@ -273,9 +261,6 @@ export default defineComponent({
       clonedPosts[editedPostIndex] = clonedEditedPost;
       this.$emit('update:modelValue', clonedPosts);
     },
-    /**
-     * 新規投稿追加ボタン押下処理
-     */
     async onClickedAddPostButton(): Promise<void> {
       if (this.isNotLogined()) {
         this.$accessor.snackBarError.open('投稿するにはログインしてください。');
@@ -346,9 +331,6 @@ export default defineComponent({
 
     // #region private
 
-    /**
-     * 投稿編集ダイアログ起動
-     */
     async openSharedPostDialog(
       parameter: SharedPostDialogParameter,
     ): Promise<SharedPostDialogResult | void> {
@@ -359,15 +341,9 @@ export default defineComponent({
       const result = await sharedPostDialog.open(parameter);
       return result;
     },
-    /**
-     * 投稿IDから投稿要素番号を取得
-     */
     getTargetPostIndex(keyPostId: string): number {
       return this.modelValue.findIndex((x) => x.postId === keyPostId);
     },
-    /**
-     * ユーザがログイン済みであるか
-     */
     isNotLogined(): boolean {
       const firebaseLoginUserId =
         this.$accessor.firebaseAuthorization.userIdComputed;

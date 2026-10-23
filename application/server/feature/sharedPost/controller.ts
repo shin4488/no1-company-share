@@ -185,7 +185,7 @@ class SharedPostController extends BaseController {
     };
     const requestParameter = request.params;
     const requestParameterPostId = requestParameter.postId;
-    // URIにお気に入り対象の投稿IDがあれば、リクエストボディよりもURIの方を優先する
+    // URIに削除対象の投稿IDがあれば、リクエストボディよりもURIの方を優先する
     if (StringUtil.isNotEmpty(requestParameterPostId)) {
       parameter.posts.push({
         id: requestParameterPostId as string,

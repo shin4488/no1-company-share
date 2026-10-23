@@ -4,7 +4,7 @@
 // method:DELETE
 // base.js記載の「Authorization」にログインユーザIDトークンが有効なときのみ使用可能
 
-// 「post-id」が存在すればpost-idのレコードのみを削除
+// URIに「post-id」があれば、リクエストボディよりもURIの投稿IDを優先する
 // prettier-ignore
 const requestBody = {
     "posts": [

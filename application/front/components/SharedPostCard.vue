@@ -1,8 +1,8 @@
 <template>
   <v-card>
     <!-- Vue側でエスケープ処理を行ってくれるため、onerrorやscriptタグなどの入力値処理は行っていない -->
-    <!-- https://jp.vuejs.org/v2/guide/security.html#HTML-%E3%82%B3%E3%83%B3%E3%83%86%E3%83%B3%E3%83%84 -->
-    <!-- 会社名 -->
+    <!-- https://ja.vuejs.org/guide/best-practices/security.html#html-content -->
+    <!-- Vueはhrefのjavascript: URLを防がないため、会社ホームページURLはAPIの入力検査でURL形式に限っている -->
     <v-card-title>
       <a
         v-if="hasCompanyUrl"
@@ -29,7 +29,6 @@
         v-text="detailText"
       />
 
-      <!-- 会社画像 -->
       <v-img
         v-show="hasCompanyImageUrl"
         contain
@@ -126,7 +125,6 @@ import { StringUtil } from '@c/util/stringUtil';
 export default defineComponent({
   name: 'SharedPostCard',
   props: {
-    // postId
     postId: {
       type: String,
       default: '',
@@ -254,7 +252,6 @@ export default defineComponent({
       return targetDivision?.text || '';
     },
     onClickedBookmarkButton(): void {
-      // 「今お気に入り状態でお気に入りクリック」=「お気に入り解除」とみなす
       if (this.isBookmarkedByLoginUser) {
         this.$emit('remove-bookmark', {
           postId: this.postId,

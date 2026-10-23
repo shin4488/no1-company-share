@@ -4,7 +4,7 @@
 // method:POST
 // base.js記載の「Authorization」にログインユーザIDトークンが有効なときのみ使用可能
 
-// 「Authorization」ヘッダから取得されるIDトークンに紐づくユーザIDを登録するため、
+// 登録するユーザIDは「Authorization」ヘッダのIDトークンから取得するため、リクエストボディには含めない
 // prettier-ignore
 const requestBody = {
     "iconImageUrl": "http://example.com",

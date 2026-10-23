@@ -60,8 +60,6 @@ export const useFirebaseAuthorizationStore = defineStore(
           return;
         }
 
-        // ログイン中でもIDトークンが送られてこない時はfirebaseから取得
-        // firebaseから取得できない時に引数でIDトークンを送ってもらう
         const idToken = authUser.idToken;
         const token = StringUtil.isNotEmpty(idToken)
           ? idToken
@@ -80,8 +78,7 @@ export const useFirebaseAuthorizationStore = defineStore(
           return;
         }
 
-        // ブラウザからのfirebaseユーザ削除や、別アプリ側でのユーザ名・アイコン画像変更に対応するため、
-        // 画面初期表示の都度ユーザ情報を更新する
+        // ブラウザからのfirebaseユーザ削除や、別アプリ側でのユーザ名・アイコン画像変更に対応するため、ログイン中のユーザを受け取るたびにユーザ情報を登録し直す
         const requestBody: UserPostRequest = {
           iconImageUrl: iconImageUrl ?? '',
           displayedName: displayedName ?? '',

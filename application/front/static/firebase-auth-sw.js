@@ -20,7 +20,6 @@ firebase.initializeApp({
   measurementId: 'G-ZJVQSKLGQ0',
 });
 
-// Initialize authService
 const authService = firebase.auth();
 
 /**
@@ -56,10 +55,8 @@ const fetchWithAuthorization = async (original, idToken) => {
     headers.append(entry[0], entry[1]);
   }
 
-  // Add ID token to header.
   headers.set('Authorization', 'Bearer ' + idToken);
 
-  // Create authorized request
   const { url, ...props } = original.clone();
   const authorized = new Request(url, {
     ...props,
@@ -98,8 +95,6 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Fetch the resource after checking for the ID token.
-  // This can also be integrated with existing logic to serve cached files
-  // in offline mode.
   event.respondWith(
     getIdToken().then((idToken) =>
       idToken
@@ -114,7 +109,6 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// In service worker script.
 self.addEventListener('activate', (event) => {
   event.waitUntil(clients.claim());
 });

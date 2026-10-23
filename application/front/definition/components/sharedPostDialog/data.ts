@@ -18,7 +18,7 @@ export interface SharedPostDialogDetailData {
 }
 
 /**
- * カードに表示する要素データ
+ * 投稿ダイアログのデータ
  */
 export interface SharedPostDialogData {
   isOpenDialog: boolean;

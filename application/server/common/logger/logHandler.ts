@@ -1,6 +1,6 @@
-// log4js is CommonJS and its named imports fail in the Nitro ESM bundle.
 import express from 'express';
 import { injectable } from 'inversify';
+// log4js is CommonJS and its named imports fail in the Nitro ESM bundle.
 import log4js, { type Level } from 'log4js';
 import config from './config.json';
 import { LogHandler } from './interface/LogHandler';

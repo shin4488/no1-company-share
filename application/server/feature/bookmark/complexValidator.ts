@@ -15,8 +15,7 @@ export class BookmarkComplexValidatorImpl implements BookmarkComplexValidator {
   public async validateForPostNewBookmarks(
     parameter: BookmarkPostParameter,
   ): Promise<void> {
-    // エラーメッセージ処理は複数メソッドにわたって使用すると、
-    // 意図しないメッセージ（別メソッドで追加したメッセージ）の追加になりかねないため、クラスメンバではなくメソッド内でインスタンス取得している
+    // エラーメッセージ処理は複数メソッドにわたって使用すると、意図しないメッセージ（別メソッドで追加したメッセージ）の追加になりかねないため、クラスメンバではなくメソッド内でインスタンス取得している
     const errorHandler = appContainer.get<BadParameterErrorHandler>(
       types.BadParameterErrorHandler,
     );
