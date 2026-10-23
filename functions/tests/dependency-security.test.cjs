@@ -170,12 +170,10 @@ test("Firebase CLI access logs escape quotes in request headers", () => {
   assert.doesNotMatch(line, /"browser" forged-field"/);
 });
 
-test("Firebase analytics creates a v4 client ID without sending events", () => {
-  const analytics = require("universal-analytics");
-  const uuid = createRequire(require.resolve("universal-analytics"))("uuid");
-  const visitor = analytics("UA-0-0");
-  assert.equal(uuid.validate(visitor.cid), true);
-  assert.equal(uuid.version(visitor.cid), 4);
+test("Firebase CLI no longer bundles universal-analytics and its old uuid", () => {
+  assert.throws(() => fromCli.resolve("universal-analytics"), {
+    code: "MODULE_NOT_FOUND",
+  });
 });
 
 test("CLI Gaxios UUID generation supports v4 and rejects short v5 output buffers", () => {
