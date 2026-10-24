@@ -77,12 +77,14 @@ export class SharedPostDaoImpl implements SharedPostDao {
     return resultDto;
   }
 
-  public async getNonReportedAliveByCompanyNumbers(
+  public async getNonReportedAliveByUserAndCompanyNumbers(
+    userId: string,
     companyNumbers: string[],
   ): Promise<SharedPost[]> {
     const posts = await SharedPost.findAll({
       attributes: ['companyNumber'],
       where: {
+        userId: { [Op.eq]: userId },
         companyNumber: {
           [Op.in]: companyNumbers,
         },

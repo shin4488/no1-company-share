@@ -19,8 +19,16 @@ globalThis.visualViewport ??= Object.assign(new EventTarget(), {
 });
 
 const companies = [
-  { number: '1000000000001', name: '株式会社ＡＢＣ', isRegistered: false },
-  { number: '1000000000002', name: 'ＸＹＺ工業株式会社', isRegistered: true },
+  {
+    number: '1000000000001',
+    name: '株式会社ＡＢＣ',
+    isPostedByLoginUser: false,
+  },
+  {
+    number: '1000000000002',
+    name: 'ＸＹＺ工業株式会社',
+    isPostedByLoginUser: true,
+  },
 ];
 
 const options = () =>
@@ -65,23 +73,26 @@ afterEach(() => {
   document.body.innerHTML = '';
 });
 
-test('登録済みの企業は無効な候補として、登録済みであることを添えて表示する', async () => {
+test('自分の投稿がある企業は無効な候補として、そのことを添えて表示する', async () => {
   const wrapper = await openCompanyMenu();
   expect(options()).toEqual([
     { title: '株式会社ABC', subtitle: undefined, disabled: false },
-    { title: 'XYZ工業株式会社', subtitle: '登録済みです', disabled: true },
+    {
+      title: 'XYZ工業株式会社',
+      subtitle: '自分の投稿があります',
+      disabled: true,
+    },
   ]);
   wrapper.unmount();
 });
 
-test('登録済みの企業はクリックしても選ばれず、未登録の企業は選べる', async () => {
+test('自分の投稿がある企業はクリックしても選ばれず、ほかの企業は選べる', async () => {
   const wrapper = await openCompanyMenu();
-  const [unregistered, registered] =
-    document.querySelectorAll('[role="option"]');
-  registered.click();
+  const [notPosted, posted] = document.querySelectorAll('[role="option"]');
+  posted.click();
   await flushPromises();
   expect(wrapper.vm.companyNumber).toBe('');
-  unregistered.click();
+  notPosted.click();
   await flushPromises();
   expect(wrapper.vm.companyNumber).toBe('1000000000001');
   expect(wrapper.vm.companyName).toBe('株式会社ABC');

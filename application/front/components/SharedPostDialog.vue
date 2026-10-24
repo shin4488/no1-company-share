@@ -452,8 +452,8 @@ export default defineComponent({
           // eslint-disable-next-line no-irregular-whitespace
           .replace(/　/g, ' '),
         value: StringUtil.ifEmpty(x.number),
-        disabled: x.isRegistered || false,
-        subtitle: x.isRegistered ? '登録済みです' : undefined,
+        disabled: x.isPostedByLoginUser || false,
+        subtitle: x.isPostedByLoginUser ? '自分の投稿があります' : undefined,
       }));
 
       this.isAutocompleteLoadingShown = false;

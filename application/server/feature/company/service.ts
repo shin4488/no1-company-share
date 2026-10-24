@@ -55,6 +55,7 @@ export class CompanyServiceImpl implements CompanyService {
     const companiesResponse =
       await this.logic.createCompanyResponseByFetchingCompanyMaster(
         responseCreationParameters,
+        parameter.userId,
       );
     return {
       companies: companiesResponse,

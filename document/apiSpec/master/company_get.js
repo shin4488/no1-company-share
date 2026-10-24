@@ -17,13 +17,13 @@ const responseBody = {
         // 法人番号
         "number": "C000000000001",
         "name": "テスト1株式会社",
-        // すでにこの会社が投稿されているか
-        "isRegistered": true
+        // base.js記載の「Authorization」のログインユーザが、この会社の投稿（通報・削除されていないもの）をすでに持っているか。未ログイン時はfalse
+        "isPostedByLoginUser": true
       },
       {
         "number": "C000000000002",
         "name": "テスト2株式会社",
-        "isRegistered": false
+        "isPostedByLoginUser": false
       }
     ]
   }

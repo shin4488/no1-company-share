@@ -84,7 +84,7 @@ export class SharedPostServiceImpl implements SharedPostService {
             post,
             transaction,
             async (company: CompanyMaster): Promise<SharedPost> => {
-              // 1企業につき有効な投稿は１つのみ（通報時や削除時には1企業につき複数投稿レコードとなりえるが、投稿時には通報・削除はしない）
+              // 同じユーザー・同じ企業の有効な投稿は1件だけだが、通報・削除された投稿のレコードは残るため、投稿IDには作成日時も含める
               const postId = this.saveLogic.createSharedPostId({
                 companyNumber: post.companyNumber,
                 userId: parameter.userId,
