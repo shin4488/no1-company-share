@@ -9,7 +9,7 @@ import { catchError } from '@s/common/middleware/appErrorHandler';
 import { appRouter } from '@s/feature/router';
 
 const logger = appContainer.get<LogHandler>(types.LogHandler);
-// モデルの静的メソッドを使う前に、生成時の処理でSequelizeとモデルを初期化しておく
+// SequelizeHandlerImplのコンストラクタがSequelizeとモデルを初期化するため、モデルの静的メソッドを使う前にここで一度取得しておく
 appContainer.get<SequelizeHandler>(types.SequelizeHandler);
 
 getFirebaseApp();
@@ -23,7 +23,7 @@ const accessLoggerMiddleware = logger.getAccessLoggerMiddleware();
 app.use(accessLoggerMiddleware);
 app.use(logRequestResponse);
 
-// SSRで使う従来のlocalhost付きパスも同じAPIへ渡す。
+// 投稿一覧の取得はSSRとブラウザのどちらでも /localhost 付きのパスを使うため、同じAPIへ渡す
 app.use('/api/v1/localhost', appRouter);
 app.use('/api/v1', appRouter);
 

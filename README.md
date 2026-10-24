@@ -52,7 +52,7 @@ cd ../../
 
 ### 2. コンテナの起動
 
-`docker-compose.yml` はデータベースの環境変数を `database/.env` から読み込むため、起動前にこのファイルを作成してください。プロジェクトルートで Docker Compose を起動します。
+`docker-compose.yml` はデータベースの環境変数を `database/.env` から読み込むため、起動前にこのファイルを作成してください。データベースの初期化でロケールのエラーになる場合は、[document/docker.md](document/docker.md#postgresql) の `POSTGRES_INITDB_ARGS` を設定してください。プロジェクトルートで Docker Compose を起動します。
 
 ```bash
 docker compose up
@@ -70,7 +70,7 @@ yarn lint
 yarn build
 
 # Firebase Functions のテスト・静的解析
-cd functions/functions
+cd ../functions/functions
 npm test
 npm run lint
 ```

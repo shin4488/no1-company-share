@@ -2,7 +2,8 @@ import { AxiosInstance, AxiosResponse } from 'axios';
 import { ApiResponse } from '@f/definition/common/apiSpec/apiResponse';
 
 export class AjaxHelper {
-  // A successful write returns `data: null`, which post and put cannot tell apart from a failure.
+  // Writes without response data return `data: null` on success.
+  // `post()` and `put()` also return null on failure, so this method checks for an empty `messages` array instead.
   static async submit<TRequest = unknown>(
     axios: AxiosInstance,
     method: 'post' | 'put' | 'delete',

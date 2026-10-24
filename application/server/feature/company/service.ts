@@ -46,7 +46,6 @@ export class CompanyServiceImpl implements CompanyService {
       };
     }
 
-    // この時点では会社リストはundefinedにはなり得ない
     const responseCreationParameters =
       companyResultItems.map<CompanyResponseCreationParameterItem>((x) => ({
         companyNumber: x.companyNumber,

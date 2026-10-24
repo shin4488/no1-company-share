@@ -106,8 +106,7 @@ server {
 }
 ```
 
-3ヶ月ごとのSSL証明書更新を自動で行うように設定
-（登録されているドメインすべてに対して設定する）
+3ヶ月ごとのSSL証明書更新を自動で行うように設定（登録されているドメインすべてに対して設定する）
 
 ```
 $ sudo certbot renew --dry-run
@@ -199,25 +198,13 @@ https://www.postgresql.org/docs/12/app-psql.html
 psql -h /tmp -p 20000 -d postgres
 ```
 
-Sequelize上での指定
-
-```ts
-new Sequelize(
-  'your_database_name',
-  'your_user_name',
-  'your_user_password',
-  {
-    host: '/tmp',
-    port: 20000,
-    dialect: 'postgres',
-    logging: (log) => this.logger.log('info', log),
-  },
-);
-```
+アプリからは、アプリのディレクトリの `.env` に `POSTGRES_HOST_NAME=/tmp`・`POSTGRES_PORT=20000` を設定して接続する（`yarn start` が `.env` を読み込み、Sequelize の接続先に使う）。
 
 ## `yarn start` の永続化
 https://qiita.com/isao_e_dev/items/36b99b0e186b2d656b50
+
 https://www.sejuku.net/blog/81363
+
 `-c` は「コマンド実行」の意味
 
 ```
