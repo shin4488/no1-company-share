@@ -181,6 +181,14 @@ let count = 0;
     'fixture-owner',
     400,
   );
+  await call('GET', '/companies/', undefined, 'fixture-owner', 400);
+  await call(
+    'GET',
+    '/companies/?companyName=a&companyName=b',
+    undefined,
+    'fixture-owner',
+    400,
+  );
   await call(
     'POST',
     '/shared-posts/',

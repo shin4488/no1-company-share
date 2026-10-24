@@ -414,12 +414,15 @@ export default defineComponent({
         this.close();
       }
     },
-    async onChangedSearchedCompanyText(text: string): Promise<void> {
+    async onChangedSearchedCompanyText(text: string | null): Promise<void> {
       if (StringUtil.isNotEmpty(this.postId)) {
         return;
       }
 
-      this.selectableCompanies = await this.getMatchedCompanies(text);
+      // 消去アイコンを押すとVuetifyは検索文字列をnullで通知する。nullはクエリに含まれず会社検索APIの入力検査で拒否されるため、空文字にする
+      this.selectableCompanies = await this.getMatchedCompanies(
+        StringUtil.ifEmpty(text),
+      );
     },
     async onClickedAutocompleteClear(): Promise<void> {
       // 入力欄をクリアしているため、検索条件は空文字としている

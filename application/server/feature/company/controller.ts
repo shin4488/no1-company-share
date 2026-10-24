@@ -8,6 +8,7 @@ import { types } from '@s/common/dependencyInjection/types';
 import { BaseController } from '@s/common/controller/baseController';
 import { StringUtil } from '@c/util/stringUtil';
 import { wrapAction } from '@s/common/middleware/controllerCatcher';
+import { throwIfHasSimpleValidationResult } from '@s/common/middleware/simpleValidationResult';
 import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthorization';
 import { authorizeCompanyUpdate } from './authorizeUpdate';
 
@@ -51,6 +52,7 @@ companyRouter.get(
   // ログイン中は、自分の投稿がある企業を候補で選べなくするためにユーザーIDを取得する
   authorizationFirebaseUser(false),
   companySimpleValidators,
+  throwIfHasSimpleValidationResult,
   wrapAction(CompanyController.getCompanies),
 );
 companyRouter.put(
