@@ -7,17 +7,11 @@
       <a
         v-if="hasCompanyUrl"
         class="text-decoration-none"
-        text
         :href="companyHomepageUrl"
         target="_blank"
         v-text="companyName"
       />
-      <a
-        v-else
-        class="cursor-auto text-decoration-none"
-        text
-        v-text="companyName"
-      />
+      <a v-else class="cursor-auto text-decoration-none" v-text="companyName" />
     </v-card-title>
 
     <!-- 一位内容 -->
@@ -29,15 +23,10 @@
         v-text="detailText"
       />
 
-      <v-img
-        v-show="hasCompanyImageUrl"
-        contain
-        height="100"
-        :src="companyImageUrl"
-      />
+      <v-img v-show="hasCompanyImageUrl" height="100" :src="companyImageUrl" />
 
       <!-- 備考（投稿説明） -->
-      <div class="text--primary text-pre-wrap" v-text="remarks" />
+      <div class="text-pre-wrap" v-text="remarks" />
     </v-card-text>
 
     <v-divider />
@@ -64,7 +53,6 @@
       <div class="d-flex align-center flex-grow-0 flex-shrink-0 ga-3">
         <span class="d-inline-flex align-center ga-1 text-no-wrap">
           <v-icon
-            dense
             color="bookmark"
             :aria-label="
               isBookmarkedByLoginUser ? 'お気に入りを解除' : 'お気に入りに追加'
@@ -75,12 +63,11 @@
           >
             {{ isBookmarkedByLoginUser ? 'mdi-heart' : 'mdi-heart-outline' }}
           </v-icon>
-          <span class="subheading" v-text="numberOfBookmarksComputed" />
+          <span v-text="numberOfBookmarksComputed" />
         </span>
 
         <v-icon
           v-show="isLogined && !isPostedByLoginUser"
-          dense
           color="warning"
           aria-label="投稿を通報"
           @click="onClickedAlertButton"
@@ -91,7 +78,6 @@
         </v-icon>
         <v-icon
           v-show="isLogined && isPostedByLoginUser"
-          dense
           color="secondary"
           aria-label="投稿を編集"
           @click="onClickedEditButton"
@@ -102,7 +88,6 @@
         </v-icon>
         <v-icon
           v-show="isLogined && isPostedByLoginUser"
-          dense
           color="secondary"
           aria-label="投稿を削除"
           @click="onClickedDeleteButton"
@@ -126,11 +111,6 @@ export default defineComponent({
   name: 'SharedPostCard',
   props: {
     postId: {
-      type: String,
-      default: '',
-      required: true,
-    },
-    companyNumber: {
       type: String,
       default: '',
       required: true,

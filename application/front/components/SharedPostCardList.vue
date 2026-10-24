@@ -14,7 +14,6 @@
       >
         <SharedPostCard
           :post-id="item.postId"
-          :company-number="item.companyNumber"
           :company-name="item.companyName"
           :company-homepage-url="item.companyHomepageUrl"
           :company-image-url="item.companyImageUrl"

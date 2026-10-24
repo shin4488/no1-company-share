@@ -1,8 +1,4 @@
-const ignorePaths = [
-  '\u002F__webpack_hmr',
-  '\u002F_loading',
-  '\u002F_nuxt\u002F',
-];
+const ignorePaths = ['/_nuxt/'];
 
 importScripts(
   'https://www.gstatic.com/firebasejs/13.0.0/firebase-app-compat.js',
@@ -81,13 +77,7 @@ self.addEventListener('fetch', (event) => {
     self.location.hostname === 'localhost' ||
     self.location.hostname === '127.0.0.1';
 
-  const isIgnored = ignorePaths.some((path) => {
-    if (typeof path === 'string') {
-      return url.pathname.startsWith(path);
-    }
-
-    return path.test(url.pathname.slice(1));
-  });
+  const isIgnored = ignorePaths.some((path) => url.pathname.startsWith(path));
 
   // https://github.com/nuxt-community/firebase-module/issues/465
   if (!expectsHTML || !isSameOrigin || !isHttps || isIgnored) {

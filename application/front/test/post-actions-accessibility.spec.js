@@ -25,7 +25,6 @@ function mountCard(postingUserId = 'owner') {
   return mount(SharedPostCard, {
     props: {
       postId: 'post-1',
-      companyNumber: 'company-1',
       postingUserId,
       isBookmarkedByLoginUser: false,
       numberOfBookmarks: 0,

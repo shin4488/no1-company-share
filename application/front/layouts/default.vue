@@ -30,7 +30,7 @@
         width="190"
         permanent
       >
-        <v-list shaped>
+        <v-list>
           <v-list-item
             v-for="(item, index) in sideBarItems"
             :key="index"

@@ -2,10 +2,10 @@
   <!-- ダイアログ閉じるごとに入力ボックスのrulesをリセットしたいためv-ifでコンポーネントを再構築している -->
   <v-dialog v-if="isOpenDialog" v-model="isOpenDialog" scrollable persistent>
     <v-card>
-      <v-toolbar color="primary" dark>
+      <v-toolbar color="primary">
         <v-toolbar-title>No.1企業投稿</v-toolbar-title>
         <v-toolbar-items>
-          <v-btn icon dark class="mr-2" @click="onClickedCloseButton">
+          <v-btn icon class="mr-2" @click="onClickedCloseButton">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar-items>
@@ -45,7 +45,6 @@
           <v-col cols="2" sm="1">
             <v-icon
               :disabled="disabledToDeleteDetail"
-              dense
               color="error"
               title="1位内容の削除"
               @click="onClickedNo1ContentDeleteButton(index)"
@@ -79,7 +78,6 @@
           <v-col cols="2" offset="2" sm="1" offset-sm="1">
             <v-icon
               title="1位内容の追加"
-              dense
               color="primary"
               @click="onClickedNo1ContentAddButton"
             >
@@ -110,7 +108,6 @@
               v-if="
                 !(isImageLoadingShown || hasImageAlternativeMessageComputed)
               "
-              contain
               height="100"
               :title="companyName"
               :alt="companyName"
@@ -127,7 +124,6 @@
               hint="投稿内容の説明や出典など"
               persistent-hint
               rows="2"
-              dense
               auto-grow
             ></v-textarea>
           </v-col>

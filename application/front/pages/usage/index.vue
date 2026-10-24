@@ -74,10 +74,10 @@
           </div>
           <v-row>
             <v-col sm="6" col="12">
-              <v-img max-height="400" contain src="/usageNewPost.png" />
+              <v-img max-height="400" src="/usageNewPost.png" />
             </v-col>
             <v-col sm="6" col="12">
-              <v-img max-height="400" contain src="/usagePostInput.png" />
+              <v-img max-height="400" src="/usagePostInput.png" />
             </v-col>
           </v-row>
         </v-card-text>
