@@ -40,7 +40,7 @@ import { ReportPostRequest } from '@f/definition/components/reportDialog/apiSpec
 import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
 
 export default defineComponent({
-  name: 'ConfirmDialog',
+  name: 'ReportDialog',
   data() {
     return {
       isDialogShow: false,

@@ -5,7 +5,10 @@ export interface SelectItemAutoComplete {
   text: string;
   value: string;
   disabled: boolean;
-  header?: string;
+  /**
+   * 候補の会社名の下に表示する補足。空文字でも空の行が表示されるため、補足がないときはundefinedにする
+   */
+  subtitle?: string;
 }
 
 /**

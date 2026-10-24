@@ -22,6 +22,8 @@ export default defineConfig({
     include: ['front/test/**/*.spec.js'],
     environment: 'jsdom',
     globals: true,
+    // VuetifyはCSSをimportするため、Nodeに直接読み込ませずViteで変換する
+    server: { deps: { inline: ['vuetify'] } },
     coverage: {
       enabled: true,
       provider: 'v8',
