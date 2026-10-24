@@ -38,8 +38,10 @@ const options = () =>
     disabled: el.classList.contains('v-list-item--disabled'),
   }));
 
+const get = vi.fn();
+
 async function openCompanyMenu() {
-  const get = vi.fn().mockResolvedValue({
+  get.mockReset().mockResolvedValue({
     data: { messages: [], data: { companies } },
   });
   const wrapper = mount(SharedPostDialog, {
@@ -96,5 +98,19 @@ test('自分の投稿がある企業はクリックしても選ばれず、ほ�
   await flushPromises();
   expect(wrapper.vm.companyNumber).toBe('1000000000001');
   expect(wrapper.vm.companyName).toBe('株式会社ABC');
+  wrapper.unmount();
+});
+
+// 消去アイコンを押すと、Vuetifyは検索文字列をnullで通知する
+test('検索文字列がnullで通知されても、会社名を空文字で検索する', async () => {
+  const wrapper = await openCompanyMenu();
+  get.mockClear();
+  wrapper
+    .findComponent({ name: 'VAutocomplete' })
+    .vm.$emit('update:search', null);
+  await flushPromises();
+  expect(get).toHaveBeenCalledWith('/companies/', {
+    params: { companyName: '' },
+  });
   wrapper.unmount();
 });

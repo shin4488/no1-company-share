@@ -5,6 +5,7 @@
 
 // prettier-ignore
 const requestQueryParameter = {
+  // 入力欄が空のときも空文字で指定する
   "companyName": "テス"
 };
 
@@ -27,4 +28,15 @@ const responseBody = {
       }
     ]
   }
+};
+
+// prettier-ignore
+const errorResponseBody = {
+  "messages": [
+    // 「companyName」がないとき、または複数あるとき
+    {
+      "message": "会社名は文字を入力してください。"
+    }
+  ],
+  "data": null
 };
