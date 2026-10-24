@@ -67,17 +67,17 @@
           </div>
           <div>企業検索では福井県の企業を選択できます。</div>
           <div>
-            ※他の投稿で既に登録されている企業に関しては、選択できません。
+            ※自分の投稿がすでにある企業は選択できません。他の人が投稿している企業は選択できます。
           </div>
           <div>
             「No.1の内容」には「何の分野でNo.1であるか」を記載し、また複数記載することができます。（例「眼鏡生産台数」「眼鏡売上高」など）
           </div>
           <v-row>
             <v-col sm="6" col="12">
-              <v-img max-height="400" contain src="/usageNewPost.png" />
+              <v-img max-height="400" src="/usageNewPost.png" />
             </v-col>
             <v-col sm="6" col="12">
-              <v-img max-height="400" contain src="/usagePostInput.png" />
+              <v-img max-height="400" src="/usagePostInput.png" />
             </v-col>
           </v-row>
         </v-card-text>

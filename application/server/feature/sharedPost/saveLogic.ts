@@ -35,8 +35,7 @@ export class SharedPostSaveLogicImpl implements SharedPostSaveLogic {
     transaction: Transaction,
     createSharedPost: (company: companyMaster) => Promise<sharedPost>,
   ): Promise<SharedPostSaveResult> {
-    // 会社画像は日次バッチでデータ保存するが、
-    // バッチ実行まではデータ保存されないため会社マスタ作成時に一度画像保存しておく
+    // 会社画像は日次バッチでデータ保存するが、バッチ実行まではデータ保存されないため会社マスタ作成時に一度画像保存しておく
     const companyHomepageUrl = parameter.companyHomepageUrl;
     const ogResult = await this.openGraphLogic.getOpenGraph(
       companyHomepageUrl,
@@ -87,6 +86,7 @@ export class SharedPostSaveLogicImpl implements SharedPostSaveLogic {
     };
   }
 
+  // 投稿IDは法人番号13桁・ユーザID28文字・作成日時17桁（年月日時分秒ミリ秒）を連結した58文字で、shared_post.idのVARCHAR(58)に収まる
   public createSharedPostId(parameter: SharedPostIdCreationParameter): string {
     const currentDate = this.dateHandler.getCurrentDate();
     const month = currentDate.getMonth() + 1;

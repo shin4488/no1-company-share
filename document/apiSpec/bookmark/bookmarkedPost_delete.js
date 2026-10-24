@@ -1,10 +1,10 @@
-// 投稿お気に入り
+// お気に入り削除
 
 // URI:/api/v1/bookmarked-posts/:post-id
 // method:DELETE
 // base.js記載の「Authorization」にログインユーザIDトークンが有効なときのみ使用可能
 
-// 「post-id」が存在すればpost-idのレコードのみをお気に入り
+// URIに「post-id」があれば、リクエストボディよりもURIの投稿IDを優先する
 // prettier-ignore
 const requestBody = {
     "posts": [
@@ -30,7 +30,11 @@ const errorResponseBody = {
         },
         // 削除対象の投稿が存在しないとき
         {
-            "message": "お気に入り削除対象の投稿が存在しません。"
+            "message": "存在する投稿の投稿No.を入力してください。"
+        },
+        // 削除対象の投稿をお気に入り登録していないとき
+        {
+            "message": "指定した投稿はお気に入り未登録です。"
         }
     ],
     "data": null

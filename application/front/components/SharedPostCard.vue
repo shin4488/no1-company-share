@@ -1,23 +1,17 @@
 <template>
   <v-card>
     <!-- Vue側でエスケープ処理を行ってくれるため、onerrorやscriptタグなどの入力値処理は行っていない -->
-    <!-- https://jp.vuejs.org/v2/guide/security.html#HTML-%E3%82%B3%E3%83%B3%E3%83%86%E3%83%B3%E3%83%84 -->
-    <!-- 会社名 -->
+    <!-- https://ja.vuejs.org/guide/best-practices/security.html#html-content -->
+    <!-- Vueはhrefのjavascript: URLを防がないため、会社ホームページURLはAPIの入力検査でURL形式に限っている -->
     <v-card-title>
       <a
         v-if="hasCompanyUrl"
         class="text-decoration-none"
-        text
         :href="companyHomepageUrl"
         target="_blank"
         v-text="companyName"
       />
-      <a
-        v-else
-        class="cursor-auto text-decoration-none"
-        text
-        v-text="companyName"
-      />
+      <a v-else class="cursor-auto text-decoration-none" v-text="companyName" />
     </v-card-title>
 
     <!-- 一位内容 -->
@@ -29,16 +23,10 @@
         v-text="detailText"
       />
 
-      <!-- 会社画像 -->
-      <v-img
-        v-show="hasCompanyImageUrl"
-        contain
-        height="100"
-        :src="companyImageUrl"
-      />
+      <v-img v-show="hasCompanyImageUrl" height="100" :src="companyImageUrl" />
 
       <!-- 備考（投稿説明） -->
-      <div class="text--primary text-pre-wrap" v-text="remarks" />
+      <div class="text-pre-wrap" v-text="remarks" />
     </v-card-text>
 
     <v-divider />
@@ -65,7 +53,6 @@
       <div class="d-flex align-center flex-grow-0 flex-shrink-0 ga-3">
         <span class="d-inline-flex align-center ga-1 text-no-wrap">
           <v-icon
-            dense
             color="bookmark"
             :aria-label="
               isBookmarkedByLoginUser ? 'お気に入りを解除' : 'お気に入りに追加'
@@ -76,12 +63,11 @@
           >
             {{ isBookmarkedByLoginUser ? 'mdi-heart' : 'mdi-heart-outline' }}
           </v-icon>
-          <span class="subheading" v-text="numberOfBookmarksComputed" />
+          <span v-text="numberOfBookmarksComputed" />
         </span>
 
         <v-icon
           v-show="isLogined && !isPostedByLoginUser"
-          dense
           color="warning"
           aria-label="投稿を通報"
           @click="onClickedAlertButton"
@@ -92,7 +78,6 @@
         </v-icon>
         <v-icon
           v-show="isLogined && isPostedByLoginUser"
-          dense
           color="secondary"
           aria-label="投稿を編集"
           @click="onClickedEditButton"
@@ -103,7 +88,6 @@
         </v-icon>
         <v-icon
           v-show="isLogined && isPostedByLoginUser"
-          dense
           color="secondary"
           aria-label="投稿を削除"
           @click="onClickedDeleteButton"
@@ -126,13 +110,7 @@ import { StringUtil } from '@c/util/stringUtil';
 export default defineComponent({
   name: 'SharedPostCard',
   props: {
-    // postId
     postId: {
-      type: String,
-      default: '',
-      required: true,
-    },
-    companyNumber: {
       type: String,
       default: '',
       required: true,
@@ -254,7 +232,6 @@ export default defineComponent({
       return targetDivision?.text || '';
     },
     onClickedBookmarkButton(): void {
-      // 「今お気に入り状態でお気に入りクリック」=「お気に入り解除」とみなす
       if (this.isBookmarkedByLoginUser) {
         this.$emit('remove-bookmark', {
           postId: this.postId,

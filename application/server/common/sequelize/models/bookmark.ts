@@ -31,13 +31,10 @@ export default class Bookmark extends Model<
         sharedPostId: {
           type: DataTypes.STRING(58),
           primaryKey: true,
-          // 投稿削除時にはお気に入りも強制削除（ユーザ削除時も同様）
-          onDelete: 'CASCADE',
         },
         userId: {
           type: DataTypes.STRING(28),
           primaryKey: true,
-          onDelete: 'CASCADE',
         },
       },
       {

@@ -5,6 +5,7 @@
 
 // prettier-ignore
 const requestQueryParameter = {
+  // 入力欄が空のときも空文字で指定する
   "companyName": "テス"
 };
 
@@ -17,14 +18,25 @@ const responseBody = {
         // 法人番号
         "number": "C000000000001",
         "name": "テスト1株式会社",
-        // すでにこの会社が投稿されているか
-        "isRegistered": true
+        // base.js記載の「Authorization」のログインユーザが、この会社の投稿（通報・削除されていないもの）をすでに持っているか。未ログイン時はfalse
+        "isPostedByLoginUser": true
       },
       {
         "number": "C000000000002",
         "name": "テスト2株式会社",
-        "isRegistered": false
+        "isPostedByLoginUser": false
       }
     ]
   }
+};
+
+// prettier-ignore
+const errorResponseBody = {
+  "messages": [
+    // 「companyName」がないとき、または複数あるとき
+    {
+      "message": "会社名は文字を入力してください。"
+    }
+  ],
+  "data": null
 };

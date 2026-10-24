@@ -8,7 +8,7 @@ export interface SidebarItem {
 }
 
 /**
- * DefaultページのVueデータ
+ * デフォルトレイアウトのデータ
  */
 export interface DefaultData {
   isDrawerOpened: boolean;

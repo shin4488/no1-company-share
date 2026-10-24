@@ -31,10 +31,11 @@ export class SharedPostComplexValidatorImpl implements SharedPostComplexValidato
 
     const posts = parameter.posts;
     for (const post of posts) {
-      // 同企業の別投稿が存在しないことのチェック
+      // 同じ企業の投稿は、ほかのユーザーの投稿があっても作れる。同じユーザーの2件目だけを拒否する
       const companyNumbers = [post.companyNumber];
       const companyErrorMessage =
         await this.validateExistingNonReportedAliveSameCompanyPost(
+          parameter.userId,
           companyNumbers,
         );
       if (StringUtil.isNotEmpty(companyErrorMessage)) {
@@ -148,7 +149,7 @@ export class SharedPostComplexValidatorImpl implements SharedPostComplexValidato
     for (const post of posts) {
       const sharedPostId = post.id;
 
-      // 削除しようとしている投稿の存在
+      // 通報しようとしている投稿の存在
       const notExistingPostErrorMessage =
         await this.validateExistingSharedPost(sharedPostId);
       if (StringUtil.isNotEmpty(notExistingPostErrorMessage)) {
@@ -160,15 +161,17 @@ export class SharedPostComplexValidatorImpl implements SharedPostComplexValidato
   }
 
   private async validateExistingNonReportedAliveSameCompanyPost(
+    userId: string,
     companyNumbers: string[],
   ): Promise<string> {
     const sameCompanySharedPosts =
-      await this.sharedPostDao.getNonReportedAliveByCompanyNumbers(
+      await this.sharedPostDao.getNonReportedAliveByUserAndCompanyNumbers(
+        userId,
         companyNumbers,
       );
 
     return ArrayUtil.isNotEmpty(sameCompanySharedPosts)
-      ? '同じ企業に関する投稿がすでに存在します。'
+      ? '同じ企業に関する自分の投稿がすでに存在します。'
       : '';
   }
 

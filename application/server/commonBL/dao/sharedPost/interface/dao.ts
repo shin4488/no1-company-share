@@ -6,7 +6,8 @@ export interface SharedPostDao {
   getSharedPostWithDetails(
     parameterDto: SharedPostParameterDto,
   ): Promise<SharedPost[]>;
-  getNonReportedAliveByCompanyNumbers(
+  getNonReportedAliveByUserAndCompanyNumbers(
+    userId: string,
     companyNumbers: string[],
   ): Promise<SharedPost[]>;
   updateForLogicalDelete(

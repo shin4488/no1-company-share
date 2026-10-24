@@ -2,7 +2,7 @@
 
 // prettier-ignore
 const requestHeader = {
-    "Authorization": "firebaseのログインユーザIDトークン"
+    "Authorization": "Bearer <FirebaseのログインユーザIDトークン>"
 };
 
 // prettier-ignore

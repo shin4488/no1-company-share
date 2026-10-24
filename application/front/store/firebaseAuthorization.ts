@@ -2,13 +2,11 @@ import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { defineStore } from 'pinia';
 import { UserPostRequest } from './definition/firebaseAuthorization/userPostRequest';
 import { firebaseUserInfo } from './definition/firebaseAuthorization/data';
-import { StringUtil } from '@c/util/stringUtil';
 import { AjaxHelper } from '@f/common/ajax/ajaxHelper';
 
 export interface AuthUser {
   uid: string;
   idToken?: string | null;
-  getIdToken?: () => Promise<string>;
   allClaims?: { picture: string; name: string };
   photoURL?: string | null;
   displayName?: string | null;
@@ -45,11 +43,7 @@ export const useFirebaseAuthorizationStore = defineStore(
         this.iconImageUrl = iconImageUrl;
         this.displayedName = displayedName;
       },
-      async onAuthStateChangedAction({
-        authUser,
-      }: {
-        authUser: AuthUser | null;
-      }) {
+      onAuthStateChangedAction({ authUser }: { authUser: AuthUser | null }) {
         if (authUser === null) {
           this.setUserInfo({
             userId: null,
@@ -60,19 +54,13 @@ export const useFirebaseAuthorizationStore = defineStore(
           return;
         }
 
-        // ログイン中でもIDトークンが送られてこない時はfirebaseから取得
-        // firebaseから取得できない時に引数でIDトークンを送ってもらう
-        const idToken = authUser.idToken;
-        const token = StringUtil.isNotEmpty(idToken)
-          ? idToken
-          : await authUser.getIdToken?.();
         const claims = authUser.allClaims;
         const hasClaims = claims !== undefined;
         const iconImageUrl = hasClaims ? claims.picture : authUser.photoURL;
         const displayedName = hasClaims ? claims.name : authUser.displayName;
         this.setUserInfo({
           userId: authUser.uid,
-          idToken: token ?? null,
+          idToken: authUser.idToken || null,
           iconImageUrl: iconImageUrl ?? null,
           displayedName: displayedName ?? null,
         });
@@ -80,8 +68,7 @@ export const useFirebaseAuthorizationStore = defineStore(
           return;
         }
 
-        // ブラウザからのfirebaseユーザ削除や、別アプリ側でのユーザ名・アイコン画像変更に対応するため、
-        // 画面初期表示の都度ユーザ情報を更新する
+        // ブラウザからのfirebaseユーザ削除や、別アプリ側でのユーザ名・アイコン画像変更に対応するため、ログイン中のユーザを受け取るたびにユーザ情報を登録し直す
         const requestBody: UserPostRequest = {
           iconImageUrl: iconImageUrl ?? '',
           displayedName: displayedName ?? '',

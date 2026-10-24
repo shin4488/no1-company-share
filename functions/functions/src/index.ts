@@ -1,9 +1,6 @@
 import * as functions from 'firebase-functions/v1';
 import axios, {isAxiosError} from 'axios';
 
-// Start writing Firebase Functions
-// https://firebase.google.com/docs/functions/typescript
-
 const scheduledCompanyMasterUpdate = functions
   .runWith({secrets: ['COMPANY_UPDATE_SECRET'], timeoutSeconds: 120})
   .pubsub

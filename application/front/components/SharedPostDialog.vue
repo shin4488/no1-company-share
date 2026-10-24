@@ -2,10 +2,10 @@
   <!-- ダイアログ閉じるごとに入力ボックスのrulesをリセットしたいためv-ifでコンポーネントを再構築している -->
   <v-dialog v-if="isOpenDialog" v-model="isOpenDialog" scrollable persistent>
     <v-card>
-      <v-toolbar color="primary" dark>
+      <v-toolbar color="primary">
         <v-toolbar-title>No.1企業投稿</v-toolbar-title>
         <v-toolbar-items>
-          <v-btn icon dark class="mr-2" @click="onClickedCloseButton">
+          <v-btn icon class="mr-2" @click="onClickedCloseButton">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar-items>
@@ -14,11 +14,13 @@
       <v-card-text>
         <v-row density="compact">
           <v-col>
+            <!-- Vuetify 3以降は項目のdisabledを読まず、item-propsで渡した値だけを選択肢に反映する -->
             <v-autocomplete
               v-model="companyNumber"
               :items="selectableCompanies"
               item-title="text"
               item-value="value"
+              :item-props="companyItemProps"
               :disabled="isEditMode"
               clearable
               :loading="isAutocompleteLoadingShown"
@@ -45,7 +47,6 @@
           <v-col cols="2" sm="1">
             <v-icon
               :disabled="disabledToDeleteDetail"
-              dense
               color="error"
               title="1位内容の削除"
               @click="onClickedNo1ContentDeleteButton(index)"
@@ -79,7 +80,6 @@
           <v-col cols="2" offset="2" sm="1" offset-sm="1">
             <v-icon
               title="1位内容の追加"
-              dense
               color="primary"
               @click="onClickedNo1ContentAddButton"
             >
@@ -110,7 +110,6 @@
               v-if="
                 !(isImageLoadingShown || hasImageAlternativeMessageComputed)
               "
-              contain
               height="100"
               :title="companyName"
               :alt="companyName"
@@ -127,7 +126,6 @@
               hint="投稿内容の説明や出典など"
               persistent-hint
               rows="2"
-              dense
               auto-grow
             ></v-textarea>
           </v-col>
@@ -177,7 +175,7 @@ import {
 } from '@f/definition/components/sharedPostDialog/apiSpec/sharedPostPutResponse';
 
 export default defineComponent({
-  name: 'SharedPostCard',
+  name: 'SharedPostDialog',
   props: {
     no1Divisions: {
       type: Array as PropType<SelectItem[]>,
@@ -229,17 +227,11 @@ export default defineComponent({
     isEditMode(): boolean {
       return StringUtil.isNotEmpty(this.postId);
     },
-    /**
-     * No.1内容の削除が不可である
-     */
     disabledToDeleteDetail(): boolean {
       // 詳細1つのみの場合は消去できないようにする
       const hasNoOrOneDetail = this.postDetails.length <= 1;
       return hasNoOrOneDetail;
     },
-    /**
-     * 確定ボタンが非活性である
-     */
     disabledConfirmButton(): boolean {
       return (
         StringUtil.isEmpty(this.companyNumber) ||
@@ -252,31 +244,16 @@ export default defineComponent({
         this.isImageLoadingShown
       );
     },
-    /**
-     * 会社HPのURL入力ラベル
-     */
     companyHomePageUrlInputLabelComputed: (): string => '会社ホームページURL',
-    /**
-     * 会社HP未入力時の画像代替メッセージ
-     */
     imageAlternativeMessageWithoutHomepage(): string {
       return `${this.companyHomePageUrlInputLabelComputed}入力後、画像が表示されます。`;
     },
-    /**
-     * 会社HP入力済時の画像代替メッセージ
-     */
     imageAlternativeMessageWithHomepage: (): string => '画像を取得できません。',
-    /**
-     * 画像代替メッセージが存在する
-     */
     hasImageAlternativeMessageComputed(): boolean {
       return StringUtil.isNotEmpty(this.imageAlternativeMessage);
     },
   },
   methods: {
-    /**
-     * ダイアログ起動
-     */
     async open(
       parameter: SharedPostDialogParameter,
     ): Promise<SharedPostDialogResult | void> {
@@ -307,7 +284,6 @@ export default defineComponent({
         no1Division: x.no1Division,
       }));
 
-      // 起動時は、会社が選択済みの場合は選択した会社を表示、なければ会社リストを取得
       if (StringUtil.isNotEmpty(companyNumber)) {
         this.selectableCompanies = [
           {
@@ -331,9 +307,6 @@ export default defineComponent({
       this.clear();
       resolve?.(result);
     },
-    /**
-     * 確定ボタン押下処理
-     */
     async onClickedConfirmButton(): Promise<void> {
       let hasError = false;
       await this.$accessor.spinnerOverlay.open(async () => {
@@ -371,9 +344,6 @@ export default defineComponent({
       };
       this.close(result);
     },
-    /**
-     * 新規投稿作成用のサーバ処理呼び出し
-     */
     async calloutForNewPost() {
       const request: SharedPostPostRequest = {
         posts: [
@@ -403,9 +373,6 @@ export default defineComponent({
       this.postId = StringUtil.ifEmpty(responsePost.id);
       this.updatedAt = StringUtil.ifEmpty(responsePost.updatedAt);
     },
-    /**
-     * 既存投稿更新用のサーバ処理呼び出し
-     */
     async calloutForExistingPost() {
       const request: SharedPostPutRequest = {
         posts: [
@@ -436,9 +403,6 @@ export default defineComponent({
       this.postId = StringUtil.ifEmpty(responsePost.id);
       this.updatedAt = StringUtil.ifEmpty(responsePost.updatedAt);
     },
-    /**
-     * 閉じるボタン押下処理
-     */
     async onClickedCloseButton(): Promise<void> {
       const confirmDialog = this.$refs.confirmDialog as InstanceType<
         typeof ConfirmDialog
@@ -450,26 +414,20 @@ export default defineComponent({
         this.close();
       }
     },
-    /**
-     * 会社名入力処理
-     */
-    async onChangedSearchedCompanyText(text: string): Promise<void> {
+    async onChangedSearchedCompanyText(text: string | null): Promise<void> {
       if (StringUtil.isNotEmpty(this.postId)) {
         return;
       }
 
-      this.selectableCompanies = await this.getMatchedCompanies(text);
+      // 消去アイコンを押すとVuetifyは検索文字列をnullで通知する。nullはクエリに含まれず会社検索APIの入力検査で拒否されるため、空文字にする
+      this.selectableCompanies = await this.getMatchedCompanies(
+        StringUtil.ifEmpty(text),
+      );
     },
-    /**
-     * 会社選択AutoCompleteのクリアアイコン押下処理
-     */
     async onClickedAutocompleteClear(): Promise<void> {
       // 入力欄をクリアしているため、検索条件は空文字としている
       this.selectableCompanies = await this.getMatchedCompanies('');
     },
-    /**
-     * 検索条件に一致する会社を取得
-     */
     async getMatchedCompanies(
       companyNameText: string,
     ): Promise<SelectItemAutoComplete[]> {
@@ -489,7 +447,7 @@ export default defineComponent({
 
       const companyResonses = response.companies;
       const companies = companyResonses.map<SelectItemAutoComplete>((x) => ({
-        // 英数字が全角で返却されるが、autocompleteは半角・全角も区別するため、結果に表示されるように英数字を全角→半角に返却
+        // 会社検索APIは英数字を全角で返し、autocompleteは全角と半角を区別して絞り込むため、半角で入力しても候補に残るよう英数字・記号・空白を半角にする
         text: StringUtil.ifEmpty(x.name)
           .replace(/[Ａ-Ｚａ-ｚ０-９－．＆]/g, (char) =>
             String.fromCharCode(char.charCodeAt(0) - 0xfee0),
@@ -497,16 +455,19 @@ export default defineComponent({
           // eslint-disable-next-line no-irregular-whitespace
           .replace(/　/g, ' '),
         value: StringUtil.ifEmpty(x.number),
-        disabled: x.isRegistered || false,
-        header: x.isRegistered ? `${x.name} （登録済みです）` : '',
+        disabled: x.isPostedByLoginUser || false,
+        subtitle: x.isPostedByLoginUser ? '自分の投稿があります' : undefined,
       }));
 
       this.isAutocompleteLoadingShown = false;
       return companies;
     },
-    /**
-     * 会社選択時処理
-     */
+    // 選択中の値が候補から見つからないと、Vuetifyは値そのもの（入力欄を空にした直後はnull）を渡して項目を作るため、候補のときだけ値を返す
+    companyItemProps(item: SelectItemAutoComplete | string | null) {
+      return typeof item === 'object' && item !== null
+        ? { disabled: item.disabled, subtitle: item.subtitle }
+        : {};
+    },
     onClickedCompany(selectedCompanyNumber: string) {
       const selectedCompanySelectItem = this.selectableCompanies.find(
         (x) => x.value === selectedCompanyNumber,
@@ -522,15 +483,9 @@ export default defineComponent({
         },
       ];
     },
-    /**
-     * No.1内容削除ボタン押下処理
-     */
     onClickedNo1ContentDeleteButton(detailIndex: number): void {
       this.postDetails.splice(detailIndex, 1);
     },
-    /**
-     * No.1内容追加ボタン押下処理
-     */
     onClickedNo1ContentAddButton() {
       const firstNo1Division = ArrayUtil.isNotEmpty(this.no1Divisions)
         ? this.no1Divisions[0].value
@@ -541,9 +496,6 @@ export default defineComponent({
         no1Division: firstNo1Division,
       });
     },
-    /**
-     * 会社ページURLフォーカスを外した時の処理
-     */
     async onBluredCompanyHomePageUrl() {
       if (StringUtil.isEmpty(this.companyHomepageUrl)) {
         this.imageAlternativeMessage =

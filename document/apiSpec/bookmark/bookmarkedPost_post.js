@@ -4,7 +4,7 @@
 // method:POST
 // base.js記載の「Authorization」にログインユーザIDトークンが有効なときのみ使用可能
 
-// 「post-id」が存在すればpost-idのレコードのみをお気に入り
+// URIに「post-id」があれば、リクエストボディよりもURIの投稿IDを優先する
 // prettier-ignore
 const requestBody = {
     "posts": [
@@ -30,7 +30,11 @@ const errorResponseBody = {
         },
         // お気に入り対象の投稿が存在しないとき
         {
-            "message": "お気に入り対象の投稿が存在しません。"
+            "message": "存在する投稿の投稿No.を入力してください。"
+        },
+        // すでにお気に入り登録しているとき
+        {
+            "message": "指定した投稿はすでにお気に入り登録済みです。"
         }
     ],
     "data": null

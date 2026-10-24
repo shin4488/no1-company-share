@@ -41,10 +41,6 @@ export class SequelizeHandlerImpl implements SequelizeHandler {
     this.initialize();
   }
 
-  /**
-   * Sequelize初期化
-   * @returns Sequelizeインスタンス
-   */
   private initialize(): void {
     // モデル作成後に、外部キーなどテーブル間情報の結びつきを行う
     CompanyMaster.initialize(SequelizeHandlerImpl._sequelize);

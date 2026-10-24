@@ -9,7 +9,7 @@
     <div class="text-pre-wrap text-break" v-text="message" />
 
     <template #actions>
-      <v-btn small plain shaped multi-line @click="onClickedCloseButton">
+      <v-btn @click="onClickedCloseButton">
         <v-icon> mdi-close </v-icon>
       </v-btn>
     </template>

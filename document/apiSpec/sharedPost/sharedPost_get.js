@@ -7,8 +7,8 @@
 // prettier-ignore
 const requestQuery = {
     "limit": 30,
-    // この時刻以前のデータを取得（これがないとページング時に取得結果のデータが1ページ目の2ページ目で整合性合わなくなる時あり）
-    "baseDateTime": "2022-04-31 10:30:59.999",
+    // この日時より前に更新された投稿を取得する（これがないと、ページングで1ページ目と2ページ目の取得結果が食い違うことがある）
+    "baseDateTime": "2022-04-30T01:30:59.999Z",
     // base.js記載の「Authorization」にログインユーザIDトークンが有効なときのみ使用可能
     "isMyPostOnly": false
 };
@@ -30,7 +30,7 @@ const responseBody = {
                 "isBookmarkedByLoginUser": false,
                 "numberOfBookmarks": 10,
                 "remarks": "テスト備考1",
-                "updatedAt": '2022-04-27 10:30:59.999',
+                "updatedAt": "2022-04-27T01:30:59.999Z",
                 "postDetails": [
                     {
                         "id": 1,

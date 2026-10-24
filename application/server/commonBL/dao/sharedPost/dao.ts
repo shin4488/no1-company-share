@@ -16,19 +16,16 @@ export class SharedPostDaoImpl implements SharedPostDao {
   ): Promise<SharedPost[]> {
     const sharedPostWhereClause: WhereOptions<SharedPost> = {};
 
-    // 投稿ID指定
     const postId = parameterDto.postId;
     if (StringUtil.isNotEmpty(postId)) {
       sharedPostWhereClause.id = { [Op.eq]: postId };
     }
 
-    // 更新日時が基準日時以前
     const baseDateTimeParameter = parameterDto.baseDateTime;
     if (baseDateTimeParameter !== null) {
       sharedPostWhereClause.updatedAt = { [Op.lt]: baseDateTimeParameter };
     }
 
-    // ログインユーザの投稿のみ
     const userId = parameterDto.userId;
     if (parameterDto.isMyPostOnly) {
       sharedPostWhereClause.userId = { [Op.eq]: parameterDto.userId };
@@ -80,12 +77,14 @@ export class SharedPostDaoImpl implements SharedPostDao {
     return resultDto;
   }
 
-  public async getNonReportedAliveByCompanyNumbers(
+  public async getNonReportedAliveByUserAndCompanyNumbers(
+    userId: string,
     companyNumbers: string[],
   ): Promise<SharedPost[]> {
     const posts = await SharedPost.findAll({
       attributes: ['companyNumber'],
       where: {
+        userId: { [Op.eq]: userId },
         companyNumber: {
           [Op.in]: companyNumbers,
         },

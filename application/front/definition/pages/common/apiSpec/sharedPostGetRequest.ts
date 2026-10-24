@@ -8,7 +8,7 @@ export interface SharedPostGetRequestQuery {
   limit: number;
   /**
    * 取得基準日時
-   * この時刻以前のデータを取得
+   * この日時より前に更新された投稿を取得する
    */
   baseDateTime: string | null;
   /**

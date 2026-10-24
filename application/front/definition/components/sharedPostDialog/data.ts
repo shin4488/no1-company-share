@@ -5,7 +5,10 @@ export interface SelectItemAutoComplete {
   text: string;
   value: string;
   disabled: boolean;
-  header?: string;
+  /**
+   * 候補の会社名の下に表示する補足。空文字でも空の行が表示されるため、補足がないときはundefinedにする
+   */
+  subtitle?: string;
 }
 
 /**
@@ -18,7 +21,7 @@ export interface SharedPostDialogDetailData {
 }
 
 /**
- * カードに表示する要素データ
+ * 投稿ダイアログのデータ
  */
 export interface SharedPostDialogData {
   isOpenDialog: boolean;

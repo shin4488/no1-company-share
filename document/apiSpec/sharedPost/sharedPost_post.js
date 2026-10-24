@@ -39,7 +39,7 @@ const responseBody = {
             {
                 "key": "C0001",
                 "id": "C000000000001cDYrCmleUFhpDok0klZxvCpZVJt120220515103059999",
-                "updatedAt": "",
+                "updatedAt": "2022-05-15T01:30:59.999Z",
             }
         ]
     }

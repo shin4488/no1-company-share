@@ -33,10 +33,22 @@ appContainer.rebind(types.LogHandler).toConstantValue({
   error() {},
   getAccessLoggerMiddleware: () => (_req, _res, next) => next(),
 });
+// The company search returns these two companies instead of calling gBizINFO.
+const companies = ['9000000000001', '9000000000002'];
+appContainer.rebind(types.ExternalCompanyLogic).toConstantValue({
+  getExternalCompany: () =>
+    Promise.resolve({
+      companies: companies.map((companyNumber) => ({
+        companyNumber,
+        japaneseName: 'Integration fixture',
+        englishName: 'Integration fixture',
+      })),
+    }),
+});
 const { initializeApp } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 initializeApp({ projectId: 'demo-local-write-test' });
-// Only identity verification is replaced; routes, DI, validation, services and SQL are real.
+// Only identity verification and gBizINFO are replaced; routes, DI, validation, services and SQL are real.
 getAuth().verifyIdToken = (token) => {
   if (!['fixture-owner', 'fixture-other'].includes(token)) {
     return Promise.reject(new Error('invalid test identity'));
@@ -169,6 +181,14 @@ let count = 0;
     'fixture-owner',
     400,
   );
+  await call('GET', '/companies/', undefined, 'fixture-owner', 400);
+  await call(
+    'GET',
+    '/companies/?companyName=a&companyName=b',
+    undefined,
+    'fixture-owner',
+    400,
+  );
   await call(
     'POST',
     '/shared-posts/',
@@ -200,6 +220,41 @@ let count = 0;
   );
   await call('DELETE', postPath, undefined, 'fixture-other', 400);
   await call('POST', '/shared-posts/', { posts: [seed] }, 'fixture-owner', 400);
+  // The company search marks only companies that the signed-in user has an active post for.
+  async function postedCompanies(identity) {
+    const data = await call(
+      'GET',
+      '/companies/?companyName=',
+      undefined,
+      identity,
+    );
+    return data.companies
+      .filter((company) => company.isPostedByLoginUser)
+      .map((company) => company.number);
+  }
+  assert.deepEqual(await postedCompanies('fixture-owner'), [
+    seed.companyNumber,
+  ]);
+  assert.deepEqual(await postedCompanies('fixture-other'), []);
+  assert.deepEqual(await postedCompanies('invalid'), []);
+  const otherCreated = await call(
+    'POST',
+    '/shared-posts/',
+    { posts: [seed] },
+    'fixture-other',
+  );
+  const otherPostPath = '/shared-posts/' + otherCreated.posts[0].id;
+  assert.deepEqual(await postedCompanies('fixture-other'), [
+    seed.companyNumber,
+  ]);
+  await call('POST', '/shared-posts/', { posts: [seed] }, 'fixture-other', 400);
+  assert.deepEqual(
+    (await call('GET', '/shared-posts/?limit=20', undefined, 'invalid')).posts
+      .filter((post) => post.companyNumber === seed.companyNumber)
+      .map((post) => post.postingUserId)
+      .sort(),
+    ['fixture-other', 'fixture-owner'],
+  );
   await call(
     'POST',
     '/reported-shared-posts/',
@@ -216,7 +271,10 @@ let count = 0;
       (post) => post.id === id,
     ),
   );
+  assert.deepEqual(await postedCompanies('fixture-owner'), []);
   await call('DELETE', postPath);
+  await call('DELETE', otherPostPath, undefined, 'fixture-other');
+  assert.deepEqual(await postedCompanies('fixture-other'), []);
   assert.equal(
     (await db.query('SELECT is_deleted FROM shared_post WHERE id=$1', [id]))
       .rows[0].is_deleted,
@@ -243,7 +301,7 @@ let count = 0;
     0,
   );
   process.stdout.write(
-    `PASS: ${count} real API calls, persisted writes, ownership checks, validation and rollback\n`,
+    `PASS: ${count} real API calls, persisted writes, ownership checks, same-company posts, validation and rollback\n`,
   );
 })()
   .catch((error) => {

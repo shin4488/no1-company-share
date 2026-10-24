@@ -33,10 +33,5 @@ export default defineComponent({
       });
     });
   },
-  methods: {
-    onClickedCloseButton(): void {
-      this.isShown = false;
-    },
-  },
 });
 </script>

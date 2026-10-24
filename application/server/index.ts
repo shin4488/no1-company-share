@@ -1,10 +1,3 @@
-// 本来はバリデーション用のクラス・マッピング用のクラスを使用したいがプロパティにデコれーたをつけるとエラーとなってしまう
-// https://github.com/nuxt/nuxt.js/issues/9677
-
-// serverMiddlewareに登録されたサーバ処理ではaliasを使用できないので、module-aliasというライブラリを使っている
-// https://github.com/nuxt/nuxt.js/issues/4580
-// https://github.com/nuxt/nuxt.js/issues/7017
-import 'module-alias/register';
 import express, { json, urlencoded } from 'express';
 import { getFirebaseApp } from '@s/firebaseApp';
 import { appContainer } from '@s/common/dependencyInjection/inversify.config';
@@ -15,9 +8,8 @@ import { logRequestResponse } from '@s/common/middleware/logger';
 import { catchError } from '@s/common/middleware/appErrorHandler';
 import { appRouter } from '@s/feature/router';
 
-// DIコンテナからインスタンス取得
 const logger = appContainer.get<LogHandler>(types.LogHandler);
-// Sequelize初期化のため
+// SequelizeHandlerImplのコンストラクタがSequelizeとモデルを初期化するため、モデルの静的メソッドを使う前にここで一度取得しておく
 appContainer.get<SequelizeHandler>(types.SequelizeHandler);
 
 getFirebaseApp();
@@ -31,7 +23,7 @@ const accessLoggerMiddleware = logger.getAccessLoggerMiddleware();
 app.use(accessLoggerMiddleware);
 app.use(logRequestResponse);
 
-// SSRで使う従来のlocalhost付きパスも同じAPIへ渡す。
+// 投稿一覧の取得はSSRとブラウザのどちらでも /localhost 付きのパスを使うため、同じAPIへ渡す
 app.use('/api/v1/localhost', appRouter);
 app.use('/api/v1', appRouter);
 
