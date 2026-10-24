@@ -462,8 +462,11 @@ export default defineComponent({
       this.isAutocompleteLoadingShown = false;
       return companies;
     },
-    companyItemProps(item: SelectItemAutoComplete) {
-      return { disabled: item.disabled, subtitle: item.subtitle };
+    // 選択中の値が候補から見つからないと、Vuetifyは値そのもの（入力欄を空にした直後はnull）を渡して項目を作るため、候補のときだけ値を返す
+    companyItemProps(item: SelectItemAutoComplete | string | null) {
+      return typeof item === 'object' && item !== null
+        ? { disabled: item.disabled, subtitle: item.subtitle }
+        : {};
     },
     onClickedCompany(selectedCompanyNumber: string) {
       const selectedCompanySelectItem = this.selectableCompanies.find(
