@@ -14,11 +14,13 @@
       <v-card-text>
         <v-row density="compact">
           <v-col>
+            <!-- Vuetify 3以降は項目のdisabledを読まず、item-propsで渡した値だけを選択肢に反映する -->
             <v-autocomplete
               v-model="companyNumber"
               :items="selectableCompanies"
               item-title="text"
               item-value="value"
+              :item-props="companyItemProps"
               :disabled="isEditMode"
               clearable
               :loading="isAutocompleteLoadingShown"
@@ -451,11 +453,14 @@ export default defineComponent({
           .replace(/　/g, ' '),
         value: StringUtil.ifEmpty(x.number),
         disabled: x.isRegistered || false,
-        header: x.isRegistered ? `${x.name} （登録済みです）` : '',
+        subtitle: x.isRegistered ? '登録済みです' : undefined,
       }));
 
       this.isAutocompleteLoadingShown = false;
       return companies;
+    },
+    companyItemProps(item: SelectItemAutoComplete) {
+      return { disabled: item.disabled, subtitle: item.subtitle };
     },
     onClickedCompany(selectedCompanyNumber: string) {
       const selectedCompanySelectItem = this.selectableCompanies.find(
