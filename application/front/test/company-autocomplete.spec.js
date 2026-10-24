@@ -39,16 +39,20 @@ const options = () =>
   }));
 
 const get = vi.fn();
+// 描画中の例外は、Vueのエラーハンドラーで受けて確かめる
+const errorHandler = vi.fn();
 
 async function openCompanyMenu() {
   get.mockReset().mockResolvedValue({
     data: { messages: [], data: { companies } },
   });
+  errorHandler.mockReset();
   const wrapper = mount(SharedPostDialog, {
     attachTo: document.body,
     props: { no1Divisions: [{ text: '世界一', value: '1' }] },
     global: {
       plugins: [createVuetify({ components, directives })],
+      config: { errorHandler },
       stubs: { ConfirmDialog: true, Spinner: true },
       mocks: { $axios: { get }, $accessor: {} },
     },
@@ -112,5 +116,59 @@ test('検索文字列がnullで通知されても、会社名を空文字で検�
   expect(get).toHaveBeenCalledWith('/companies/', {
     params: { companyName: '' },
   });
+  wrapper.unmount();
+});
+
+const companyInput = () =>
+  document.querySelector('.v-autocomplete input[type="text"]');
+const typeCompanyName = async (text) => {
+  companyInput().value = text;
+  companyInput().dispatchEvent(new Event('input', { bubbles: true }));
+  await flushPromises();
+};
+const selectNotPostedCompany = async () => {
+  document.querySelector('[role="option"]').click();
+  await flushPromises();
+};
+const clickClearIcon = async () => {
+  document.querySelector('.v-autocomplete .v-field__clearable i').click();
+  await flushPromises();
+};
+
+test.each([
+  [
+    '入力した文字をBackspaceで消す',
+    async () => {
+      await typeCompanyName('ＡＢＣ');
+      await typeCompanyName('');
+    },
+  ],
+  [
+    '入力した文字を消去アイコンで消す',
+    async () => {
+      await typeCompanyName('ＡＢＣ');
+      await clickClearIcon();
+    },
+  ],
+  [
+    '選んだ企業を消去アイコンで消す',
+    async () => {
+      await selectNotPostedCompany();
+      await clickClearIcon();
+    },
+  ],
+  [
+    '選んだ企業名をBackspaceで消す',
+    async () => {
+      await selectNotPostedCompany();
+      await typeCompanyName('');
+    },
+  ],
+])('%sと、例外を出さずに企業の選択が外れる', async (_, clearInput) => {
+  const wrapper = await openCompanyMenu();
+  await clearInput();
+  expect(errorHandler).not.toHaveBeenCalled();
+  expect(companyInput().value).toBe('');
+  expect(wrapper.vm.companyNumber || '').toBe('');
   wrapper.unmount();
 });
