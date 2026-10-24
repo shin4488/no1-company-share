@@ -1,7 +1,7 @@
 export interface CompanyResponse {
   number: string | null;
   name: string | null;
-  isRegistered: boolean | null;
+  isPostedByLoginUser: boolean | null;
 }
 
 export interface CompanyGetResponse {

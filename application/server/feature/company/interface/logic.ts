@@ -4,5 +4,6 @@ import { CompanyResponseCreationParameterItem } from '../definition/companyRespo
 export interface CompanyLogic {
   createCompanyResponseByFetchingCompanyMaster(
     parameters: CompanyResponseCreationParameterItem[],
+    userId: string,
   ): Promise<CompanyListGetResponse[]>;
 }
