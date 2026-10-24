@@ -5,6 +5,7 @@
 // base.js記載の「Authorization」にログインユーザIDトークンが有効なときのみ使用可能
 
 // 「post-id」が存在すればpost-idのレコードのみを更新
+// 投稿の会社は変更できないため、「companyNumber」には投稿の法人番号を指定する。削除・通報された投稿は更新できない
 // prettier-ignore
 const requestBody = {
     "posts": [
@@ -39,4 +40,23 @@ const responseBody = {
             }
         ]
     }
+};
+
+// prettier-ignore
+const errorResponseBody = {
+    "messages": [
+        // 投稿が存在しないとき、または削除・通報されているとき
+        {
+            "message": "存在する投稿の投稿No.を入力してください。"
+        },
+        // 「companyNumber」が投稿の法人番号と異なるとき
+        {
+            "message": "投稿の会社は変更できません。"
+        },
+        // 投稿したユーザ以外が更新しようとしたとき
+        {
+            "message": "投稿したユーザのみが編集できます。"
+        }
+    ],
+    "data": null
 };

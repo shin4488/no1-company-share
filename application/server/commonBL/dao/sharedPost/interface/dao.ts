@@ -9,6 +9,7 @@ export interface SharedPostDao {
   getNonReportedAliveByUserAndCompanyNumbers(
     userId: string,
     companyNumbers: string[],
+    transaction?: Transaction,
   ): Promise<SharedPost[]>;
   updateForLogicalDelete(
     sharedPostIds: string[],

@@ -30,24 +30,27 @@ export class SharedPostSaveLogicImpl implements SharedPostSaveLogic {
     this.openGraphLogic = openGraphLogic;
   }
 
-  public async createModels(
-    parameter: SharedPostSaveParameter,
-    transaction: Transaction,
-    createSharedPost: (company: companyMaster) => Promise<sharedPost>,
-  ): Promise<SharedPostSaveResult> {
-    // 会社画像は日次バッチでデータ保存するが、バッチ実行まではデータ保存されないため会社マスタ作成時に一度画像保存しておく
-    const companyHomepageUrl = parameter.companyHomepageUrl;
+  // 会社画像は日次バッチでデータ保存するが、バッチ実行まではデータ保存されないため会社マスタ作成時に一度画像保存しておく
+  public async getCompanyImageUrl(companyHomepageUrl: string): Promise<string> {
     const ogResult = await this.openGraphLogic.getOpenGraph(
       companyHomepageUrl,
       [OpenGraphType.IMAGE],
     );
+    return ogResult.image;
+  }
 
+  public async createModels(
+    parameter: SharedPostSaveParameter,
+    companyImageUrl: string,
+    transaction: Transaction,
+    createSharedPost: (company: companyMaster) => Promise<sharedPost>,
+  ): Promise<SharedPostSaveResult> {
     const company = await this.companyMasterDao.upsertCompany(
       {
         companyNumber: parameter.companyNumber,
         companyJapaneseName: parameter.companyName,
-        homepageUrl: companyHomepageUrl,
-        imageUrl: ogResult.image,
+        homepageUrl: parameter.companyHomepageUrl,
+        imageUrl: companyImageUrl,
       },
       transaction,
     );

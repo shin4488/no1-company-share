@@ -67,6 +67,20 @@ let count = 0;
   server = app.listen(0, '127.0.0.1');
   await new Promise((resolve) => server.once('listening', resolve));
   const base = `http://127.0.0.1:${server.address().port}/api/v1`;
+  async function send(method, endpoint, body, identity = 'fixture-owner') {
+    const response = await fetch(base + endpoint, {
+      method,
+      headers: { 'Content-Type': 'application/json', authorization: identity },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    const result = await response.json();
+    count++;
+    return {
+      status: response.status,
+      messages: result.messages.map((x) => x.message),
+      data: result.data,
+    };
+  }
   async function call(
     method,
     endpoint,
@@ -74,20 +88,16 @@ let count = 0;
     identity = 'fixture-owner',
     status = 200,
   ) {
-    const response = await fetch(base + endpoint, {
-      method,
-      headers: { 'Content-Type': 'application/json', authorization: identity },
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
-    const result = await response.json();
+    const result = await send(method, endpoint, body, identity);
     assert.equal(
-      response.status,
+      result.status,
       status,
       `${method} ${endpoint}: ${JSON.stringify(result.messages)}`,
     );
-    count++;
     return result.data;
   }
+  const postOf = async (id) =>
+    (await db.query('SELECT * FROM shared_post WHERE id=$1', [id])).rows[0];
   const seed = {
     companyNumber: '9000000000001',
     companyName: 'Integration fixture',
@@ -174,6 +184,54 @@ let count = 0;
       .postDetails.length,
     1,
   );
+  // The dialog keeps the company of a post fixed, so the API rejects a change to another registered company.
+  await db.query(
+    "INSERT INTO company_master(company_number,company_japanese_name) VALUES ('9000000000004','Integration fixture 4') ON CONFLICT DO NOTHING",
+  );
+  assert.deepEqual(
+    await send('PUT', postPath, {
+      posts: [{ ...seed, id, companyNumber: '9000000000004' }],
+    }),
+    { status: 400, messages: ['投稿の会社は変更できません。'], data: null },
+  );
+  assert.equal((await postOf(id)).company_number, seed.companyNumber);
+  // One request cannot contain two posts about the same company.
+  const racing = { ...seed, companyNumber: '9000000000003' };
+  assert.deepEqual(
+    await send('POST', '/shared-posts/', { posts: [racing, racing] }),
+    {
+      status: 400,
+      messages: ['同じ企業に関する投稿が複数含まれています。'],
+      data: null,
+    },
+  );
+  const racingPosts = () =>
+    db.query(
+      "SELECT id FROM shared_post WHERE user_id='fixture-owner' AND company_number=$1 AND NOT is_deleted AND NOT is_reported",
+      [racing.companyNumber],
+    );
+  assert.equal((await racingPosts()).rows.length, 0);
+  // Simultaneous posts by the same user about the same company save only one post.
+  const racingResults = await Promise.all(
+    Array.from({ length: 8 }, () =>
+      send('POST', '/shared-posts/', { posts: [racing] }),
+    ),
+  );
+  assert.deepEqual(
+    racingResults.map((x) => x.status).sort(),
+    [200, 400, 400, 400, 400, 400, 400, 400],
+  );
+  assert.ok(
+    racingResults
+      .filter((x) => x.status === 400)
+      .every(
+        (x) =>
+          x.messages[0] === '同じ企業に関する自分の投稿がすでに存在します。',
+      ),
+  );
+  const racingRows = (await racingPosts()).rows;
+  assert.equal(racingRows.length, 1);
+  await call('DELETE', '/shared-posts/' + racingRows[0].id);
   await call(
     'POST',
     '/shared-posts/',
@@ -272,7 +330,23 @@ let count = 0;
     ),
   );
   assert.deepEqual(await postedCompanies('fixture-owner'), []);
+  // Updating a reported or deleted post does not bring it back.
+  const notFound = {
+    status: 400,
+    messages: ['存在する投稿の投稿No.を入力してください。'],
+    data: null,
+  };
+  assert.deepEqual(
+    await send('PUT', postPath, { posts: [{ ...seed, id }] }),
+    notFound,
+  );
+  assert.equal((await postOf(id)).is_reported, true);
   await call('DELETE', postPath);
+  assert.deepEqual(
+    await send('PUT', postPath, { posts: [{ ...seed, id }] }),
+    notFound,
+  );
+  assert.equal((await postOf(id)).is_deleted, true);
   await call('DELETE', otherPostPath, undefined, 'fixture-other');
   assert.deepEqual(await postedCompanies('fixture-other'), []);
   assert.equal(
@@ -301,7 +375,7 @@ let count = 0;
     0,
   );
   process.stdout.write(
-    `PASS: ${count} real API calls, persisted writes, ownership checks, same-company posts, validation and rollback\n`,
+    `PASS: ${count} real API calls, persisted writes, ownership checks, same-company posts, simultaneous posts, validation and rollback\n`,
   );
 })()
   .catch((error) => {
