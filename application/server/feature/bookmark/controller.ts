@@ -28,7 +28,7 @@ import { throwIfHasSimpleValidationResult } from '@s/common/middleware/simpleVal
 /**
  * お気に入りの投稿処理に関するコントローラクラス
  */
-class SharedPostController extends BaseController {
+class BookmarkController extends BaseController {
   public static bookmarkGetEndpoint: string = '/bookmarked-posts{/:postId}';
   public static async getBookamrks(
     request: express.Request<
@@ -125,27 +125,27 @@ class SharedPostController extends BaseController {
 
 const bookmarkRouter = Router();
 bookmarkRouter.get(
-  SharedPostController.bookmarkGetEndpoint,
+  BookmarkController.bookmarkGetEndpoint,
   authorizationFirebaseUser(),
   apiRateLimiter,
   bookmarkGetSimpleValidators,
   throwIfHasSimpleValidationResult,
-  wrapAction(SharedPostController.getBookamrks),
+  wrapAction(BookmarkController.getBookamrks),
 );
 bookmarkRouter.post(
-  SharedPostController.bookmarkPostEndpoint,
+  BookmarkController.bookmarkPostEndpoint,
   authorizationFirebaseUser(),
   apiRateLimiter,
   bookmarkPostSimpleValidators,
   throwIfHasSimpleValidationResult,
-  wrapAction(SharedPostController.postNewBookmarks),
+  wrapAction(BookmarkController.postNewBookmarks),
 );
 bookmarkRouter.delete(
-  SharedPostController.bookmarkDeleteEndpoint,
+  BookmarkController.bookmarkDeleteEndpoint,
   authorizationFirebaseUser(),
   apiRateLimiter,
   bookmarkDeleteSimpleValidators,
   throwIfHasSimpleValidationResult,
-  wrapAction(SharedPostController.deleteBookmarks),
+  wrapAction(BookmarkController.deleteBookmarks),
 );
 export { bookmarkRouter };

@@ -175,7 +175,7 @@ import {
 } from '@f/definition/components/sharedPostDialog/apiSpec/sharedPostPutResponse';
 
 export default defineComponent({
-  name: 'SharedPostCard',
+  name: 'SharedPostDialog',
   props: {
     no1Divisions: {
       type: Array as PropType<SelectItem[]>,
