@@ -80,6 +80,7 @@ export class SharedPostDaoImpl implements SharedPostDao {
   public async getNonReportedAliveByUserAndCompanyNumbers(
     userId: string,
     companyNumbers: string[],
+    transaction?: Transaction,
   ): Promise<SharedPost[]> {
     const posts = await SharedPost.findAll({
       attributes: ['companyNumber'],
@@ -91,6 +92,7 @@ export class SharedPostDaoImpl implements SharedPostDao {
         isDeleted: false,
         isReported: false,
       },
+      transaction,
     });
 
     return posts;

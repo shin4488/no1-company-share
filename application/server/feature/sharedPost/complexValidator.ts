@@ -1,4 +1,5 @@
 import { inject, injectable } from 'inversify';
+import { Transaction } from 'sequelize';
 import { SharedPostPostParameter } from './definition/sharedPostPostParameter';
 import { SharedPostPutParameter } from './definition/sharedPostPutParameter';
 import { SharedPostComplexValidator } from './interface/complexValidator';
@@ -30,13 +31,17 @@ export class SharedPostComplexValidatorImpl implements SharedPostComplexValidato
     );
 
     const posts = parameter.posts;
+    const companyNumbers = posts.map((x) => x.companyNumber);
+    if (new Set(companyNumbers).size < companyNumbers.length) {
+      errorHandler.addMessage('同じ企業に関する投稿が複数含まれています。');
+    }
+
     for (const post of posts) {
       // 同じ企業の投稿は、ほかのユーザーの投稿があっても作れる。同じユーザーの2件目だけを拒否する
-      const companyNumbers = [post.companyNumber];
       const companyErrorMessage =
         await this.validateExistingNonReportedAliveSameCompanyPost(
           parameter.userId,
-          companyNumbers,
+          [post.companyNumber],
         );
       if (StringUtil.isNotEmpty(companyErrorMessage)) {
         errorHandler.addMessage(companyErrorMessage);
@@ -57,6 +62,25 @@ export class SharedPostComplexValidatorImpl implements SharedPostComplexValidato
     errorHandler.throwIfHasError();
   }
 
+  public async validateSameCompanyPostsInTransaction(
+    parameter: SharedPostPostParameter,
+    transaction: Transaction,
+  ): Promise<void> {
+    const errorHandler = appContainer.get<BadParameterErrorHandler>(
+      types.BadParameterErrorHandler,
+    );
+    const companyErrorMessage =
+      await this.validateExistingNonReportedAliveSameCompanyPost(
+        parameter.userId,
+        parameter.posts.map((x) => x.companyNumber),
+        transaction,
+      );
+    if (StringUtil.isNotEmpty(companyErrorMessage)) {
+      errorHandler.addMessage(companyErrorMessage);
+    }
+    errorHandler.throwIfHasError();
+  }
+
   public async validateForUpdate(
     parameter: SharedPostPutParameter,
   ): Promise<void> {
@@ -67,11 +91,20 @@ export class SharedPostComplexValidatorImpl implements SharedPostComplexValidato
     const posts = parameter.posts;
     for (const post of posts) {
       const sharedPostId = post.id;
-      // 投稿の存在チェック
+      // 削除・通報された投稿は画面に表示されず編集できないため、存在しない投稿と同じく拒否する
       const validateErrorMessage =
-        await this.validateExistingSharedPost(sharedPostId);
+        await this.validateExistingNonReportedAliveSharedPost(sharedPostId);
       if (StringUtil.isNotEmpty(validateErrorMessage)) {
         errorHandler.addMessage(validateErrorMessage);
+      }
+
+      // 画面の編集では会社を変えられないため、APIでも投稿の会社を変更させない
+      const companyChangeErrorMessage = await this.validateUnchangedCompany(
+        sharedPostId,
+        post.companyNumber,
+      );
+      if (StringUtil.isNotEmpty(companyChangeErrorMessage)) {
+        errorHandler.addMessage(companyChangeErrorMessage);
       }
 
       // 作成者と更新リクエスト送信者の一致チェック（既存の投稿．投稿者ID=リクエスト．ユーザID）
@@ -163,11 +196,13 @@ export class SharedPostComplexValidatorImpl implements SharedPostComplexValidato
   private async validateExistingNonReportedAliveSameCompanyPost(
     userId: string,
     companyNumbers: string[],
+    transaction?: Transaction,
   ): Promise<string> {
     const sameCompanySharedPosts =
       await this.sharedPostDao.getNonReportedAliveByUserAndCompanyNumbers(
         userId,
         companyNumbers,
+        transaction,
       );
 
     return ArrayUtil.isNotEmpty(sameCompanySharedPosts)
@@ -196,6 +231,29 @@ export class SharedPostComplexValidatorImpl implements SharedPostComplexValidato
     const targetSharedPost = await SharedPost.findByPk(sharedPostNo);
     return targetSharedPost === null
       ? '存在する投稿の投稿No.を入力してください。'
+      : '';
+  }
+
+  private async validateExistingNonReportedAliveSharedPost(
+    sharedPostNo: string,
+  ): Promise<string> {
+    const targetSharedPost = await SharedPost.findOne({
+      where: { id: sharedPostNo, isDeleted: false, isReported: false },
+    });
+    return targetSharedPost === null
+      ? '存在する投稿の投稿No.を入力してください。'
+      : '';
+  }
+
+  private async validateUnchangedCompany(
+    sharedPostNo: string,
+    companyNumber: string,
+  ): Promise<string> {
+    const targetSharedPost = await SharedPost.findByPk(sharedPostNo);
+    // 投稿がないときは、投稿の存在チェックのメッセージだけを返す
+    return targetSharedPost !== null &&
+      targetSharedPost.companyNumber !== companyNumber
+      ? '投稿の会社は変更できません。'
       : '';
   }
 
