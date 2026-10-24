@@ -12,7 +12,7 @@ import { authorizationFirebaseUser } from '@s/common/middleware/firebaseAuthoriz
 import { apiRateLimiter } from '@s/common/middleware/apiRateLimit';
 
 /**
- * 投稿処理に関するコントローラクラス
+ * Open Graph取得に関するコントローラクラス
  */
 class OpenGraphController extends BaseController {
   public static openGraphGetEndpoint: string = '/open-graph/';

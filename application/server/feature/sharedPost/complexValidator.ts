@@ -148,7 +148,7 @@ export class SharedPostComplexValidatorImpl implements SharedPostComplexValidato
     for (const post of posts) {
       const sharedPostId = post.id;
 
-      // 削除しようとしている投稿の存在
+      // 通報しようとしている投稿の存在
       const notExistingPostErrorMessage =
         await this.validateExistingSharedPost(sharedPostId);
       if (StringUtil.isNotEmpty(notExistingPostErrorMessage)) {

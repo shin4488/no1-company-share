@@ -11,6 +11,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const { $accessor } = nuxtApp;
   const localPort = useRequestEvent()?.node.req.socket.localPort;
   const api = create({
+    // SSRでは、要求を受けたサーバー自身のAPIへループバックで接続する
     baseURL:
       typeof window === 'undefined'
         ? `http://127.0.0.1:${localPort || process.env.PORT || 3000}/api/v1`

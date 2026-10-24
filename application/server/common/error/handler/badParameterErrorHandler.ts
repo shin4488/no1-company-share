@@ -13,12 +13,6 @@ export class BadParameterErrorHandlerImpl implements BadParameterErrorHandler {
     return this;
   }
 
-  public toDistinct(): BadParameterErrorHandler {
-    const messageSet = new Set(this.messages);
-    this.messages = Array.from(messageSet);
-    return this;
-  }
-
   public throwIfHasError() {
     if (ArrayUtil.isEmpty(this.messages)) {
       return;

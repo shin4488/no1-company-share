@@ -21,6 +21,7 @@ export default defineNuxtConfig({
   css: ['@mdi/font/css/materialdesignicons.css'],
   modules: ['@pinia/nuxt', 'vuetify-nuxt-module', '@vite-pwa/nuxt'],
   nitro: {
+    // サーバーのDI（inversify）はTypeScriptの旧仕様のデコレーターを使う
     esbuild: {
       options: {
         tsconfigRaw: {

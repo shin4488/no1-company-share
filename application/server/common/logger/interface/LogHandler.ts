@@ -5,8 +5,6 @@ export interface LogHandler {
   /**
    * ログファイルへの出力
    * エラーログはerrorメソッドを使用してください。
-   * @param level
-   * @param args
    */
   log(level: Level | 'trace' | 'debug' | 'info' | 'warn', ...args: any[]): void;
   error(message: any, ...args: any[]): void;

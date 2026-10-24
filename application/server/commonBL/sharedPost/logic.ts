@@ -25,7 +25,6 @@ export class SharedPostLogicImpl implements SharedPostLogic {
   ): Promise<SharedPostLogicResultItem[]> {
     const sharedPostResultDtos =
       await this.sharedPostDao.getSharedPostWithDetails(parameter);
-    // 投稿テーブルのデータからレスポンスデータ作成
     const responsePosts = sharedPostResultDtos.map<SharedPostLogicResultItem>(
       (post) => {
         const sharedPostDetails = post.SharedPostDetails;

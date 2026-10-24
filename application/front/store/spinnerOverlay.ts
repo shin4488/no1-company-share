@@ -6,7 +6,6 @@ export const useSpinnerOverlayStore = defineStore('spinnerOverlay', {
   }),
   actions: {
     async open(action: () => unknown) {
-      // actionを実行中のみスピナーをオン、実行後はオフとする
       this.isShown = true;
       try {
         await action();

@@ -3,8 +3,7 @@ const { readFileSync, writeFileSync, readdirSync } = require('node:fs');
 const { join } = require('node:path');
 const tar = require('tar');
 
-// Reconstruct the unmodified upstream package offline, then replace ONLY its
-// TLS implementation. Do not accept a different tarball or silently skip a patch.
+// Reconstruct the unmodified upstream package offline, then replace ONLY its TLS implementation. Do not accept a different tarball or silently skip a patch.
 const archive = join(__dirname, 'upstream.tgz');
 const expected =
   '6nt/86SkqUQSLW1ofz8MxC6RhRMqOl3ONISe6qqvJ3xj09aJWQx6DhgSZpugs3PX4PXdOas/WD6A9jx6J2N19A==';

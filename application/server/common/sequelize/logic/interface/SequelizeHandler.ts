@@ -5,10 +5,8 @@ export interface SequelizeHandler {
   readonly sequelize: Sequelize;
 
   /**
-   * このメソッド内でトランザクションを張ります
-   * コミットは呼び出し側で行ってください
-   * ロールバックはエラー時に自動で実行します
-   * @param process
+   * processをトランザクション内で実行する
+   * processが正常に終わればコミットし、例外が発生すればロールバックする
    */
   transact(
     process: (transaction: Transaction) => Promise<void> | void,

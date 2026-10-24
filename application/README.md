@@ -1,6 +1,6 @@
 # no1-company-share application
 
-This application uses Nuxt 4, Vue 3, Vuetify 3, and an Express API mounted under `/api/`. The Nuxt source is in `front/`, the API is in `server/`, and shared code is in `common/`.
+This application uses Nuxt 4, Vue 3, Vuetify 4, and an Express API mounted under `/api/`. The Nuxt source is in `front/`, the API is in `server/`, and shared code is in `common/`.
 
 ## Development and checks
 
@@ -25,6 +25,6 @@ Nuxt CLI and Nitro use a locally patched listhen to replace the vulnerable node-
 
 ## API access limits
 
-The bookmark, shared-post, user and development-user routes share a limit of 120 requests per minute per authenticated Firebase user. The limiter runs after token verification and before database access. Both `/api/v1` and its `/localhost` compatibility paths share the same counter. Excess requests receive HTTP 429 and a `Retry-After` header. The in-process counter resets on restart and is not shared between replicas.
+The bookmark, shared-post, Open Graph, user and development-user routes share a limit of 120 requests per minute per authenticated Firebase user. The limiter runs after token verification and before database access or fetching external pages. Both `/api/v1` and its `/localhost` compatibility paths share the same counter. Excess requests receive HTTP 429 and a `Retry-After` header. The in-process counter resets on restart and is not shared between replicas.
 
 Unauthenticated shared-post reads use the socket IP and do not trust forwarded headers. Anonymous clients behind a reverse proxy share one quota. For a production proxy, configure trust for only its actual addresses and use an ingress limiter or shared store for multiple replicas. Do not enable blanket `trust proxy` or derive the key from unverified headers. Authentication attempts and other endpoints need separate ingress protection.

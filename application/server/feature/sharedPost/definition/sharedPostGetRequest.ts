@@ -10,8 +10,8 @@ export interface SharedPostGetRequestQuery extends ParsedQs {
   limit?: string;
   /**
    * 取得基準日時
-   * この時刻以前のデータを取得
-   * これがないとページング時に取得結果のデータが1ページ目の2ページ目で整合性合わなくなる時あり
+   * この日時より前に更新された投稿を取得する
+   * これがないと、ページングで1ページ目と2ページ目の取得結果が食い違うことがある
    */
   baseDateTime?: string;
   /**

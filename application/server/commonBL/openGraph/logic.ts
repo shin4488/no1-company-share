@@ -138,9 +138,7 @@ export class OpenGraphLogicImpl implements OpenGraphLogic {
   }
 
   /**
-   * headタグ内からog:img部分の抽出
-   * @param headElements
-   * @returns
+   * headタグ直下の要素から、ogTypesで指定したOGのcontent属性の値を取り出す
    */
   private extractTargetOpenGraph(
     pageUri: string,

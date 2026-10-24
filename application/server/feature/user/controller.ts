@@ -13,7 +13,7 @@ import { throwIfHasSimpleValidationResult } from '@s/common/middleware/simpleVal
 import { wrapAction } from '@s/common/middleware/controllerCatcher';
 
 /**
- * 投稿処理に関するコントローラクラス
+ * ユーザに関するコントローラクラス
  */
 class UserController extends BaseController {
   public static userSaveEndpoint: string = '/users/';

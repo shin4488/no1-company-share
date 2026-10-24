@@ -15,8 +15,7 @@ async function resolveCertificate(input) {
     };
   }
   if (options.pfx) {
-    // Node's OpenSSL parser handles PKCS#12 directly, including its certificate
-    // chain. Never parse attacker-controlled ASN.1 with node-forge.
+    // Node's OpenSSL parser handles PKCS#12 directly, including its certificate chain. Never parse attacker-controlled ASN.1 with node-forge.
     return { pfx: await readFile(options.pfx), passphrase: options.passphrase };
   }
 

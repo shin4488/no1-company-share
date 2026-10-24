@@ -24,15 +24,13 @@
         </v-avatar>
       </v-app-bar>
 
-      <!-- mini-variant:アイコンのみナビゲーション表示 -->
-      <!-- clipped:app-barの下にナビゲーション表示 -->
       <v-navigation-drawer
         v-model="isDrawerOpened"
         :rail="isDrawerMini"
         width="190"
         permanent
       >
-        <v-list shaped>
+        <v-list>
           <v-list-item
             v-for="(item, index) in sideBarItems"
             :key="index"
@@ -114,7 +112,6 @@ export default defineComponent({
         {
           icon: 'mdi-login',
           title: 'ログイン',
-          // ログイン画面はfirebaseのポップアップとなるが、ログインボタン押下判定のために「#」を付与
           to: this.loginPath,
         },
         {

@@ -7,11 +7,6 @@ import { types } from '@s/common/dependencyInjection/types';
  * このアプリの基底となるコントローラクラス
  */
 export class BaseController {
-  /**
-   * 成功のAPIレスポンス返却
-   * @param response
-   * @param data
-   */
   public static success<TResponse>(
     response: express.Response,
     data?: TResponse,

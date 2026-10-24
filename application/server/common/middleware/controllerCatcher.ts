@@ -6,8 +6,6 @@ interface PromiseRequestAction {
 
 /**
  * 非同期処理中に例外発生した際にキャッチするためのラッパー
- * @param controllerAction
- * @returns
  */
 const wrapAction = (controllerAction: PromiseRequestAction) => {
   return (

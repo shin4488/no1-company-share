@@ -15,21 +15,11 @@ export class DivisionSelectItemLogicImpl implements DivisionSelectItemLogic {
 
   async getDivisionSelectItemsByColumn(
     columnName: string,
-    shouldIncludeEmptyItem: boolean = false,
   ): Promise<SelectItem[]> {
     const divisions = await this.divisionDao.getDivisionsByColumn(columnName);
-    const selectItems = divisions.map<SelectItem>((x) => ({
+    return divisions.map<SelectItem>((x) => ({
       text: x.divisionDisplayedName,
       value: StringUtil.toString(x.id),
     }));
-
-    if (shouldIncludeEmptyItem) {
-      selectItems.unshift({
-        text: '',
-        value: '',
-      });
-    }
-
-    return selectItems;
   }
 }

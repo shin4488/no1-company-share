@@ -1,8 +1,4 @@
-const ignorePaths = [
-  '\u002F__webpack_hmr',
-  '\u002F_loading',
-  '\u002F_nuxt\u002F',
-];
+const ignorePaths = ['/_nuxt/'];
 
 importScripts(
   'https://www.gstatic.com/firebasejs/13.0.0/firebase-app-compat.js',
@@ -20,7 +16,6 @@ firebase.initializeApp({
   measurementId: 'G-ZJVQSKLGQ0',
 });
 
-// Initialize authService
 const authService = firebase.auth();
 
 /**
@@ -56,10 +51,8 @@ const fetchWithAuthorization = async (original, idToken) => {
     headers.append(entry[0], entry[1]);
   }
 
-  // Add ID token to header.
   headers.set('Authorization', 'Bearer ' + idToken);
 
-  // Create authorized request
   const { url, ...props } = original.clone();
   const authorized = new Request(url, {
     ...props,
@@ -84,13 +77,7 @@ self.addEventListener('fetch', (event) => {
     self.location.hostname === 'localhost' ||
     self.location.hostname === '127.0.0.1';
 
-  const isIgnored = ignorePaths.some((path) => {
-    if (typeof path === 'string') {
-      return url.pathname.startsWith(path);
-    }
-
-    return path.test(url.pathname.slice(1));
-  });
+  const isIgnored = ignorePaths.some((path) => url.pathname.startsWith(path));
 
   // https://github.com/nuxt-community/firebase-module/issues/465
   if (!expectsHTML || !isSameOrigin || !isHttps || isIgnored) {
@@ -98,8 +85,6 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Fetch the resource after checking for the ID token.
-  // This can also be integrated with existing logic to serve cached files
-  // in offline mode.
   event.respondWith(
     getIdToken().then((idToken) =>
       idToken
@@ -114,7 +99,6 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// In service worker script.
 self.addEventListener('activate', (event) => {
   event.waitUntil(clients.claim());
 });

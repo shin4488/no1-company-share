@@ -1,4 +1,4 @@
-// 投稿取得
+// お気に入り投稿の取得
 
 // URI:/api/v1/bookmarked-posts/:post-id
 // method:GET
@@ -21,12 +21,14 @@ const responseBody = {
                 "companyNumber": "C000000000001",
                 "companyName": "テスト1株式会社",
                 "companyHomepageUrl": "http://1.example.com",
+                "companyImageUrl": "http://11.example.com",
                 "postingUserId": "cDYrCmleUFhpDok0klZxvCpZVJt1",
                 "postingUserName": "Taro Yamada",
                 "postingUserIcomImageUrl": "http://i1.example.com",
+                "isBookmarkedByLoginUser": true,
                 "numberOfBookmarks": 10,
                 "remarks": "テスト備考1",
-                "baseDateTime": '2022-04-27 10:30:59.999',
+                "updatedAt": "2022-04-27T01:30:59.999Z",
                 "postDetails": [
                     {
                         "id": 1,
