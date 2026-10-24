@@ -3,6 +3,7 @@
 // URI:/api/v1/shared-posts/
 // method:POST
 // base.js記載の「Authorization」にログインユーザIDトークンが有効なときのみ使用可能
+// 同じユーザーが同じ企業について持てる投稿（削除・通報されていないもの）は1件。同じ企業を1回の要求に2件以上含めることもできない
 
 // prettier-ignore
 const requestBody = {
@@ -43,4 +44,19 @@ const responseBody = {
             }
         ]
     }
+};
+
+// prettier-ignore
+const errorResponseBody = {
+    "messages": [
+        // 同じ企業について、自分の投稿（削除・通報されていないもの）がすでにあるとき
+        {
+            "message": "同じ企業に関する自分の投稿がすでに存在します。"
+        },
+        // 「posts」に同じ法人番号が2件以上あるとき
+        {
+            "message": "同じ企業に関する投稿が複数含まれています。"
+        }
+    ],
+    "data": null
 };

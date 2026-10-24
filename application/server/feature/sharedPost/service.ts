@@ -24,6 +24,9 @@ import { SharedPostParameterDto } from '@s/commonBL/dao/sharedPost/definition/sh
 import { SharedPostLogic } from '@s/commonBL/sharedPost/interface/logic';
 import { SharedPostDao } from '@s/commonBL/dao/sharedPost/interface/dao';
 
+// pg_advisory_xact_lockの1つ目のキー。ほかの用途のロックとキーが重ならないよう、投稿の作成を表す値にする
+const insertSharedPostLockKind = 1;
+
 @injectable()
 export class SharedPostServiceImpl implements SharedPostService {
   private sequelizeHandler: SequelizeHandler;
@@ -73,15 +76,39 @@ export class SharedPostServiceImpl implements SharedPostService {
     await this.complexValidator.validateForInsert(parameter);
 
     const posts = parameter.posts;
+    const companyImageUrls = await Promise.all(
+      posts.map((post) =>
+        this.saveLogic.getCompanyImageUrl(post.companyHomepageUrl),
+      ),
+    );
     const response: SharedPostPostResponse = { posts: [] };
     await this.sequelizeHandler.transact(async (transaction) => {
+      // 同じユーザーの投稿が同時に届くと、どちらも上の検査を通って同じ企業の投稿が2件保存される。
+      // 検査から保存までをユーザーごとのロックで1件ずつ行い、ロックを取ってから検査し直す。
+      // ロックはトランザクションの終了で外れる。ユーザーIDのハッシュが別のユーザーと重なっても、待つだけになる
+      await this.sequelizeHandler.sequelize.query(
+        'SELECT pg_advisory_xact_lock(:lockKind, hashtext(:userId))',
+        {
+          replacements: {
+            lockKind: insertSharedPostLockKind,
+            userId: parameter.userId,
+          },
+          transaction,
+        },
+      );
+      await this.complexValidator.validateSameCompanyPostsInTransaction(
+        parameter,
+        transaction,
+      );
+
       // 会社マスタ更新
       // ホームページURLや会社名変更対応できるように、投稿ごとに書き換える
       // TODO:将来的には複数件一括でupsertしたい
       response.posts = await Promise.all(
-        posts.map<Promise<SharedPostPostResponseItem>>(async (post) => {
+        posts.map<Promise<SharedPostPostResponseItem>>(async (post, index) => {
           const responseItem = await this.saveLogic.createModels(
             post,
+            companyImageUrls[index],
             transaction,
             async (company: CompanyMaster): Promise<SharedPost> => {
               // 同じユーザー・同じ企業の有効な投稿は1件だけだが、通報・削除された投稿のレコードは残るため、投稿IDには作成日時も含める
@@ -123,25 +150,27 @@ export class SharedPostServiceImpl implements SharedPostService {
     await this.complexValidator.validateForUpdate(parameter);
 
     const posts = parameter.posts;
+    const companyImageUrls = await Promise.all(
+      posts.map((post) =>
+        this.saveLogic.getCompanyImageUrl(post.companyHomepageUrl),
+      ),
+    );
     const response: SharedPostPutResponse = { posts: [] };
     await this.sequelizeHandler.transact(async (transaction) => {
       // 会社マスタ更新
       // ホームページURLや会社名変更対応できるように、投稿ごとに書き換える
       // TODO:将来的には複数件一括でupsertしたい
       response.posts = await Promise.all(
-        posts.map<Promise<SharedPostPutResponseItem>>(async (post) => {
+        posts.map<Promise<SharedPostPutResponseItem>>(async (post, index) => {
           const responseItem = await this.saveLogic.createModels(
             post,
+            companyImageUrls[index],
             transaction,
-            async (company: CompanyMaster): Promise<SharedPost> => {
+            async (): Promise<SharedPost> => {
               const postId = post.id;
+              // 投稿ID・会社・投稿者・削除と通報の状態は変えない。検査の後に削除・通報されても、元に戻さないため
               await SharedPost.update(
                 {
-                  id: postId,
-                  companyNumber: company.companyNumber,
-                  userId: parameter.userId,
-                  isDeleted: false,
-                  isReported: false,
                   remarks: post.remarks,
                 },
                 {
