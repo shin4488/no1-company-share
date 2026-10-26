@@ -55,13 +55,18 @@ describe.each([
     wrapper.unmount();
   });
 
-  test('閉じたあとに別の通知を開ける', async () => {
+  test('閉じたあとに同じ通知も別の通知も開ける', async () => {
     const { store, wrapper } = mountNotification();
     store.open('最初の通知');
     await wrapper.vm.$nextTick();
     await wrapper.find('button').trigger('click');
     expect(wrapper.find('section').exists()).toBe(false);
-    expect(store.message).toBe('最初の通知');
+    store.open('最初の通知');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('section > div').element.textContent).toBe(
+      '最初の通知',
+    );
+    await wrapper.find('button').trigger('click');
     store.open('次の通知');
     await wrapper.vm.$nextTick();
     expect(wrapper.find('section > div').element.textContent).toBe('次の通知');

@@ -167,7 +167,7 @@ test.each(routes)(
   '%s %s は両URLで上限後にDB処理を呼ばない',
   async (method, path, body) => {
     await exhaust();
-    appContainer.get.mockClear();
+    vi.clearAllMocks();
     for (const alias of [false, true]) {
       const response = await request(method, path, body, {
         alias,
@@ -177,7 +177,9 @@ test.each(routes)(
       expect(Number(response.headers.get('retry-after'))).toBeGreaterThan(0);
       expect((await response.json()).messages[0].message).toContain('再試行');
     }
-    expect(appContainer.get).not.toHaveBeenCalled();
+    for (const operation of Object.values(service)) {
+      expect(operation).not.toHaveBeenCalled();
+    }
     expect(
       (await request('POST', '/users/', validUser, { uid: `${user}-other` }))
         .status,

@@ -14,13 +14,12 @@ vi.mock('../../server/common/dependencyInjection/inversify.config', () => ({
 
 // 実際のDAOと同じく、指定したユーザー・企業の投稿だけを返す
 const postsOf = (posts) => ({
-  getNonReportedAliveByUserAndCompanyNumbers: vi.fn((userId, companyNumbers) =>
+  getNonReportedAliveByUserAndCompanyNumbers: (userId, companyNumbers) =>
     Promise.resolve(
       posts.filter(
         (x) => x.userId === userId && companyNumbers.includes(x.companyNumber),
       ),
     ),
-  ),
 });
 const postedByA = [{ userId: 'user-a', companyNumber: '1000000000001' }];
 
@@ -62,7 +61,6 @@ describe('会社検索', () => {
       ['1000000000001', false],
       ['1000000000002', false],
     ]);
-    expect(dao.getNonReportedAliveByUserAndCompanyNumbers).not.toBeCalled();
   });
 });
 

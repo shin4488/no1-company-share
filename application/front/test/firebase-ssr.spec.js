@@ -1,4 +1,9 @@
-import middleware from '../../server/firebaseSsr';
+// @vitest-environment node
+import { createPinia } from 'pinia';
+import { useRequestEvent } from '#app';
+import ssrAuthentication from '../../server/middleware/firebase-ssr';
+import storePlugin from '../plugins/01.store';
+
 vi.mock('firebase-admin/app', () => ({
   getApps: vi.fn(() => ['app']),
   initializeApp: vi.fn(),
@@ -10,77 +15,68 @@ vi.mock('../../common/firebaseConfig', () => ({
   firebaseConfig: { projectId: 'demo-test' },
 }));
 const mockVerifyToken = vi.fn();
-describe('SSRの認証境界', () => {
+
+const signedOut = {
+  userId: null,
+  idToken: null,
+  iconImageUrl: null,
+  displayedName: null,
+};
+
+// 1件のHTML要求について、サーバーの認証からSSRのストア初期化までを通す
+async function renderInitialUser(authorization, path = '/home') {
+  const req = { headers: authorization ? { authorization } : {} };
+  const event = { path, node: { req, res: {} }, context: {} };
+  await ssrAuthentication(event);
+  useRequestEvent.mockReturnValue(event);
+  const { provide } = await storePlugin({ $pinia: createPinia() });
+  return provide.accessor.firebaseAuthorization.userInfoComputed;
+}
+
+describe('SSRの初期表示の認証', () => {
   beforeEach(() => {
     mockVerifyToken.mockReset();
+    mockVerifyToken.mockImplementation((token) =>
+      token === 'test-token'
+        ? Promise.resolve({
+            uid: 'user-a',
+            name: '表示名',
+            picture: 'https://example.invalid/user-a.png',
+            email: 'test@example.invalid',
+            email_verified: true,
+          })
+        : Promise.reject(new Error('invalid token')),
+    );
   });
-  test.each([undefined, '', 'raw-token'])(
-    'Bearerなしの要求 %s は未認証として続行する',
+  afterEach(() => {
+    useRequestEvent.mockReset();
+  });
+
+  test('Bearerで送られた検証済みのIDトークンのユーザーで初期表示する', async () => {
+    expect(await renderInitialUser('Bearer test-token')).toEqual({
+      userId: 'user-a',
+      idToken: 'test-token',
+      iconImageUrl: 'https://example.invalid/user-a.png',
+      displayedName: '表示名',
+    });
+  });
+
+  test.each([undefined, '', 'test-token', 'Bearer invalid'])(
+    '認証ヘッダー %s の要求は未ログインとして初期表示する',
     async (authorization) => {
-      const res = {};
-      const next = vi.fn();
-      await middleware({ headers: { authorization } }, res, next);
-      expect(mockVerifyToken).not.toHaveBeenCalled();
-      expect(res.locals).toBeUndefined();
-      expect(next).toHaveBeenCalledTimes(1);
+      expect(await renderInitialUser(authorization)).toEqual(signedOut);
     },
   );
-  test('検証されたIDトークンだけをSSRストアへ渡す', async () => {
-    const claims = {
-      uid: 'user-a',
-      name: '表示名',
-      email: 'test@example.invalid',
-      email_verified: true,
-    };
-    mockVerifyToken.mockResolvedValue(claims);
-    const res = { locals: { existing: true } };
-    const next = vi.fn();
-    await middleware(
-      { headers: { authorization: 'Bearer test-token' } },
-      res,
-      next,
-    );
-    expect(mockVerifyToken).toHaveBeenCalledWith('test-token');
-    expect(res.locals.existing).toBe(true);
-    expect(res.locals.user).toEqual({
-      uid: 'user-a',
-      displayName: '表示名',
-      email: 'test@example.invalid',
-      emailVerified: true,
-      allClaims: claims,
-      idToken: 'test-token',
-    });
-    expect(next).toHaveBeenCalledTimes(1);
+
+  test('UIDのない検証結果をログイン済みにしない', async () => {
+    mockVerifyToken.mockResolvedValue({});
+    expect(await renderInitialUser('Bearer test-token')).toEqual(signedOut);
   });
-  test('検証失敗やUID欠落を認証済みにしない', async () => {
-    for (const valid of [false, true]) {
-      if (valid) {
-        mockVerifyToken.mockResolvedValue({});
-      } else {
-        mockVerifyToken.mockRejectedValue(new Error('invalid'));
-      }
-      const res = {};
-      const next = vi.fn();
-      await middleware(
-        { headers: { authorization: 'Bearer invalid' } },
-        res,
-        next,
-      );
-      expect(res.locals).toBeUndefined();
-      expect(next).toHaveBeenCalledTimes(1);
-    }
-  });
-  test('別リクエストへ認証情報を引き継がない', async () => {
-    mockVerifyToken.mockResolvedValue({ uid: 'first' });
-    const first = {};
-    const second = {};
-    await middleware(
-      { headers: { authorization: 'Bearer first' } },
-      first,
-      () => {},
+
+  test('前の要求のユーザーを次の要求の初期表示に引き継がない', async () => {
+    expect((await renderInitialUser('Bearer test-token')).userId).toBe(
+      'user-a',
     );
-    await middleware({ headers: {} }, second, () => {});
-    expect(first.locals.user.uid).toBe('first');
-    expect(second.locals).toBeUndefined();
+    expect(await renderInitialUser(undefined)).toEqual(signedOut);
   });
 });

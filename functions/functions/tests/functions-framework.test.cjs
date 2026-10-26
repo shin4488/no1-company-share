@@ -73,7 +73,8 @@ for (const outcome of ['success', 'reject', 'missing-secret']) {
     });
     const body = await response.text();
     assert.equal(response.status, outcome === 'success' ? 204 : 500, body);
-    assert.equal((output.match(/FRAMEWORK_TEST_API_CALL/g) || []).length, outcome === 'missing-secret' ? 0 : 1);
+    const apiCalls = [...output.matchAll(/FRAMEWORK_TEST_API_CALL (.+)/g)].map((match) => JSON.parse(match[1]));
+    assert.deepEqual(apiCalls, outcome === 'missing-secret' ? [] : [{method: 'put', url: 'https://f1c.biz/api/v1/companies/', hasToken: true}]);
     if (outcome === 'success') {
       assert.match(output, /FRAMEWORK_TEST_API_FINISHED/);
     }
