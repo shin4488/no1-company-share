@@ -1,15 +1,16 @@
+import { createPinia } from 'pinia';
 import plugin from '../plugins/03.firebase.client';
 import { showError } from '#app';
+import { useFirebaseAuthorizationStore } from '../store/firebaseAuthorization';
 
 let mockAuthListener;
 let mockAuthError;
-const mockAuth = { currentUser: null };
 vi.mock('firebase/app', () => ({
   getApps: () => ['app'],
   initializeApp: vi.fn(),
 }));
 vi.mock('firebase/auth', () => ({
-  getAuth: () => mockAuth,
+  getAuth: () => ({ currentUser: null }),
   onAuthStateChanged: (_auth, listener, onError) => {
     mockAuthListener = listener;
     mockAuthError = onError;
@@ -20,28 +21,27 @@ vi.mock('@c/firebaseConfig', () => ({
   firebaseConfig: { projectId: 'demo-test' },
 }));
 
-const user = (uid) => ({
-  uid,
-  photoURL: `/${uid}.png`,
-  displayName: uid,
-  getIdTokenResult: vi.fn().mockResolvedValue({ token: `${uid}-token` }),
-});
+const user = (uid) => {
+  const token = Promise.resolve(`${uid}-token`);
+  return {
+    uid,
+    photoURL: `/${uid}.png`,
+    displayName: uid,
+    getIdToken: () => token,
+    getIdTokenResult: async () => ({ token: await token }),
+  };
+};
 
 function start() {
-  const dispatch = vi.fn().mockResolvedValue(undefined);
+  const store = useFirebaseAuthorizationStore(createPinia());
   const hooks = {};
-  const authorization = { onAuthStateChangedAction: dispatch };
-  const result = plugin({
-    $accessor: { firebaseAuthorization: authorization },
+  plugin({
+    $accessor: { firebaseAuthorization: store },
     hook: (name, callback) => {
       hooks[name] = callback;
     },
   });
-  expect(result.provide.fire.auth).toBe(mockAuth);
-  expect(authorization.$fire).toBe(result.provide.fire);
-  expect(mockAuthListener).toBeUndefined();
-  hooks['app:mounted']();
-  return { dispatch };
+  return { store, mount: () => hooks['app:mounted']() };
 }
 
 beforeEach(() => {
@@ -50,43 +50,16 @@ beforeEach(() => {
   showError.mockClear();
 });
 
-test('描画後にFirebase認証を購読しトークンを一度だけ取得する', async () => {
-  const { dispatch } = start();
-  const account = user('member');
-  await mockAuthListener(account);
-  expect(account.getIdTokenResult).toHaveBeenCalledWith(true);
-  expect(dispatch).toHaveBeenCalledWith({
-    authUser: {
-      uid: 'member',
-      idToken: 'member-token',
-      photoURL: '/member.png',
-      displayName: 'member',
-    },
-  });
-  await mockAuthListener(null);
-  expect(dispatch).toHaveBeenLastCalledWith({ authUser: null });
-});
-
-test('古い認証結果が後で届いても新しいユーザーを上書きしない', async () => {
-  const { dispatch } = start();
-  const first = user('first');
-  let finish;
-  first.getIdTokenResult.mockImplementation(
-    () =>
-      new Promise((resolve) => {
-        finish = resolve;
-      }),
-  );
-  const pending = mockAuthListener(first);
-  await mockAuthListener(user('second'));
-  finish({ token: 'first-token' });
-  await pending;
-  expect(dispatch).toHaveBeenCalledTimes(1);
-  expect(dispatch.mock.calls[0][0].authUser.uid).toBe('second');
+test('Nuxtアプリの描画後にFirebase認証の購読を始める', async () => {
+  const { store, mount } = start();
+  expect(mockAuthListener).toBeUndefined();
+  mount();
+  await mockAuthListener(user('member'));
+  expect(store.userIdComputed).toBe('member');
 });
 
 test('認証状態を確認できないときはエラーを表示する', () => {
-  start();
+  start().mount();
   mockAuthError(new Error('offline'));
   expect(showError).toHaveBeenCalledWith(
     expect.objectContaining({ statusCode: 503 }),

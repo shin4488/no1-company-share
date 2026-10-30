@@ -17,12 +17,13 @@ vi.mock('firebase/auth', () => ({
 vi.mock('firebase/analytics', () => ({ getAnalytics: vi.fn() }));
 vi.mock('@c/firebaseConfig', () => ({ firebaseConfig: {} }));
 
-const user = (uid) => ({
+// IDトークンは、どちらの取得方法でも同じ値が同じ時点で届く
+const user = (uid, token = Promise.resolve(`${uid}-token`)) => ({
   uid,
   photoURL: `/${uid}.png`,
   displayName: `User ${uid}`,
-  getIdTokenResult: vi.fn().mockResolvedValue({ token: `${uid}-token` }),
-  getIdToken: vi.fn().mockRejectedValue(new Error('unexpected second fetch')),
+  getIdToken: () => token,
+  getIdTokenResult: async () => ({ token: await token }),
 });
 
 function start() {
@@ -45,17 +46,15 @@ beforeEach(() => {
 
 test('認証ストアにトークンとプロフィールを反映し、ログアウトで消去する', async () => {
   const store = start();
-  const account = user('member');
-  await mockListener(account);
-  expect(store.$state).toEqual({
+  await mockListener(user('member'));
+  expect(store.userInfoComputed).toEqual({
     userId: 'member',
     idToken: 'member-token',
     iconImageUrl: '/member.png',
     displayedName: 'User member',
   });
-  expect(account.getIdToken).not.toHaveBeenCalled();
   await mockListener(null);
-  expect(store.$state).toEqual({
+  expect(store.userInfoComputed).toEqual({
     userId: null,
     idToken: null,
     iconImageUrl: null,
@@ -65,17 +64,13 @@ test('認証ストアにトークンとプロフィールを反映し、ログ�
 
 test('遅い前ユーザーの同期は現在のユーザーを上書きしない', async () => {
   const store = start();
-  const first = user('first');
   let finish;
-  first.getIdTokenResult.mockImplementation(
-    () =>
-      new Promise((resolve) => {
-        finish = resolve;
-      }),
-  );
-  const pending = mockListener(first);
+  const firstToken = new Promise((resolve) => {
+    finish = resolve;
+  });
+  const pending = mockListener(user('first', firstToken));
   await mockListener(user('second'));
-  finish({ token: 'first-token' });
+  finish('first-token');
   await pending;
   expect(store.userId).toBe('second');
   expect(store.idToken).toBe('second-token');

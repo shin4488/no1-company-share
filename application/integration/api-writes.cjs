@@ -49,8 +49,11 @@ const { initializeApp } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 initializeApp({ projectId: 'demo-local-write-test' });
 // Only identity verification and gBizINFO are replaced; routes, DI, validation, services and SQL are real.
+// fixture-unregistered is a valid identity without a user_master row.
 getAuth().verifyIdToken = (token) => {
-  if (!['fixture-owner', 'fixture-other'].includes(token)) {
+  if (
+    !['fixture-owner', 'fixture-other', 'fixture-unregistered'].includes(token)
+  ) {
     return Promise.reject(new Error('invalid test identity'));
   }
   return Promise.resolve({ uid: token });
@@ -354,22 +357,33 @@ let count = 0;
       .rows[0].is_deleted,
     true,
   );
-  // Force a failure after SQL starts, then verify rollback through a separate connection.
-  const handler = appContainer.get(types.SequelizeHandler);
-  await assert.rejects(
-    handler.transact(async (transaction) => {
-      await handler.sequelize.query(
-        "INSERT INTO user_master(id) VALUES ('fixture-rollback')",
-        { transaction },
-      );
-      throw new Error('rollback probe');
-    }),
-    /rollback probe/,
+  // A post saves its company first. Without a user row, saving the post itself then fails,
+  // so the API must roll back the company as well. Check through a separate connection.
+  const rollbackCompany = '9000000000005';
+  assert.equal(
+    (
+      await send(
+        'POST',
+        '/shared-posts/',
+        { posts: [{ ...seed, companyNumber: rollbackCompany }] },
+        'fixture-unregistered',
+      )
+    ).status,
+    500,
   );
   assert.equal(
     (
       await db.query(
-        "SELECT count(*)::int n FROM user_master WHERE id='fixture-rollback'",
+        'SELECT count(*)::int n FROM company_master WHERE company_number=$1',
+        [rollbackCompany],
+      )
+    ).rows[0].n,
+    0,
+  );
+  assert.equal(
+    (
+      await db.query(
+        "SELECT count(*)::int n FROM shared_post WHERE user_id='fixture-unregistered'",
       )
     ).rows[0].n,
     0,

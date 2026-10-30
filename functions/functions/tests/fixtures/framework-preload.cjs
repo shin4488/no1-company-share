@@ -1,18 +1,26 @@
-const assert = require('node:assert/strict');
 const axios = require('axios');
 
 // The real Functions Framework loads this stub before loading the deployed entry point.
-// All company updates stay in this process; no external API is called.
-axios.put = async (url, body, options) => {
-  assert.equal(url, 'https://f1c.biz/api/v1/companies/');
-  assert.equal(body, undefined);
-  assert.equal(options.headers['X-Company-Update-Token'], 'framework-test-secret');
-  assert.equal(options.timeout, 45000);
-  console.log('FRAMEWORK_TEST_API_CALL');
+// Requests stop at the Axios adapter, so no external API is called.
+axios.defaults.adapter = async (config) => {
+  const request = {
+    method: config.method,
+    url: config.url,
+    hasToken:
+      config.headers.get('X-Company-Update-Token') === 'framework-test-secret',
+  };
+  console.log(`FRAMEWORK_TEST_API_CALL ${JSON.stringify(request)}`);
   if (process.env.FRAMEWORK_TEST_OUTCOME === 'reject') {
-    throw new Error('framework-test-secret must not appear in the response or logs');
+    // Axios errors keep the sent headers, including the secret.
+    throw new axios.AxiosError(
+      'Request failed with status code 503',
+      axios.AxiosError.ERR_BAD_RESPONSE,
+      config,
+      null,
+      { status: 503, data: '', headers: {}, config },
+    );
   }
   await new Promise((resolve) => setTimeout(resolve, 50));
   console.log('FRAMEWORK_TEST_API_FINISHED');
-  return {status: 200};
+  return { status: 200, data: '', headers: {}, config };
 };

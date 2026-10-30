@@ -24,8 +24,8 @@ const stubs = Object.fromEntries(
   ].map((name) => [name, passthrough]),
 );
 stubs['v-list-item'] = {
-  props: ['title'],
-  template: '<div>{{ title }}<slot /></div>',
+  props: ['title', 'to'],
+  template: '<a :href="to">{{ title }}</a>',
 };
 stubs['v-img'] = { props: ['src'], template: '<img :src="src" />' };
 stubs['v-app-bar-nav-icon'] = { template: '<button />' };
@@ -57,6 +57,17 @@ function mountLayout(userId, iconImageUrl, currentPath = '/home') {
   return { wrapper, state, replace };
 }
 
+// サイドバーに表示されるメニューの名前
+const menu = (wrapper) => wrapper.findAll('a').map((link) => link.text());
+const signedOutMenu = ['ホーム', 'ログイン', '使い方'];
+const signedInMenu = [
+  'ホーム',
+  'お気に入り',
+  'マイ投稿',
+  'ログアウト',
+  '使い方',
+];
+
 beforeEach(() => {
   refreshNuxtData.mockClear();
 });
@@ -72,21 +83,16 @@ test('SSRからの画像とログイン後の画像更新を表示する', async
 
 test('認証状態の変化に応じてメニューと投稿を更新する', async () => {
   const { wrapper, state } = mountLayout(null, null);
-  expect(wrapper.vm.sideBarItems.map((item) => item.title)).toContain(
-    'ログイン',
-  );
+  await nextTick();
+  expect(menu(wrapper)).toEqual(signedOutMenu);
   state.userId = 'browser-user';
   state.iconImageUrl = '/avatar.png';
   await nextTick();
-  expect(wrapper.vm.sideBarItems.map((item) => item.title)).toContain(
-    'ログアウト',
-  );
+  expect(menu(wrapper)).toEqual(signedInMenu);
   expect(refreshNuxtData).toHaveBeenCalledTimes(1);
   state.userId = null;
   await nextTick();
-  expect(wrapper.vm.sideBarItems.map((item) => item.title)).toContain(
-    'ログイン',
-  );
+  expect(menu(wrapper)).toEqual(signedOutMenu);
   expect(refreshNuxtData).toHaveBeenCalledTimes(2);
   wrapper.unmount();
 });
