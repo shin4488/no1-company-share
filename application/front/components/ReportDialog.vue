@@ -4,7 +4,7 @@
       <v-card-text>
         <v-row>
           <v-col class="mt-3">
-            <div>通報した投稿は全ユーザに対して表示されなくなります。</div>
+            <div>通報した投稿は、すべてのユーザーに表示されなくなります。</div>
           </v-col>
         </v-row>
         <v-row density="compact">
