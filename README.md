@@ -28,7 +28,7 @@ flowchart LR
 | 対象 | 技術 |
 | --- | --- |
 | 画面・API | Nuxt 4（Vue 3、Vuetify 4）、Express、TypeScript、Node.js 24 |
-| 定期処理 | Firebase Functions（Node.js 22） |
+| 定期処理 | Firebase Functions（第2世代、Node.js 24） |
 | 認証 | Firebase Authentication |
 | データベース | PostgreSQL（Sequelize） |
 | 開発・インフラ | Docker、Docker Compose、Nginx |
