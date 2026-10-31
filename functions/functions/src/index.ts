@@ -1,13 +1,19 @@
-import * as functions from 'firebase-functions/v1';
+import {logger} from 'firebase-functions';
+import {defineSecret} from 'firebase-functions/params';
+import {onSchedule} from 'firebase-functions/v2/scheduler';
 import axios, {isAxiosError} from 'axios';
 
-const scheduledCompanyMasterUpdate = functions
-  .runWith({secrets: ['COMPANY_UPDATE_SECRET'], timeoutSeconds: 120})
-  .pubsub
-  .schedule('0 0 * * *')
-  .timeZone('Asia/Tokyo')
-  .onRun(async () => {
-    const secret = process.env.COMPANY_UPDATE_SECRET;
+const companyUpdateSecret = defineSecret('COMPANY_UPDATE_SECRET');
+
+const scheduledCompanyMasterUpdate = onSchedule(
+  {
+    schedule: '0 0 * * *',
+    timeZone: 'Asia/Tokyo',
+    secrets: [companyUpdateSecret],
+    timeoutSeconds: 120,
+  },
+  async () => {
+    const secret = companyUpdateSecret.value();
     if (!secret) {
       throw new Error('Company update secret is unavailable');
     }
@@ -17,16 +23,17 @@ const scheduledCompanyMasterUpdate = functions
         undefined,
         {headers: {'X-Company-Update-Token': secret}, timeout: 45000},
       );
-      functions.logger.info('Company image update completed', {
+      logger.info('Company image update completed', {
         status: httpResponse.status,
       });
     } catch (error) {
       // Axiosの例外には認証ヘッダーが含まれ得るため、そのままログに出さない。
       const status = isAxiosError(error) ? error.response?.status : undefined;
-      functions.logger.error('Company image update failed', {status});
+      logger.error('Company image update failed', {status});
       // eslint-disable-next-line preserve-caught-error -- 認証ヘッダーを含み得るAxiosの例外をcauseとして記録させない
       throw new Error('Company image update failed');
     }
-  });
+  },
+);
 
 export { scheduledCompanyMasterUpdate };

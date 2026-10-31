@@ -69,9 +69,9 @@ function useSecret(t, secret) {
   }
 }
 
-test('毎日日本時間0時に実行する第1世代の関数として、秘密を渡して配備する', (t) => {
+test('毎日日本時間0時に実行する第2世代の関数として、秘密を渡して配備する', (t) => {
   const endpoint = deployedEndpoint(t);
-  assert.equal(endpoint.platform, 'gcfv1');
+  assert.equal(endpoint.platform, 'gcfv2');
   assert.equal(endpoint.scheduleTrigger.schedule, '0 0 * * *');
   assert.equal(endpoint.scheduleTrigger.timeZone, 'Asia/Tokyo');
   assert.deepEqual(
