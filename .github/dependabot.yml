@@ -22,6 +22,10 @@ updates:
       - dependency-name: "@types/node"
         update-types:
           - version-update:semver-major
+      # Nuxt 4のサーバー（Nitro 2）はh3 1系のイベントでハンドラーを呼ぶため、h3のメジャー版はNuxtのメジャー版と合わせて上げる
+      - dependency-name: h3
+        update-types:
+          - version-update:semver-major
 
   - package-ecosystem: docker
     directories:
