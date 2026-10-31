@@ -48,7 +48,7 @@
             <v-icon
               :disabled="disabledToDeleteDetail"
               color="error"
-              title="1位内容の削除"
+              title="No.1の内容を削除"
               @click="onClickedNo1ContentDeleteButton(index)"
             >
               mdi-delete
@@ -79,7 +79,7 @@
         <v-row class="align-start" density="compact">
           <v-col cols="2" offset="2" sm="1" offset-sm="1">
             <v-icon
-              title="1位内容の追加"
+              title="No.1の内容を追加"
               color="primary"
               @click="onClickedNo1ContentAddButton"
             >
