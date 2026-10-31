@@ -17,7 +17,7 @@ yarn start
 
 `yarn start` loads an existing `.env` and runs the Nitro server built in `.output/`. To run the real API write tests, set `NO1_TEST_DATABASE_URL` to a dedicated local PostgreSQL database whose name starts with `codex_no1_`, then run `yarn test:integration`. These tests write to that database. Do not point them at production or a shared development database.
 
-The Firebase authentication tests use local fixtures. The service worker passes the current Firebase ID token with same-origin HTML navigation; the server verifies it before initial rendering. The client waits until the Nuxt app is mounted before subscribing to Firebase authentication changes. Only the latest authentication notification may update the store. After a user changes, personalized lists refresh and signed-out users return from bookmark and my-post pages to home.
+The Firebase authentication tests use local fixtures. The service worker adds the current Firebase ID token to same-origin page navigations, and the server verifies it before the first render. The client subscribes to Firebase authentication changes only after the Nuxt app is mounted, and only the latest notification may update the store. When the signed-in user changes, the post lists reload, and a user who signs out on the bookmark or my-post page returns to home.
 
 ## Development TLS dependency
 
