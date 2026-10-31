@@ -15,7 +15,7 @@ async function freePort() {
 }
 
 for (const outcome of ['success', 'reject', 'missing-secret']) {
-  test(`実際のFunctions Frameworkで第1世代Pub/Subイベントを処理する: ${outcome}`, async (t) => {
+  test(`実際のFunctions FrameworkでCloud Schedulerからの呼び出しを処理する: ${outcome}`, async (t) => {
     const port = await freePort();
     const env = {
       ...process.env,
@@ -30,7 +30,7 @@ for (const outcome of ['success', 'reject', 'missing-secret']) {
     const child = spawn(process.execPath, [
       '--require', path.join(__dirname, 'fixtures/framework-preload.cjs'),
       path.join(path.dirname(require.resolve('@google-cloud/functions-framework')), 'main.js'),
-      '--target=scheduledCompanyMasterUpdate', '--signature-type=event', `--port=${port}`,
+      '--target=scheduledCompanyMasterUpdate', '--signature-type=http', `--port=${port}`,
     ], {cwd: path.join(__dirname, '..'), env, stdio: ['ignore', 'pipe', 'pipe']});
     let output = '';
     child.stdout.on('data', (data) => { output += data; });
@@ -57,22 +57,17 @@ for (const outcome of ['success', 'reject', 'missing-secret']) {
         reject(new Error(`Framework exited before serving: ${output}`));
       });
     });
+    // Cloud Schedulerと同じく、ジョブ名と予定時刻のヘッダーを付けてPOSTする
     const response = await fetch(`http://127.0.0.1:${port}/`, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        data: {data: '', attributes: {}},
-        context: {
-          eventId: 'local-test-event',
-          timestamp: '2026-10-02T00:00:00.000Z',
-          eventType: 'google.pubsub.topic.publish',
-          resource: {name: 'projects/demo-scheduled-update/topics/local-test'},
-        },
-      }),
+      headers: {
+        'X-CloudScheduler-JobName': 'firebase-schedule-scheduledCompanyMasterUpdate-us-central1',
+        'X-CloudScheduler-ScheduleTime': '2026-10-01T15:00:00Z',
+      },
       signal: AbortSignal.timeout(10000),
     });
     const body = await response.text();
-    assert.equal(response.status, outcome === 'success' ? 204 : 500, body);
+    assert.equal(response.status, outcome === 'success' ? 200 : 500, body);
     const apiCalls = [...output.matchAll(/FRAMEWORK_TEST_API_CALL (.+)/g)].map((match) => JSON.parse(match[1]));
     assert.deepEqual(apiCalls, outcome === 'missing-secret' ? [] : [{method: 'put', url: 'https://f1c.biz/api/v1/companies/', hasToken: true}]);
     if (outcome === 'success') {
