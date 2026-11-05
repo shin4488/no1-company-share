@@ -21,9 +21,9 @@
     "@mdi/font": "7.4.47",
     "@pinia/nuxt": "1.0.3",
     "@vite-pwa/nuxt": "1.1.1",
-    "axios": "1.20.0",
+    "axios": "1.21.0",
     "express": "5.3.0",
-    "express-rate-limit": "8.7.1",
+    "express-rate-limit": "8.7.2",
     "express-validator": "7.3.2",
     "firebase": "13.1.0",
     "firebase-admin": "14.5.0",
@@ -41,7 +41,7 @@
     "reflect-metadata": "0.2.2",
     "sequelize": "^6.19.0",
     "vue": "3.5.44",
-    "vuetify": "4.3.0",
+    "vuetify": "4.3.1",
     "vuetify-nuxt-module": "1.0.0-rc.6"
   },
   "devDependencies": {
@@ -59,10 +59,10 @@
     "eslint-plugin-promise": "7.3.0",
     "globals": "17.13.0",
     "prettier": "3.9.10",
-    "sass-embedded": "^1.106.1",
+    "sass-embedded": "^1.107.0",
     "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "5.0.5",
-    "vue-tsc": "3.3.13"
+    "vue-tsc": "3.3.14"
   },
   "engines": {
     "node": "24.x"
