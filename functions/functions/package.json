@@ -17,7 +17,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "@google-cloud/functions-framework": "5.0.5",
-    "axios": "1.20.0",
+    "axios": "1.21.0",
     "firebase-admin": "14.5.0",
     "firebase-functions": "7.4.0"
   },
@@ -31,7 +31,7 @@
     "globals": "17.13.0",
     "prettier": "3.9.10",
     "typescript": "npm:@typescript/typescript6@6.0.2",
-    "typescript-eslint": "8.72.0"
+    "typescript-eslint": "8.72.1"
   },
   "private": true,
   "overrides": {
