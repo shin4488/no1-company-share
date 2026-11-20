@@ -1,4 +1,4 @@
-FROM node:24.22.1-bookworm@sha256:d862bb5d082c5ae0210ac07e8c0344cb8cf7bef6d78e9b8c50c179da923108ea
+FROM node:24.22.3-bookworm@sha256:9d266751ca3d7fdbe651c878ffd5ad0a42fed49a18c283509267c97f025b7496
 
 # コンテナ間通信時は、コンテナ内部で使用されるポートを指定
 # postgreSQLはデフォルトで5432ポートを使用
