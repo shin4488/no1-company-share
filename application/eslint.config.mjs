@@ -34,6 +34,12 @@ export default createConfigForNuxt({
       },
     },
   },
+  {
+    files: ['front/service-worker/sw.js'],
+    languageOptions: {
+      globals: globals.serviceworker,
+    },
+  },
   prettier,
   {
     plugins: { n, promise },

@@ -89,9 +89,11 @@ export default defineNuxtConfig({
       display: 'standalone',
       theme_color: '#6D9EEB',
     },
-    workbox: {
-      importScripts: ['/firebase-auth-sw.js'],
-      navigateFallback: null,
+    strategies: 'buildSW',
+    buildSW: {
+      swSrc: 'front/service-worker/sw.js',
+      // プリキャッシュは、モジュールが加えるビルド情報とWebマニフェストだけにする
+      globPatterns: [],
     },
   },
 });
